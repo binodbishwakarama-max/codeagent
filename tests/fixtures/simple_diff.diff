@@ -1,0 +1,13 @@
+diff --git a/src/main.py b/src/main.py
+index abc1234..def5678 100644
+--- a/src/main.py
++++ b/src/main.py
+@@ -1,7 +1,9 @@
+ import os
+-import json
++import json  # added
+ 
+ def main():
+-    pass
++    print("hello")
++    print("world")

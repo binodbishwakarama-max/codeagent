@@ -1,0 +1,10 @@
+diff --git a/src/no_newline.py b/src/no_newline.py
+index abc1234..def5678 100644
+--- a/src/no_newline.py
++++ b/src/no_newline.py
+@@ -1,4 +1,4 @@
+ def func():
+-    return "old"
+\ No newline at end of file
++    return "new"
+\ No newline at end of file
