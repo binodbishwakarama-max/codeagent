@@ -1,0 +1,63 @@
+# Prism Review - Default Engineering Standards
+# Used when .prism/standards.yml is not present in the target repository.
+
+standards:
+  - id: "SEC-001"
+    title: "No Hardcoded Secrets or Credentials"
+    description: "Never hardcode passwords, API keys, private certificates, or access tokens in source code. Retrieve sensitive credentials exclusively from validated environment variables or external secret stores."
+    good_example: "api_key = os.environ.get('STRIPE_API_KEY')\nif not api_key:\n    raise ConfigError('Missing STRIPE_API_KEY')"
+    bad_example: "stripe_client = stripe.Client(api_key='sk_live_9384729183748293')"
+
+  - id: "SEC-002"
+    title: "Parameterized SQL Queries"
+    description: "Always use parameterized queries, prepared statements, or ORM parameter binding when assembling SQL or database queries. Never interpolate or concatenate untrusted user input into query strings."
+    good_example: "cursor.execute('SELECT id, email FROM accounts WHERE org_id = %s', (org_id,))"
+    bad_example: "cursor.execute(f'SELECT id, email FROM accounts WHERE org_id = {org_id}')"
+
+  - id: "ERR-001"
+    title: "Explicit Exception Handling"
+    description: "Never use bare except clauses (e.g. 'except:') or catch generic exceptions (like 'except Exception:') without re-raising or detailed logging. Catch specific exception types."
+    good_example: "try:\n    payload = json.loads(raw_data)\nexcept json.JSONDecodeError as exc:\n    logger.warning('Malformed JSON received: %s', exc)\n    raise BadRequest('Invalid payload') from exc"
+    bad_example: "try:\n    payload = json.loads(raw_data)\nexcept:\n    pass"
+
+  - id: "ERR-002"
+    title: "Deterministic Resource Cleanup"
+    description: "Use context managers ('with' or 'async with') or try-finally blocks when allocating I/O handles, database connections, sockets, and temporary files to prevent resource leaks under failure."
+    good_example: "with open(report_path, 'w', encoding='utf-8') as f:\n    f.write(report_data)"
+    bad_example: "f = open(report_path, 'w')\nf.write(report_data)\nf.close()"
+
+  - id: "PERF-001"
+    title: "N+1 Query Prevention"
+    description: "Avoid issuing database queries or network requests inside loops. Prefer batch fetching, preloading, or bulk queries (e.g. IN clauses or JOINs) before iterating."
+    good_example: "user_ids = [item.user_id for item in items]\nusers = fetch_users_by_ids(user_ids)"
+    bad_example: "for item in items:\n    user = db.query(User).filter_by(id=item.user_id).first()"
+
+  - id: "PERF-002"
+    title: "Bounded Collections and Pagination"
+    description: "Always specify limits and pagination offsets when querying unbounded lists, logs, or database tables to guard against memory exhaustion and high database load."
+    good_example: "query = session.query(AuditLog).filter_by(org_id=org_id).order_by(AuditLog.created_at.desc()).limit(100)"
+    bad_example: "logs = session.query(AuditLog).filter_by(org_id=org_id).all()"
+
+  - id: "TEST-001"
+    title: "Deterministic Tests Without Live Network Access"
+    description: "Unit and integration tests must not make un-mocked external network calls. Use fixtures, mocking libraries (e.g., respx, unittest.mock), or local emulators."
+    good_example: "@respx.mock\ndef test_payment_webhook(respx_mock):\n    respx_mock.post('https://api.stripe.com/v1/charges').respond(200, json={'id': 'ch_123'})"
+    bad_example: "def test_payment():\n    resp = requests.post('https://api.stripe.com/v1/charges')\n    assert resp.status_code == 200"
+
+  - id: "READ-001"
+    title: "Explicit Function Type Signatures"
+    description: "All public functions, methods, and API handlers must declare complete parameter types and return type annotations. Avoid untyped Any or missing return signatures."
+    good_example: "def calculate_discount(price: float, rate: float) -> float:\n    return price * (1.0 - rate)"
+    bad_example: "def calculate_discount(price, rate):\n    return price * (1.0 - rate)"
+
+  - id: "READ-002"
+    title: "Defensive Public Input Validation"
+    description: "Validate public inputs, request payloads, and webhook headers immediately at service boundaries using strict schemas (e.g. Pydantic) before executing business logic."
+    good_example: "class CreateUserRequest(BaseModel):\n    email: EmailStr\n    age: int = Field(ge=18, le=120)"
+    bad_example: "def create_user(data: dict):\n    email = data['email']"
+
+  - id: "ASYNC-001"
+    title: "No Blocking Calls in Asynchronous Contexts"
+    description: "Do not execute synchronous, blocking I/O operations (e.g. requests.get, time.sleep, blocking disk reads) inside async functions. Use async equivalents or offload to thread pools."
+    good_example: "async def fetch_status(client: httpx.AsyncClient) -> int:\n    response = await client.get('https://service/health')\n    return response.status_code"
+    bad_example: "async def fetch_status() -> int:\n    response = requests.get('https://service/health')\n    return response.status_code"
