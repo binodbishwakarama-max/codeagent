@@ -1,0 +1,36 @@
+# A2: + Retrieval (vector only)
+name: A2_retrieval_vector
+version: "1.0.0"
+
+dataset:
+  path: "data/final"
+
+pipeline:
+  model: "gpt-4o-mini"
+  timeout_seconds: 30.0
+  max_concurrency: 5
+  confidence_threshold: 0.6
+  max_comments_per_pr: 10
+  seed: 42
+  prompt_variant: "standard"
+  retrieval_enabled: true
+  retrieval_mode: "vector"
+  reranker_enabled: false
+  retrieval_top_k: 6
+  self_verification_enabled: false
+
+matcher:
+  line_tolerance: 3
+  strategy: "both"
+  semantic_judge_model: "gpt-4o-mini"
+  embedding_threshold: 0.75
+  cache_dir: ".cache/matcher"
+
+bootstrap:
+  n_resamples: 1000
+  confidence_level: 0.95
+  seed: 42
+
+baseline:
+  random_findings_per_pr: 3
+  random_seed: 42

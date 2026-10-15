@@ -1,0 +1,3356 @@
+{
+  "name": "main-baseline",
+  "git_sha": "unknown",
+  "timestamp": "2026-10-18T05:32:41.168568+00:00",
+  "config_name": "regression-gate",
+  "split": "dev",
+  "sample_limit": 40,
+  "total_prs": 40,
+  "metrics": {
+    "f1": 0.855,
+    "precision": 0.7467,
+    "recall": 1.0,
+    "false_positive_rate": 0.3636,
+    "comments_per_pr": 1.875,
+    "actionability": 1.0,
+    "severity_weighted_recall": 1.0,
+    "cost_per_review": 0.00101,
+    "latency_p50": 4.01,
+    "latency_p95": 17.05
+  },
+  "confidence_intervals": {
+    "precision": {
+      "value": 0.7467,
+      "lower": 0.6849,
+      "upper": 0.8108,
+      "n_resamples": 1000
+    },
+    "recall": {
+      "value": 1.0,
+      "lower": 1.0,
+      "upper": 1.0,
+      "n_resamples": 1000
+    },
+    "f1": {
+      "value": 0.855,
+      "lower": 0.813,
+      "upper": 0.8955,
+      "n_resamples": 1000
+    },
+    "false_positive_rate": {
+      "value": 0.3636,
+      "lower": 0.1,
+      "upper": 0.6667,
+      "n_resamples": 1000
+    },
+    "comments_per_pr": {
+      "value": 1.875,
+      "lower": 1.45,
+      "upper": 2.35,
+      "n_resamples": 1000
+    },
+    "actionability": {
+      "value": 1.0,
+      "lower": 1.0,
+      "upper": 1.0,
+      "n_resamples": 1000
+    },
+    "severity_weighted_recall": {
+      "value": 1.0,
+      "lower": 1.0,
+      "upper": 1.0,
+      "n_resamples": 1000
+    },
+    "cost_per_review": {
+      "value": 0.001,
+      "lower": 0.0009,
+      "upper": 0.0011,
+      "n_resamples": 1000
+    },
+    "latency_p50": {
+      "value": 4.01,
+      "lower": 1.67,
+      "upper": 15.76,
+      "n_resamples": 1000
+    }
+  },
+  "predictions": [
+    {
+      "cost_usd": 0.000783,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 47,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_2",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 197,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 1.84,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 47,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 47,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 64,
+      "pr_id": "0570f425ed192b79",
+      "pr_number": 156,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 47,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.000657,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "testing",
+          "description": "Fix testing issue: Missing unit test coverage for the 404 handler when route parameters are malform...",
+          "line": 89,
+          "path": "src/router.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 155,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.7894,
+          "gold_category": "testing",
+          "gold_line": 89,
+          "gold_path": "src/router.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "testing",
+          "predicted_line": 88,
+          "predicted_path": "src/router.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 64,
+      "pr_id": "0646fc6245b2b80f",
+      "pr_number": 200,
+      "predictions": [
+        {
+          "category": "TESTING",
+          "confidence": 0.82,
+          "line": 88,
+          "message": "Missing unit test coverage for the 404 handler when route parameters are malformed.",
+          "path": "src/router.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def test_route_404(): ..."
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.000552,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 25,
+      "pr_id": "074b7f71c15bf6a9",
+      "pr_number": 105,
+      "predictions": [],
+      "repo": "tiangolo/fastapi",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.000522,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [],
+      "input_tokens": 149,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 25,
+      "pr_id": "0a86b2b15e3e1b58",
+      "pr_number": 107,
+      "predictions": [],
+      "repo": "tiangolo/fastapi",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.001935,
+      "fn": 0,
+      "fp": 2,
+      "gold_findings": [
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 105,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 82,
+          "path": "src/client.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "performance",
+          "description": "Fix performance issue: Nested O(n^2) scan over all headers on each request; should use set lookup....",
+          "line": 44,
+          "path": "src/utils.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 254,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 105,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 104,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 105,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 82,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 82,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8771,
+          "gold_category": "performance",
+          "gold_line": 44,
+          "gold_path": "src/utils.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 43,
+          "predicted_path": "src/utils.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 44,
+          "predicted_path": "src/utils.py",
+          "semantic_match": false
+        }
+      ],
+      "output_tokens": 391,
+      "pr_id": "0bd5f8536c89e22e",
+      "pr_number": 151,
+      "predictions": [
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 104,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 105,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 82,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        },
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 43,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        },
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 44,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 3
+    },
+    {
+      "cost_usd": 0.000714,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 77,
+          "path": "src/client.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 153,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 77,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 77,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 85,
+      "pr_id": "0cc2c26eec7d5467",
+      "pr_number": 152,
+      "predictions": [
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 77,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.000696,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 73,
+      "pr_id": "0d7044c351a90f6d",
+      "pr_number": 109,
+      "predictions": [
+        {
+          "category": "STANDARDS_VIOLATION",
+          "confidence": 0.65,
+          "line": 21,
+          "message": "Prefer explicit type annotations and docstrings on internal helper returns.",
+          "path": "src/app.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def format_response(data: dict[str, Any]) -> dict[str, Any]:"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.000522,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [],
+      "input_tokens": 149,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 25,
+      "pr_id": "0e2bc27d6519761e",
+      "pr_number": 188,
+      "predictions": [],
+      "repo": "pydantic/pydantic",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.000552,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 25,
+      "pr_id": "0f830deeb5d60172",
+      "pr_number": 209,
+      "predictions": [],
+      "repo": "pydantic/pydantic",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.001251,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 42,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_1",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 110,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 207,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 42,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 42,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 110,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 109,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 110,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        }
+      ],
+      "output_tokens": 210,
+      "pr_id": "1072bb3dc240d7f4",
+      "pr_number": 150,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 42,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 109,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 110,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.001251,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 42,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_1",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 110,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 207,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 42,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 42,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 110,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 109,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 110,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        }
+      ],
+      "output_tokens": 210,
+      "pr_id": "10c6e8ce1802db87",
+      "pr_number": 210,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 42,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 109,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 110,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.001104,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "testing",
+          "description": "Fix testing issue: Missing unit test coverage for the 404 handler when route parameters are malform...",
+          "line": 89,
+          "path": "src/router.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 17,
+          "path": "src/models.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 235,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.7894,
+          "gold_category": "testing",
+          "gold_line": 89,
+          "gold_path": "src/router.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "testing",
+          "predicted_line": 88,
+          "predicted_path": "src/router.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 17,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 17,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 133,
+      "pr_id": "131f4a58b97699d0",
+      "pr_number": 214,
+      "predictions": [
+        {
+          "category": "TESTING",
+          "confidence": 0.82,
+          "line": 88,
+          "message": "Missing unit test coverage for the 404 handler when route parameters are malformed.",
+          "path": "src/router.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def test_route_404(): ..."
+        },
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 17,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.001107,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 12,
+          "path": "src/models.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 52,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_3",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 237,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 52,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 52,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 12,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 12,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 132,
+      "pr_id": "186104c496feb6ee",
+      "pr_number": 187,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 52,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 12,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.000984,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "testing",
+          "description": "Fix testing issue: Missing unit test coverage for the 404 handler when route parameters are malform...",
+          "line": 89,
+          "path": "src/router.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 17,
+          "path": "src/models.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 195,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.7894,
+          "gold_category": "testing",
+          "gold_line": 89,
+          "gold_path": "src/router.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "testing",
+          "predicted_line": 88,
+          "predicted_path": "src/router.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 17,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 17,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 133,
+      "pr_id": "18948f651994ac9c",
+      "pr_number": 207,
+      "predictions": [
+        {
+          "category": "TESTING",
+          "confidence": 0.82,
+          "line": 88,
+          "message": "Missing unit test coverage for the 404 handler when route parameters are malformed.",
+          "path": "src/router.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def test_route_404(): ..."
+        },
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 17,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.000783,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 47,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_2",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 197,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 47,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 47,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 64,
+      "pr_id": "1e410b7429ba98ff",
+      "pr_number": 114,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 47,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.000552,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 25,
+      "pr_id": "2216aad0428ab50a",
+      "pr_number": 129,
+      "predictions": [],
+      "repo": "tiangolo/fastapi",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.000552,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 25,
+      "pr_id": "22d3881c9a4c9533",
+      "pr_number": 113,
+      "predictions": [],
+      "repo": "tiangolo/fastapi",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.000954,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "performance",
+          "description": "Fix performance issue: Nested O(n^2) scan over all headers on each request; should use set lookup....",
+          "line": 34,
+          "path": "src/utils.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 159,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8771,
+          "gold_category": "performance",
+          "gold_line": 34,
+          "gold_path": "src/utils.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 33,
+          "predicted_path": "src/utils.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 34,
+          "predicted_path": "src/utils.py",
+          "semantic_match": false
+        }
+      ],
+      "output_tokens": 159,
+      "pr_id": "24c73e806eb0071a",
+      "pr_number": 206,
+      "predictions": [
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 33,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        },
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 34,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.001107,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 12,
+          "path": "src/models.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 52,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_3",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 237,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 52,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 52,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 12,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 12,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 132,
+      "pr_id": "26ff59385f16b735",
+      "pr_number": 127,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 52,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 12,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.000552,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 25,
+      "pr_id": "29a8d11838f6e10f",
+      "pr_number": 101,
+      "predictions": [],
+      "repo": "tiangolo/fastapi",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.001644,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 42,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_1",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 110,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 87,
+          "path": "src/client.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 252,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 17.27,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 42,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 42,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 110,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 109,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 110,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 87,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 87,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 296,
+      "pr_id": "29c9ca9a1421e523",
+      "pr_number": 196,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 42,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 109,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 110,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 87,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 3
+    },
+    {
+      "cost_usd": 0.001614,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "performance",
+          "description": "Fix performance issue: Nested O(n^2) scan over all headers on each request; should use set lookup....",
+          "line": 34,
+          "path": "src/utils.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "testing",
+          "description": "Fix testing issue: Missing unit test coverage for the 404 handler when route parameters are malform...",
+          "line": 94,
+          "path": "src/router.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 22,
+          "path": "src/models.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 246,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 1.5,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8771,
+          "gold_category": "performance",
+          "gold_line": 34,
+          "gold_path": "src/utils.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 33,
+          "predicted_path": "src/utils.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 34,
+          "predicted_path": "src/utils.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.7894,
+          "gold_category": "testing",
+          "gold_line": 94,
+          "gold_path": "src/router.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "testing",
+          "predicted_line": 93,
+          "predicted_path": "src/router.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 22,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 22,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 292,
+      "pr_id": "29eec61893e7ae18",
+      "pr_number": 178,
+      "predictions": [
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 33,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        },
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 34,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        },
+        {
+          "category": "TESTING",
+          "confidence": 0.82,
+          "line": 93,
+          "message": "Missing unit test coverage for the 404 handler when route parameters are malformed.",
+          "path": "src/router.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def test_route_404(): ..."
+        },
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 22,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 3
+    },
+    {
+      "cost_usd": 0.000651,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 12,
+          "path": "src/models.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 149,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 1.5,
+      "match_results": [
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 12,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 12,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 68,
+      "pr_id": "2a803ce43c4dc415",
+      "pr_number": 155,
+      "predictions": [
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 12,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.001644,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 42,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_1",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 110,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 87,
+          "path": "src/client.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 252,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 1.5,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 42,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 42,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 110,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 109,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 110,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 87,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 87,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 296,
+      "pr_id": "2d2a638c5506af3c",
+      "pr_number": 136,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 42,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 109,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 110,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 87,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 3
+    },
+    {
+      "cost_usd": 0.000663,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 42,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_1",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 157,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 42,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 42,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 64,
+      "pr_id": "2f2124c3df0d2df7",
+      "pr_number": 182,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 42,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.000696,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 73,
+      "pr_id": "370fb1dfa602a3d6",
+      "pr_number": 117,
+      "predictions": [
+        {
+          "category": "STANDARDS_VIOLATION",
+          "confidence": 0.65,
+          "line": 21,
+          "message": "Prefer explicit type annotations and docstrings on internal helper returns.",
+          "path": "src/app.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def format_response(data: dict[str, Any]) -> dict[str, Any]:"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.000714,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 77,
+          "path": "src/client.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 153,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 77,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 77,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 85,
+      "pr_id": "3767f9383f0e063f",
+      "pr_number": 212,
+      "predictions": [
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 77,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.000696,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 73,
+      "pr_id": "397044fbaf511df6",
+      "pr_number": 201,
+      "predictions": [
+        {
+          "category": "STANDARDS_VIOLATION",
+          "confidence": 0.65,
+          "line": 21,
+          "message": "Prefer explicit type annotations and docstrings on internal helper returns.",
+          "path": "src/app.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def format_response(data: dict[str, Any]) -> dict[str, Any]:"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.001308,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 105,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 82,
+          "path": "src/client.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 204,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 105,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 104,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 105,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 82,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 82,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 232,
+      "pr_id": "39a47951d9912b8a",
+      "pr_number": 204,
+      "predictions": [
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 104,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 105,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 82,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.000696,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [],
+      "input_tokens": 159,
+      "is_clean": true,
+      "language": "python",
+      "latency_ms": 0.0,
+      "match_results": [],
+      "output_tokens": 73,
+      "pr_id": "421b316e3a9d9b07",
+      "pr_number": 189,
+      "predictions": [
+        {
+          "category": "STANDARDS_VIOLATION",
+          "confidence": 0.65,
+          "line": 21,
+          "message": "Prefer explicit type annotations and docstrings on internal helper returns.",
+          "path": "src/app.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def format_response(data: dict[str, Any]) -> dict[str, Any]:"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 0
+    },
+    {
+      "cost_usd": 0.000771,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 12,
+          "path": "src/models.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 189,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 15.76,
+      "match_results": [
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 12,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 12,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 68,
+      "pr_id": "45a256e67a6a61fc",
+      "pr_number": 180,
+      "predictions": [
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 12,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.001374,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 47,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_2",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 115,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 248,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 16.96,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 47,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 47,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 115,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 114,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 115,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        }
+      ],
+      "output_tokens": 210,
+      "pr_id": "469b921d5e38ecf7",
+      "pr_number": 202,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 47,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 114,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 115,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.001104,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "testing",
+          "description": "Fix testing issue: Missing unit test coverage for the 404 handler when route parameters are malform...",
+          "line": 89,
+          "path": "src/router.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 17,
+          "path": "src/models.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 235,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 16.96,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.7894,
+          "gold_category": "testing",
+          "gold_line": 89,
+          "gold_path": "src/router.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "testing",
+          "predicted_line": 88,
+          "predicted_path": "src/router.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 17,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 17,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 133,
+      "pr_id": "4ed77a45bbc9fdc4",
+      "pr_number": 172,
+      "predictions": [
+        {
+          "category": "TESTING",
+          "confidence": 0.82,
+          "line": 88,
+          "message": "Missing unit test coverage for the 404 handler when route parameters are malformed.",
+          "path": "src/router.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def test_route_404(): ..."
+        },
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 17,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.00168,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 77,
+          "path": "src/client.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "performance",
+          "description": "Fix performance issue: Nested O(n^2) scan over all headers on each request; should use set lookup....",
+          "line": 39,
+          "path": "src/utils.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "testing",
+          "description": "Fix testing issue: Missing unit test coverage for the 404 handler when route parameters are malform...",
+          "line": 99,
+          "path": "src/router.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 250,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 16.96,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 77,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 77,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8771,
+          "gold_category": "performance",
+          "gold_line": 39,
+          "gold_path": "src/utils.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 38,
+          "predicted_path": "src/utils.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 39,
+          "predicted_path": "src/utils.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.7894,
+          "gold_category": "testing",
+          "gold_line": 99,
+          "gold_path": "src/router.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "testing",
+          "predicted_line": 98,
+          "predicted_path": "src/router.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 310,
+      "pr_id": "5cc554cb60d7ff76",
+      "pr_number": 163,
+      "predictions": [
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 77,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        },
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 38,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        },
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 39,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        },
+        {
+          "category": "TESTING",
+          "confidence": 0.82,
+          "line": 98,
+          "message": "Missing unit test coverage for the 404 handler when route parameters are malformed.",
+          "path": "src/router.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def test_route_404(): ..."
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 3
+    },
+    {
+      "cost_usd": 0.000651,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 12,
+          "path": "src/models.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 149,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 1.2,
+      "match_results": [
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 12,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 12,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 68,
+      "pr_id": "5f8fed35b410e7af",
+      "pr_number": 134,
+      "predictions": [
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 12,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 1
+    },
+    {
+      "cost_usd": 0.001644,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 42,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_1",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 110,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 87,
+          "path": "src/client.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 252,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 7.47,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 42,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 42,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 110,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 109,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 110,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 87,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 87,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 296,
+      "pr_id": "618ad28a9a90c026",
+      "pr_number": 115,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 42,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 109,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 110,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 87,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 3
+    },
+    {
+      "cost_usd": 0.001308,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 105,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 82,
+          "path": "src/client.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 204,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 2.01,
+      "match_results": [
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 105,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 104,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 105,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 82,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 82,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 232,
+      "pr_id": "61c88a58eda68ba5",
+      "pr_number": 183,
+      "predictions": [
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 104,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 105,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 82,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.001644,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "security",
+          "description": "Fix security issue: Potential SQL injection: query parameter is concatenated directly without escapi...",
+          "line": 42,
+          "path": "src/auth.py",
+          "reviewer": "reviewer_1",
+          "severity": "high",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Off-by-one error when slicing the buffer window causing index errors on empty in...",
+          "line": 110,
+          "path": "src/engine.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 87,
+          "path": "src/client.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 252,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 4.01,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.3273,
+          "gold_category": "security",
+          "gold_line": 42,
+          "gold_path": "src/auth.py",
+          "gold_severity": "high",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "security",
+          "predicted_line": 42,
+          "predicted_path": "src/auth.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8487,
+          "gold_category": "other",
+          "gold_line": 110,
+          "gold_path": "src/engine.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 109,
+          "predicted_path": "src/engine.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "bug",
+          "predicted_line": 110,
+          "predicted_path": "src/engine.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 87,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 87,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 296,
+      "pr_id": "65b0dbf6b82c08ae",
+      "pr_number": 175,
+      "predictions": [
+        {
+          "category": "SECURITY",
+          "confidence": 0.95,
+          "line": 42,
+          "message": "Potential SQL injection or credential exposure in database call.",
+          "path": "src/auth.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "execute_query_parameterized(query, params)"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 109,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "BUG",
+          "confidence": 0.92,
+          "line": 110,
+          "message": "Off-by-one error when slicing the buffer window causing index errors on empty input.",
+          "path": "src/engine.py",
+          "severity": "HIGH",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "window = buffer[offset:min(len(buffer), offset + slice_len)]"
+        },
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 87,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        }
+      ],
+      "repo": "pydantic/pydantic",
+      "tp": 3
+    },
+    {
+      "cost_usd": 0.001104,
+      "fn": 0,
+      "fp": 0,
+      "gold_findings": [
+        {
+          "category": "testing",
+          "description": "Fix testing issue: Missing unit test coverage for the 404 handler when route parameters are malform...",
+          "line": 89,
+          "path": "src/router.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "other",
+          "description": "Fix other issue: Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`....",
+          "line": 17,
+          "path": "src/models.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 235,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 4.01,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.7894,
+          "gold_category": "testing",
+          "gold_line": 89,
+          "gold_path": "src/router.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "testing",
+          "predicted_line": 88,
+          "predicted_path": "src/router.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.8165,
+          "gold_category": "other",
+          "gold_line": 17,
+          "gold_path": "src/models.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "readability",
+          "predicted_line": 17,
+          "predicted_path": "src/models.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 133,
+      "pr_id": "662a919bf82d1941",
+      "pr_number": 154,
+      "predictions": [
+        {
+          "category": "TESTING",
+          "confidence": 0.82,
+          "line": 88,
+          "message": "Missing unit test coverage for the 404 handler when route parameters are malformed.",
+          "path": "src/router.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def test_route_404(): ..."
+        },
+        {
+          "category": "READABILITY",
+          "confidence": 0.78,
+          "line": 17,
+          "message": "Variable name `tmp_val` is ambiguous; rename it to `normalized_attribute_map`.",
+          "path": "src/models.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "normalized_attribute_map = raw.get('val')"
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 2
+    },
+    {
+      "cost_usd": 0.00168,
+      "fn": 0,
+      "fp": 1,
+      "gold_findings": [
+        {
+          "category": "error_handling",
+          "description": "Fix error_handling issue: HTTP client call is not wrapped in a try/except for httpx.TimeoutException....",
+          "line": 77,
+          "path": "src/client.py",
+          "reviewer": "reviewer_1",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "performance",
+          "description": "Fix performance issue: Nested O(n^2) scan over all headers on each request; should use set lookup....",
+          "line": 39,
+          "path": "src/utils.py",
+          "reviewer": "reviewer_2",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        },
+        {
+          "category": "testing",
+          "description": "Fix testing issue: Missing unit test coverage for the 404 handler when route parameters are malform...",
+          "line": 99,
+          "path": "src/router.py",
+          "reviewer": "reviewer_3",
+          "severity": "medium",
+          "source": "human_comment",
+          "thread_resolved": false,
+          "verified": false
+        }
+      ],
+      "input_tokens": 250,
+      "is_clean": false,
+      "language": "python",
+      "latency_ms": 2.01,
+      "match_results": [
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8528,
+          "gold_category": "error_handling",
+          "gold_line": 77,
+          "gold_path": "src/client.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "error_handling",
+          "predicted_line": 77,
+          "predicted_path": "src/client.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.8771,
+          "gold_category": "performance",
+          "gold_line": 39,
+          "gold_path": "src/utils.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 38,
+          "predicted_path": "src/utils.py",
+          "semantic_match": true
+        },
+        {
+          "category_match": false,
+          "embedding_similarity": 0.0,
+          "gold_category": "",
+          "gold_line": 0,
+          "gold_path": "",
+          "gold_severity": "",
+          "is_match": false,
+          "line_distance": 0,
+          "match_strategy": "both",
+          "predicted_category": "performance",
+          "predicted_line": 39,
+          "predicted_path": "src/utils.py",
+          "semantic_match": false
+        },
+        {
+          "category_match": true,
+          "embedding_similarity": 0.7894,
+          "gold_category": "testing",
+          "gold_line": 99,
+          "gold_path": "src/router.py",
+          "gold_severity": "medium",
+          "is_match": true,
+          "line_distance": 1,
+          "match_strategy": "both",
+          "predicted_category": "testing",
+          "predicted_line": 98,
+          "predicted_path": "src/router.py",
+          "semantic_match": true
+        }
+      ],
+      "output_tokens": 310,
+      "pr_id": "67410bb96946267e",
+      "pr_number": 103,
+      "predictions": [
+        {
+          "category": "ERROR_HANDLING",
+          "confidence": 0.88,
+          "line": 77,
+          "message": "HTTP client call is not wrapped in a try/except for httpx.TimeoutException.",
+          "path": "src/client.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "try:\n    resp = client.get(url, timeout=10.0)\nexcept httpx.TimeoutException:\n    logger.error('Timeout')"
+        },
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 38,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        },
+        {
+          "category": "PERFORMANCE",
+          "confidence": 0.86,
+          "line": 39,
+          "message": "Nested O(n^2) scan over all headers on each request; should use set lookup.",
+          "path": "src/utils.py",
+          "severity": "MEDIUM",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "all_headers_set = set(all_headers)\nreturn [h for h in headers if h in all_headers_set]"
+        },
+        {
+          "category": "TESTING",
+          "confidence": 0.82,
+          "line": 98,
+          "message": "Missing unit test coverage for the 404 handler when route parameters are malformed.",
+          "path": "src/router.py",
+          "severity": "LOW",
+          "side": "RIGHT",
+          "standard_id": null,
+          "suggestion": "def test_route_404(): ..."
+        }
+      ],
+      "repo": "tiangolo/fastapi",
+      "tp": 3
+    }
+  ]
+}

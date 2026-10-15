@@ -1,0 +1,45 @@
+# Prism Review — Full Evaluation Configuration
+# Run with: python -m evals.harness.runner --config evals/configs/baseline.yaml --split dev
+name: baseline-smoke
+version: "1.0.0"
+
+dataset:
+  path: "data/final"
+  sample_limit: 10
+
+pipeline:
+  model: "gpt-4o-mini"
+  timeout_seconds: 30.0
+  max_concurrency: 5
+  confidence_threshold: 0.6
+  max_comments_per_pr: 10
+  seed: 42
+
+matcher:
+  line_tolerance: 3
+  strategy: "both"
+  semantic_judge_model: "gpt-4o-mini"
+  embedding_threshold: 0.75
+  cache_dir: ".cache/matcher"
+
+bootstrap:
+  n_resamples: 1000
+  confidence_level: 0.95
+  seed: 42
+
+baseline:
+  random_findings_per_pr: 3
+  random_seed: 42
+
+metrics:
+  - precision
+  - recall
+  - f1
+  - false_positive_rate
+  - comments_per_pr
+  - actionability
+  - severity_weighted_recall
+  - cost_per_review
+  - latency_p50
+  - latency_p95
+  - tokens_per_review

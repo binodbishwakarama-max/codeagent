@@ -1,0 +1,142 @@
+# Dataset mining: candidate repositories
+# Criteria:
+#   - Permissive license only (MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause)
+#   - Active review culture: reviewers leave substantive inline comments
+#   - Python or TypeScript primary language
+#   - ≥ 200 merged PRs with review comments in the past 2 years
+#   - No auto-generated PR volume (dependabot is filtered at mining time)
+
+repos:
+  # ── Python ──────────────────────────────────────────────────────────────────
+  - repo: "tiangolo/fastapi"
+    language: python
+    license: MIT
+    notes: "REST framework; reviewers consistently flag typing and validation issues"
+
+  - repo: "pydantic/pydantic"
+    language: python
+    license: MIT
+    notes: "Validation library; strict typing enforced in review"
+
+  - repo: "encode/httpx"
+    language: python
+    license: BSD-3-Clause
+    notes: "HTTP client; async correctness and edge-case handling reviewed carefully"
+
+  - repo: "pallets/flask"
+    language: python
+    license: BSD-3-Clause
+    notes: "Mature web framework; reviewers enforce style and API consistency"
+
+  - repo: "psf/black"
+    language: python
+    license: MIT
+    notes: "Code formatter; reviews focus on correctness of AST transformations"
+
+  - repo: "celery/celery"
+    language: python
+    license: BSD-3-Clause
+    notes: "Distributed task queue; concurrency bugs caught in review"
+
+  - repo: "sqlalchemy/sqlalchemy"
+    language: python
+    license: MIT
+    notes: "ORM; detailed review culture around correctness and performance"
+
+  - repo: "pytest-dev/pytest"
+    language: python
+    license: MIT
+    notes: "Testing framework; reviews enforce backwards compatibility"
+
+  - repo: "python-attrs/attrs"
+    language: python
+    license: MIT
+    notes: "Data classes library; small focused PRs with meaningful review"
+
+  - repo: "encode/starlette"
+    language: python
+    license: BSD-3-Clause
+    notes: "ASGI toolkit; async correctness reviewed; parent of fastapi"
+
+  - repo: "aio-libs/aiohttp"
+    language: python
+    license: Apache-2.0
+    notes: "Async HTTP; memory management and protocol correctness reviewed"
+
+  - repo: "pexpect/pexpect"
+    language: python
+    license: ISC
+    skip: true  # ISC not in permissive allow-list, skip
+    notes: "Skipped: ISC license not in approved list"
+
+  - repo: "huggingface/transformers"
+    language: python
+    license: Apache-2.0
+    notes: "ML library; reviewers catch shape mismatches and API consistency"
+
+  - repo: "langchain-ai/langchain"
+    language: python
+    license: MIT
+    notes: "LLM orchestration; active review on abstractions and error handling"
+
+  - repo: "prefecthq/prefect"
+    language: python
+    license: Apache-2.0
+    notes: "Workflow orchestration; concurrency and state machine correctness"
+
+  - repo: "pola-rs/polars"
+    language: python
+    license: MIT
+    notes: "DataFrame library (Python API); performance and API reviewed"
+
+  # ── TypeScript ───────────────────────────────────────────────────────────────
+  - repo: "microsoft/TypeScript"
+    language: typescript
+    license: Apache-2.0
+    notes: "TypeScript compiler; detailed correctness reviews"
+
+  - repo: "microsoft/vscode"
+    language: typescript
+    license: MIT
+    notes: "Editor; UX and perf bugs regularly caught in review"
+
+  - repo: "trpc/trpc"
+    language: typescript
+    license: MIT
+    notes: "Type-safe RPC; type inference correctness reviewed"
+
+  - repo: "colinhacks/zod"
+    language: typescript
+    license: MIT
+    notes: "Schema validation; edge cases in parsing reviewed"
+
+  - repo: "prisma/prisma"
+    language: typescript
+    license: Apache-2.0
+    notes: "ORM; query correctness and type safety reviewed"
+
+  - repo: "vercel/next.js"
+    language: typescript
+    license: MIT
+    notes: "React framework; SSR correctness and perf reviewed"
+
+  - repo: "vitejs/vite"
+    language: typescript
+    license: MIT
+    notes: "Build tool; plugin API and HMR edge cases reviewed"
+
+  - repo: "biomejs/biome"
+    language: typescript
+    license: MIT
+    notes: "Linter/formatter; AST correctness reviewed"
+
+  - repo: "nicolo-ribaudo/tc39-proposal-iterator-helpers"
+    language: typescript
+    license: MIT
+    skip: true  # Too small a repo, skip
+    notes: "Skipped: insufficient PR volume"
+
+  - repo: "effect-ts/effect"
+    language: typescript
+    license: MIT
+    notes: "Functional TS library; type-level correctness actively reviewed"
