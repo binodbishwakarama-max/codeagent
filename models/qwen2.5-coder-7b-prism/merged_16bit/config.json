@@ -1,0 +1,8 @@
+{
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "model_type": "qwen2",
+  "base_model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "merged_from_adapter": "models\\qwen2.5-coder-7b-prism\\adapter"
+}

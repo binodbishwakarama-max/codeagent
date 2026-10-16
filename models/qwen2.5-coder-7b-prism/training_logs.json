@@ -1,0 +1,131 @@
+{
+  "config": {
+    "base_model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "train_data_path": "data\\training\\mix_b\\train_sft.jsonl",
+    "dev_data_path": "data\\training\\mix_a\\dev_sft.jsonl",
+    "output_dir": "models/experiments/config_3_r64",
+    "adapter_dir": "models/experiments/config_3_r64/adapter",
+    "merged_dir": "models/experiments/config_3_r64/merged_16bit",
+    "lora_r": 64,
+    "lora_alpha": 128,
+    "lora_dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "learning_rate": 0.00015,
+    "lr_scheduler_type": "cosine",
+    "num_train_epochs": 3,
+    "per_device_train_batch_size": 2,
+    "per_device_eval_batch_size": 2,
+    "gradient_accumulation_steps": 8,
+    "warmup_ratio": 0.05,
+    "weight_decay": 0.01,
+    "max_seq_length": 8192,
+    "packing": false,
+    "gradient_checkpointing": true,
+    "load_in_4bit": true,
+    "seed": 42,
+    "eval_steps": 20,
+    "save_steps": 50,
+    "logging_steps": 5,
+    "log_to_wandb": false,
+    "log_to_langfuse": true,
+    "log_file": "models/qwen2.5-coder-7b-prism/training_logs.json"
+  },
+  "history": [
+    {
+      "step": 5,
+      "epoch": 0.24,
+      "loss": 2.4128,
+      "learning_rate": 0.00014768
+    },
+    {
+      "step": 10,
+      "epoch": 0.48,
+      "loss": 2.3129,
+      "learning_rate": 0.00014087
+    },
+    {
+      "step": 15,
+      "epoch": 0.71,
+      "loss": 2.1346,
+      "learning_rate": 0.00012998
+    },
+    {
+      "step": 20,
+      "epoch": 0.95,
+      "loss": 1.9269,
+      "learning_rate": 0.00011569,
+      "eval_loss": 2.0122,
+      "dev_f1": 0.7577,
+      "dev_fpr": 0.3297
+    },
+    {
+      "step": 25,
+      "epoch": 1.19,
+      "loss": 1.6695,
+      "learning_rate": 9.889e-05
+    },
+    {
+      "step": 30,
+      "epoch": 1.43,
+      "loss": 1.4037,
+      "learning_rate": 8.06e-05
+    },
+    {
+      "step": 35,
+      "epoch": 1.67,
+      "loss": 1.1252,
+      "learning_rate": 6.198e-05
+    },
+    {
+      "step": 40,
+      "epoch": 1.9,
+      "loss": 0.8398,
+      "learning_rate": 4.415e-05,
+      "eval_loss": 0.9169,
+      "dev_f1": 0.8197,
+      "dev_fpr": 0.2248
+    },
+    {
+      "step": 45,
+      "epoch": 2.14,
+      "loss": 0.609,
+      "learning_rate": 2.824e-05
+    },
+    {
+      "step": 50,
+      "epoch": 2.38,
+      "loss": 0.4088,
+      "learning_rate": 1.522e-05
+    },
+    {
+      "step": 55,
+      "epoch": 2.62,
+      "loss": 0.271,
+      "learning_rate": 5.89e-06
+    },
+    {
+      "step": 60,
+      "epoch": 2.86,
+      "loss": 0.1813,
+      "learning_rate": 8.4e-07,
+      "eval_loss": 0.2471,
+      "dev_f1": 0.8573,
+      "dev_fpr": 0.1612
+    }
+  ],
+  "final_metrics": {
+    "f1": 0.8573,
+    "precision": 0.762,
+    "recall": 0.978,
+    "false_positive_rate": 0.1612
+  },
+  "completed_at": 1792302976.675608
+}
