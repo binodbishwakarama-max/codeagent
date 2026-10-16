@@ -1,0 +1,112 @@
+name: Regression Evaluation Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    paths:
+      - 'src/prism/review/**'
+      - 'src/prism/retrieval/**'
+      - 'evals/configs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  eval-gate:
+    name: Regression Gate (40-PR Dev Split)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Cache matcher embeddings & judge predictions
+        uses: actions/cache@v4
+        with:
+          path: .cache/matcher
+          key: ${{ runner.os }}-eval-matcher-cache-${{ hashFiles('evals/configs/regression.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-eval-matcher-cache-
+
+      - name: Run Regression Gate
+        id: gate
+        continue-on-error: true
+        env:
+          PR_BODY: ${{ github.event.pull_request.body || '' }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          uv run python -m evals.harness.regression_gate \
+            --config evals/configs/regression.yaml \
+            --baseline evals/baselines/main.json \
+            --split dev \
+            --output-comment comment.md \
+            --f1-drop-threshold 0.03 \
+            --fpr-rise-threshold 0.02 \
+            --cost-cap 1.00
+
+      - name: Post or update sticky PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const commentPath = 'comment.md';
+            if (!fs.existsSync(commentPath)) {
+              console.log('No comment markdown file found; skipping comment update.');
+              return;
+            }
+            const body = fs.readFileSync(commentPath, 'utf8');
+            const tag = '<!-- prism-eval-regression-gate -->';
+            
+            const issueNumber = context.issue.number || (context.payload.pull_request && context.payload.pull_request.number);
+            if (!issueNumber) {
+              console.log('No pull request issue number found; skipping.');
+              return;
+            }
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
+
+            const existingComment = comments.find(c => c.body && c.body.includes(tag));
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: body,
+              });
+              console.log(`Updated sticky PR comment (ID: ${existingComment.id})`);
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: body,
+              });
+              console.log('Posted new sticky PR comment');
+            }
+
+      - name: Enforce Gate Result
+        if: steps.gate.outcome != 'success'
+        run: |
+          echo "::error::Regression evaluation gate failed. Check sticky PR comment for metric deltas."
+          exit 1
