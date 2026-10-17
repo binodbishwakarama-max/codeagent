@@ -1,0 +1,41 @@
+groups:
+  - name: prism_review_alerts
+    rules:
+      # Alert 1: Review Error Rate > 5% for 10 minutes
+      - alert: HighReviewErrorRate
+        expr: (sum(rate(reviews_total{status="failed"}[10m])) / (sum(rate(reviews_total[10m])) > 0 or 1)) > 0.05
+        for: 10m
+        labels:
+          severity: critical
+          service: prism-review
+          tier: api-worker
+        annotations:
+          summary: "Prism review job error rate is above 5% for 10m"
+          description: "Over the last 10 minutes, {{ $value | humanizePercentage }} of reviews failed. Check worker exception logs and GitHub API status."
+          runbook_url: "docs/alerts.md#1-highreviewerrorrate"
+
+      # Alert 2: p95 Latency > 120s
+      - alert: HighReviewLatencyP95
+        expr: histogram_quantile(0.95, sum(rate(review_latency_seconds_bucket[5m])) by (le)) > 120
+        for: 5m
+        labels:
+          severity: warning
+          service: prism-review
+          tier: worker
+        annotations:
+          summary: "Prism review p95 latency exceeded 120 seconds"
+          description: "The 95th percentile PR review latency is currently {{ $value | humanizeDuration }}. Check LLM provider response times, large diff partitioning, and vector retrieval performance."
+          runbook_url: "docs/alerts.md#2-highreviewlatencyp95"
+
+      # Alert 3: Queue Depth > 50
+      - alert: HighQueueDepth
+        expr: queue_depth > 50
+        for: 5m
+        labels:
+          severity: warning
+          service: prism-review
+          tier: queue
+        annotations:
+          summary: "Review job queue depth exceeded 50 pending jobs"
+          description: "The Arq/Redis review queue has {{ $value }} pending jobs waiting for worker execution. Review worker scaling or concurrency limits."
+          runbook_url: "docs/alerts.md#3-highqueuedepth"
