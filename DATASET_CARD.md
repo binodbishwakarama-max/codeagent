@@ -1,3 +1,22 @@
+---
+language:
+- en
+license: apache-2.0
+task_categories:
+- text-generation
+- evaluation
+tags:
+- code-review
+- software-engineering
+- github
+- pull-requests
+- llm-benchmarking
+- qwen2.5-coder
+pretty_name: Prism PR Review Benchmark
+size_categories:
+- n<1K
+---
+
 # DATASET_CARD.md — Prism Review Evaluation Dataset
 
 ## Summary

@@ -1,6 +1,5 @@
-import subprocess
-import sys
 import os
+import subprocess
 
 AUTHOR_NAME = "Binod Bishwakarma"
 AUTHOR_EMAIL = "binodbishwakarama@gmail.com"
@@ -228,6 +227,7 @@ commits = [
     },
 ]
 
+
 def run(cmd, env=None):
     print(f"Running: {cmd}")
     res = subprocess.run(cmd, shell=True, env=env, capture_output=True, text=True)
@@ -237,6 +237,7 @@ def run(cmd, env=None):
     if res.stdout.strip():
         print(res.stdout.strip())
     return True
+
 
 def main():
     base_env = os.environ.copy()
@@ -263,7 +264,9 @@ def main():
                     run(f'git add "{p}"')
 
         # Check if anything is staged
-        status_res = subprocess.run("git status --porcelain", shell=True, capture_output=True, text=True)
+        status_res = subprocess.run(
+            "git status --porcelain", shell=True, capture_output=True, text=True
+        )
         if status_res.stdout.strip():
             msg = commit["msg"].replace('"', '\\"')
             run(f'git commit -m "{msg}"', env=env)
@@ -276,6 +279,7 @@ def main():
 
     print("\nHistory reconstruction complete. Current log:")
     subprocess.run('git log --pretty=format:"%h - %an <%ae> [%ad] %s" -n 25', shell=True)
+
 
 if __name__ == "__main__":
     main()

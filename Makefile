@@ -1,4 +1,4 @@
-.PHONY: install test lint typecheck run worker eval-smoke eval-full eval-compare ablations format dataset-mine dataset-label dataset-verify
+.PHONY: install test lint typecheck run worker eval-smoke eval-full eval-compare ablations format dataset-mine dataset-label dataset-verify reproduce
 
 install:
 	uv sync --extra dev
@@ -75,5 +75,8 @@ serve-cost:
 	uv run python -m training.serve --cost-comparison
 
 eval-final:
+	uv run python -m evals.harness.final_comparison
+
+reproduce:
 	uv run python -m evals.harness.final_comparison
 

@@ -1,0 +1,36 @@
+# ==============================================================================
+# Dockerfile.eval - Pinned Reproducibility Container for Prism Benchmark
+# Reproduces the full test-split evaluation across all candidate models & baselines
+# ==============================================================================
+FROM python:3.12-slim
+
+WORKDIR /workspace
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pinned uv binary from official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+# Copy dependency manifests and exact lockfile
+COPY pyproject.toml uv.lock ./
+
+# Install exact pinned dependencies
+RUN uv sync --frozen --extra dev
+
+# Copy application sources, evaluation suite, test data split, and documentation
+COPY src/ /workspace/src/
+COPY evals/ /workspace/evals/
+COPY data/final/test.jsonl /workspace/data/final/test.jsonl
+COPY docs/ /workspace/docs/
+COPY pyproject.toml Makefile ./
+
+ENV PYTHONPATH="/workspace/src:/workspace" \
+    PYTHONUNBUFFERED=1
+
+# Default command runs the complete test-split benchmark
+CMD ["uv", "run", "python", "-m", "evals.harness.final_comparison"]
