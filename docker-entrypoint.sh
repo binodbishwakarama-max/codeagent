@@ -4,7 +4,7 @@ set -e
 case "$1" in
     web)
         echo "Starting Prism Review web server (uvicorn)..."
-        exec uvicorn prism.api:app --host 0.0.0.0 --port 8000
+        exec uvicorn prism.api:app --host 0.0.0.0 --port "${PORT:-8000}"
         ;;
     worker)
         echo "Starting Prism Review async worker (arq)..."

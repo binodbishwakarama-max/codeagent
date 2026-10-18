@@ -62,7 +62,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # Run as non-root user
 USER prism
 
-EXPOSE 8000
+EXPOSE 8000 7860
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["web"]
