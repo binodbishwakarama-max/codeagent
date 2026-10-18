@@ -161,8 +161,8 @@ We conducted a manual root-cause taxonomy on **40 False Positives (FPs)** and **
 
 1. **Whole-Repository SCIP / LSIF Symbol Indexing**: Integrate Sourcegraph SCIP code graphs to resolve cross-file definitions and call hierarchies, eliminating the 37.5% of false positives caused by missing context.
 2. **AST-Aware Hunk Windowing**: Replace fixed-line diff splitting with tree-sitter AST syntax chunking to provide complete function or class enclosures rather than truncated diff hunks.
-3. **Multi-Turn Review Thread Resolution**: Enable developers to reply to `@prism-review` inline comments to provide clarification. The bot would parse the response, verify against repository context, and resolve the thread automatically.
-4. **Online Reinforcement Learning from Developer Reactions (RLDR)**: Leverage reaction telemetry in `src/prism/observability/feedback.py`. Real-time thumbs-up, thumbs-down, and thread-resolution events provide a continuous preference dataset for Direct Preference Optimization (DPO).
+3. **Multi-Turn Review Thread Resolution (Shipped in v1.1.0)**: Developers can reply directly to `@prism-review` inline comments to provide clarification or dispute findings. Prism evaluates the thread, diff hunk, and developer justification in [`src/prism/review/conversation.py`](../src/prism/review/conversation.py), conceding false positives gracefully (`decision="resolved"`) or defending the vulnerability with evidence (`decision="maintained"`).
+4. **Online Reinforcement Learning from Developer Reactions (RLDR)**: Leverage reaction telemetry and thread resolution records in [`src/prism/observability/feedback.py`](../src/prism/observability/feedback.py). Real-time thumbs-up, thumbs-down, and thread-resolution events provide a continuous preference dataset for Direct Preference Optimization (DPO).
 
 ---
 

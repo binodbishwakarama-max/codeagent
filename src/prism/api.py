@@ -1,5 +1,6 @@
 """FastAPI application entrypoint for webhook ingestion and administrative APIs."""
 
+import asyncio
 import json
 import logging
 import uuid
@@ -327,6 +328,84 @@ async def github_webhook(
                 status_code=200,
                 content={"status": "recorded", "feedback": "review_comment_reaction"},
             )
+
+        if action == "created":
+            sender = payload.get("sender", {})
+            sender_login = sender.get("login") or comment.get("user", {}).get("login")
+            sender_type = sender.get("type") or comment.get("user", {}).get("type")
+            in_reply_to_id = comment.get("in_reply_to_id")
+            parent_body = (
+                comment.get("in_reply_to", {}).get("body")
+                if isinstance(comment.get("in_reply_to"), dict)
+                else None
+            )
+
+            from prism.review.conversation import should_respond_to_comment
+
+            should_reply, reply_reason = should_respond_to_comment(
+                comment_body=body,
+                parent_body=parent_body,
+                in_reply_to_id=in_reply_to_id,
+                sender_login=sender_login,
+                sender_type=sender_type,
+            )
+
+            if should_reply:
+                installation_id = payload.get("installation", {}).get("id")
+                reply_job_payload: dict[str, Any] = {
+                    "installation_id": installation_id,
+                    "repo_full_name": repo_name,
+                    "pr_number": int(pr_num),
+                    "comment_id": int(comment_id) if comment_id else 0,
+                    "in_reply_to_id": int(in_reply_to_id) if in_reply_to_id else None,
+                    "body": body,
+                    "author": author or sender_login or "developer",
+                    "path": comment.get("path", ""),
+                    "diff_hunk": comment.get("diff_hunk"),
+                    "line": comment.get("line"),
+                    "parent_body": parent_body,
+                    "delivery_id": x_github_delivery,
+                }
+
+                if _arq_pool is not None:
+                    await _arq_pool.enqueue_job("run_thread_reply", reply_job_payload)
+                    logger.info(
+                        "Enqueued thread reply for %s#%s comment %s",
+                        repo_name,
+                        pr_num,
+                        comment_id,
+                    )
+                else:
+                    from prism.queue.jobs import run_thread_reply
+
+                    ctx = {"settings": settings, "redis": _redis_client}
+                    asyncio.create_task(run_thread_reply(ctx, reply_job_payload))
+                    logger.info(
+                        "Scheduled direct thread reply task for %s#%s comment %s",
+                        repo_name,
+                        pr_num,
+                        comment_id,
+                    )
+
+                return JSONResponse(
+                    status_code=202,
+                    content={
+                        "status": "accepted",
+                        "event": "thread_reply",
+                        "repo": repo_name,
+                        "pr": pr_num,
+                        "comment_id": comment_id,
+                    },
+                )
+
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "status": "ignored",
+                    "reason": f"comment not addressed to prism ({reply_reason})",
+                },
+            )
+
         return JSONResponse(
             status_code=200,
             content={"status": "ignored", "reason": f"comment action '{action}' not tracked"},

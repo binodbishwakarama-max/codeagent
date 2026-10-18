@@ -5,7 +5,12 @@ import signal
 from typing import Any
 
 from prism.config import Settings
-from prism.queue.jobs import process_pull_request_review, run_review
+from prism.queue.jobs import (
+    process_pull_request_review,
+    process_thread_reply,
+    run_review,
+    run_thread_reply,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +65,12 @@ class WorkerSettings:
     - health_check_interval=30s: arq health monitoring
     """
 
-    functions = [run_review, process_pull_request_review]
+    functions = [
+        run_review,
+        process_pull_request_review,
+        run_thread_reply,
+        process_thread_reply,
+    ]
     on_startup = startup
     on_shutdown = shutdown
     max_tries = 3

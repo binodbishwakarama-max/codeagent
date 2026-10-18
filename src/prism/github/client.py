@@ -206,3 +206,52 @@ class GitHubClient:
                 repo_full_name,
                 response.text,
             )
+
+    async def get_pull_request_comment(
+        self,
+        repo_full_name: str,
+        comment_id: int,
+    ) -> dict[str, Any] | None:
+        """Fetch a specific pull request review comment by ID."""
+        client = await self._get_client()
+        url = f"{self.base_url}/repos/{repo_full_name}/pulls/comments/{comment_id}"
+        headers = self._default_headers()
+        response = await client.get(url, headers=headers)
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        return data if isinstance(data, dict) else None
+
+    async def reply_to_pull_request_comment(
+        self,
+        repo_full_name: str,
+        pr_number: int,
+        comment_id: int,
+        body: str,
+    ) -> dict[str, Any]:
+        """Post an inline reply to an existing pull request review comment thread."""
+        client = await self._get_client()
+        url = f"{self.base_url}/repos/{repo_full_name}/pulls/{pr_number}/comments/{comment_id}/replies"
+        headers = self._default_headers()
+        payload = {"body": body}
+        response = await client.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        return data if isinstance(data, dict) else {}
+
+    async def create_issue_comment(
+        self,
+        repo_full_name: str,
+        issue_number: int,
+        body: str,
+    ) -> dict[str, Any]:
+        """Post a top-level comment on an issue or pull request."""
+        client = await self._get_client()
+        url = f"{self.base_url}/repos/{repo_full_name}/issues/{issue_number}/comments"
+        headers = self._default_headers()
+        payload = {"body": body}
+        response = await client.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        return data if isinstance(data, dict) else {}

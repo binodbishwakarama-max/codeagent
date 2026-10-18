@@ -104,6 +104,55 @@ async def record_thread_resolved(
     return record_id
 
 
+async def record_thread_reply_feedback(
+    database_url: str,
+    repo: str,
+    pr: int,
+    comment_id: str,
+    decision: str,
+    is_false_positive: bool,
+    developer_message: str,
+    bot_reply: str,
+    author: str | None = None,
+    head_sha: str | None = None,
+    file_path: str | None = None,
+    line_number: int | None = None,
+) -> int:
+    """Record a multi-turn developer review conversation resolution."""
+    feedback_type = "false_positive" if is_false_positive else f"thread_{decision}"
+    feedback_value = "conceded" if is_false_positive else decision
+
+    record_id = await save_feedback_record(
+        database_url=database_url,
+        repo=repo,
+        pr=pr,
+        comment_id=comment_id,
+        feedback_type=feedback_type,
+        feedback_value=feedback_value,
+        author=author,
+        head_sha=head_sha,
+        file_path=file_path,
+        line_number=line_number,
+        details=(
+            f"Developer: {developer_message[:500]}\nBot Resolution ({decision}): {bot_reply[:500]}"
+        ),
+    )
+
+    logger.info(
+        "Recorded thread reply feedback %s (%s) on %s#%d comment %s (author=%s, record_id=%d)",
+        feedback_type,
+        feedback_value,
+        repo,
+        pr,
+        comment_id,
+        author,
+        record_id,
+    )
+
+    await refresh_acceptance_rate_metric(database_url)
+    return record_id
+
+
 async def record_line_touched(
     database_url: str,
     repo: str,

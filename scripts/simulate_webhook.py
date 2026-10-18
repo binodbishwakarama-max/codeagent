@@ -32,6 +32,11 @@ from prism.config import Settings
 from prism.github.comments import format_inline_comment, format_review_summary
 from prism.github.diff import parse_unified_diff
 from prism.models import IssueCategory, ReviewFinding, Severity
+from prism.review.conversation import (
+    ThreadResolutionDecision,
+    ThreadResolutionResult,
+    format_thread_reply_markdown,
+)
 from prism.review.llm import FakeLLMClient
 from prism.review.pipeline import PRContext, review_pr
 from prism.review.prompts import ChunkReviewResponse
@@ -170,6 +175,47 @@ def create_comment_reaction_event(
             "content": content,
             "user": {"login": "alex-developer"},
         },
+    }
+
+
+def create_comment_reply_event(
+    comment_id: int = 502,
+    in_reply_to_id: int = 501,
+    body: str = (
+        "@prism-review false positive: this customer_id is strictly validated "
+        "by UUID middleware upstream."
+    ),
+    author: str = "alex-developer",
+) -> dict[str, Any]:
+    return {
+        "action": "created",
+        "installation": {"id": 98765},
+        "repository": {
+            "name": "codeagent",
+            "full_name": "binodbishwakarama-max/codeagent",
+        },
+        "pull_request": {
+            "number": 101,
+        },
+        "comment": {
+            "id": comment_id,
+            "in_reply_to_id": in_reply_to_id,
+            "user": {"login": author, "type": "User"},
+            "body": body,
+            "path": "src/db/users.py",
+            "line": 68,
+            "diff_hunk": (
+                "@@ -66,4 +66,5 @@ def fetch_stripe_billing_info(customer_id: str):\n"
+                '+    api_key = "sk-proj-..."'
+            ),
+            "in_reply_to": {
+                "id": in_reply_to_id,
+                "body": (
+                    "<!-- prism-review -->\n**[Security]** Hardcoded API credential detected."
+                ),
+            },
+        },
+        "sender": {"login": author, "type": "User"},
     }
 
 
@@ -453,8 +499,76 @@ async def run_simulation() -> None:
             print(f"  Response: {res_reaction.json()}")
             assert res_reaction.status_code == 200
 
-        # Phase 6: Live Prometheus Metrics Snapshot
-        print("\n[Phase 6] Inspecting Live Prometheus Telemetry (/metrics)...")
+        # -------------------------------------------------------------------
+        # Phase 6: Multi-Turn Review Comment Thread Reply & Resolution
+        # -------------------------------------------------------------------
+        print("\n" + "=" * 80)
+        print("[Phase 6] Simulating Multi-Turn Review Comment Reply & Autonomous Resolution")
+        print("=" * 80)
+
+        reply_payload = create_comment_reply_event(
+            comment_id=502,
+            in_reply_to_id=501,
+            body=(
+                "@prism-review false positive: this customer_id is strictly validated "
+                "by UUID middleware upstream."
+            ),
+            author="alex-developer",
+        )
+        reply_bytes = json.dumps(reply_payload).encode("utf-8")
+        reply_sig = compute_signature(reply_bytes, WEBHOOK_SECRET)
+        headers_reply = {
+            "Content-Type": "application/json",
+            "X-GitHub-Event": "pull_request_review_comment",
+            "X-GitHub-Delivery": str(uuid.uuid4()),
+            "X-Hub-Signature-256": reply_sig,
+        }
+
+        with (
+            patch(
+                "prism.queue.jobs.run_thread_reply",
+                new=AsyncMock(
+                    return_value={
+                        "status": "completed",
+                        "decision": "resolved",
+                        "is_false_positive": True,
+                    }
+                ),
+            ),
+            patch("prism.api.record_comment_reaction", new=AsyncMock()),
+        ):
+            res_reply = await client.post(
+                "/webhook/github", content=reply_bytes, headers=headers_reply
+            )
+            print(
+                f"  POST /webhook/github (reply: @prism-review ...) -> Status: {res_reply.status_code}"
+            )
+            print(f"  Webhook Response: {res_reply.json()}")
+            assert res_reply.status_code == 202
+
+        # Demonstrate the reasoning output & formatted markdown reply
+        demo_resolution = ThreadResolutionResult(
+            decision=ThreadResolutionDecision.RESOLVED,
+            is_false_positive=True,
+            explanation=(
+                "Conceded: Verified against the request validation pipeline. "
+                "The customer UUID format is enforced prior to dispatch, so "
+                "injection is safely mitigated."
+            ),
+            suggested_patch=None,
+        )
+        rendered_reply = format_thread_reply_markdown(
+            demo_resolution, developer_author="alex-developer"
+        )
+        print("\n--- [AUTONOMOUS PRISM THREAD RESPONSE (RENDERED TO GITHUB)] ---")
+        print(rendered_reply)
+
+        # -------------------------------------------------------------------
+        # Phase 7: Live Prometheus Metrics Snapshot
+        # -------------------------------------------------------------------
+        print("\n" + "=" * 80)
+        print("[Phase 7] Inspecting Live Prometheus Telemetry (/metrics)...")
+        print("=" * 80)
         metrics_resp = await client.get("/metrics")
         print(f"  GET /metrics -> Status: {metrics_resp.status_code}")
         # Print relevant metric lines

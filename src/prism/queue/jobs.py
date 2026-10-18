@@ -20,6 +20,7 @@ from prism.github.client import GitHubClient
 from prism.github.comments import post_pull_request_review
 from prism.github.diff import parse_unified_diff
 from prism.models import FileDiff
+from prism.observability.feedback import record_thread_reply_feedback
 from prism.observability.metrics import (
     record_cache_stats,
     record_github_api_error,
@@ -37,6 +38,8 @@ from prism.observability.tracing import (
 from prism.queue.budget import check_daily_budget, record_daily_cost
 from prism.queue.cache import get_cache_stats, log_cache_stats
 from prism.queue.rate_limiter import RateLimiter
+from prism.review.conversation import resolve_thread_conversation
+from prism.review.llm import create_llm_client
 from prism.review.pipeline import PRContext, review_pr
 from prism.review.redactor import redact_file_diffs
 from prism.review.standards import parse_repo_standards
@@ -409,3 +412,136 @@ async def run_review(ctx: dict[str, Any], job: dict[str, Any]) -> None:
 
 
 process_pull_request_review = run_review
+
+
+async def run_thread_reply(ctx: dict[str, Any], job: dict[str, Any]) -> dict[str, Any]:
+    """Async background worker job processing an interactive PR review comment reply."""
+    settings: Settings = ctx.get("settings") or Settings()
+    redis_client = ctx.get("redis")
+    llm_client = ctx.get("llm_client")
+
+    installation_id = job.get("installation_id")
+    repo = str(job.get("repo_full_name", ""))
+    pr_num = int(job.get("pr_number", 0))
+    comment_id = int(job.get("comment_id", 0))
+    in_reply_to_id = job.get("in_reply_to_id")
+    author = str(job.get("author", "developer"))
+    developer_message = str(job.get("body", ""))
+    parent_comment_body = str(job.get("parent_body", ""))
+    file_path = str(job.get("path", ""))
+    diff_hunk = job.get("diff_hunk")
+    line_number = job.get("line")
+
+    bind_log_context(repo=repo, pr=pr_num)
+    logger.info(
+        "Processing review thread reply for %s#%d comment %d by @%s",
+        repo,
+        pr_num,
+        comment_id,
+        author,
+    )
+
+    client: GitHubClient | None = None
+    try:
+        if "github_client" in ctx:
+            client = ctx["github_client"]
+        elif "github_token" in job:
+            client = GitHubClient(token=job["github_token"])
+        elif installation_id:
+            token = await get_installation_access_token(
+                installation_id=int(installation_id),
+                settings=settings,
+                redis_client=redis_client,
+            )
+            client = GitHubClient(token=token)
+
+        # If parent comment body was not sent directly, retrieve it from GitHub
+        target_reply_id = int(in_reply_to_id) if in_reply_to_id else comment_id
+        if not parent_comment_body and client and in_reply_to_id:
+            try:
+                parent_comment = await client.get_pull_request_comment(repo, int(in_reply_to_id))
+                if parent_comment:
+                    parent_comment_body = str(parent_comment.get("body", ""))
+                    if not file_path:
+                        file_path = str(parent_comment.get("path", ""))
+                    if not diff_hunk:
+                        diff_hunk = parent_comment.get("diff_hunk")
+                    if not line_number:
+                        line_number = parent_comment.get("line")
+            except Exception as fetch_exc:
+                logger.warning("Could not fetch parent comment %s: %s", in_reply_to_id, fetch_exc)
+
+        if llm_client is None:
+            llm_client = create_llm_client(settings)
+
+        # Fetch standards if available
+        standards_context: str | None = None
+        if client and repo:
+            try:
+                standards_context = await client.fetch_repo_file(repo, ".prism/standards.yml")
+            except Exception:
+                standards_context = None
+
+        result, markdown_reply = await resolve_thread_conversation(
+            llm_client=llm_client,
+            developer_message=developer_message,
+            developer_author=author,
+            parent_comment_body=parent_comment_body,
+            file_path=file_path,
+            diff_hunk=diff_hunk,
+            line_number=line_number,
+            standards_context=standards_context,
+        )
+
+        # Post reply on GitHub
+        if client and repo and pr_num and target_reply_id:
+            try:
+                await client.reply_to_pull_request_comment(
+                    repo_full_name=repo,
+                    pr_number=pr_num,
+                    comment_id=target_reply_id,
+                    body=markdown_reply,
+                )
+                logger.info(
+                    "Posted inline review reply on %s#%d comment %d (decision=%s)",
+                    repo,
+                    pr_num,
+                    target_reply_id,
+                    result.decision.value,
+                )
+            except Exception as post_exc:
+                logger.error("Failed to post comment reply on %s#%d: %s", repo, pr_num, post_exc)
+
+        # Record feedback loop in Postgres
+        if settings.database_url:
+            try:
+                await record_thread_reply_feedback(
+                    database_url=settings.database_url,
+                    repo=repo,
+                    pr=pr_num,
+                    comment_id=str(target_reply_id),
+                    decision=result.decision.value,
+                    is_false_positive=result.is_false_positive,
+                    developer_message=developer_message,
+                    bot_reply=markdown_reply,
+                    author=author,
+                    file_path=file_path,
+                    line_number=line_number,
+                )
+            except Exception as db_exc:
+                logger.warning("Failed to record thread reply feedback: %s", db_exc)
+
+        return {
+            "status": "completed",
+            "decision": result.decision.value,
+            "is_false_positive": result.is_false_positive,
+            "explanation": result.explanation,
+            "reply_body": markdown_reply,
+        }
+    finally:
+        clear_log_context()
+        if client is not None and "github_client" not in ctx:
+            await client.close()
+
+
+process_thread_reply = run_thread_reply
