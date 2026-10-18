@@ -9,7 +9,7 @@
 [![CI / CD](https://github.com/binodbishwakarama-max/codeagent/actions/workflows/deploy.yml/badge.svg)](https://github.com/binodbishwakarama-max/codeagent/actions)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Datasets-FFD21E.svg)](https://huggingface.co/datasets)
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Datasets-FFD21E.svg)](https://huggingface.co/datasets/Vinod8848/prism-review-benchmark)
 [![vLLM Powered](https://img.shields.io/badge/Served%20with-vLLM%20AWQ-purple.svg)](https://github.com/vllm-project/vllm)
 [![Code style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Strict Types: mypy](https://img.shields.io/badge/types-mypy%20strict-1f425f.svg)](https://mypy-lang.org/)

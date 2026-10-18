@@ -13,7 +13,11 @@ import argparse
 import json
 import logging
 import shutil
+import sys
 from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("publish_dataset")
@@ -90,7 +94,6 @@ language:
 license: apache-2.0
 task_categories:
 - text-generation
-- evaluation
 tags:
 - code-review
 - software-engineering
@@ -154,7 +157,7 @@ def upload_to_hub(output_dir: Path, repo_id: str, token: str | None = None) -> N
         commit_message="Initial benchmark dataset release v1.0.0",
     )
     print("\n" + "=" * 80)
-    print(f"🎉 SUCCESS: Published dataset to https://huggingface.co/datasets/{repo_id}")
+    print(f"SUCCESS: Published dataset to https://huggingface.co/datasets/{repo_id}")
     print("=" * 80 + "\n")
 
 
