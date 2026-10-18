@@ -1,4 +1,4 @@
-.PHONY: install test lint typecheck run worker eval-smoke eval-full eval-compare ablations format dataset-mine dataset-label dataset-verify reproduce
+.PHONY: install test lint typecheck run worker eval-smoke eval-full eval-compare ablations format dataset-mine dataset-label dataset-verify reproduce simulate-webhook
 
 install:
 	uv sync --extra dev
@@ -79,4 +79,7 @@ eval-final:
 
 reproduce:
 	uv run python -m evals.harness.final_comparison
+
+simulate-webhook:
+	uv run python scripts/simulate_webhook.py
 
