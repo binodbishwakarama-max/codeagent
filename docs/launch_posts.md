@@ -3,6 +3,7 @@
 This document contains publication-ready launch copy, empirical tables, and discussion hooks for Hacker News, LinkedIn, Twitter/X, and longform technical blogging.
 
 All links and metrics are verified against:
+* **Interactive Live Space**: [https://huggingface.co/spaces/Vinod8848/prism-review](https://huggingface.co/spaces/Vinod8848/prism-review)
 * **Hugging Face Benchmark Dataset**: [https://huggingface.co/datasets/Vinod8848/prism-review-benchmark](https://huggingface.co/datasets/Vinod8848/prism-review-benchmark)
 * **GitHub Repository**: [https://github.com/binodbishwakarama-max/codeagent](https://github.com/binodbishwakarama-max/codeagent)
 * **GitHub Release v1.0.0**: [https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0](https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0)
@@ -69,6 +70,7 @@ We mined 300+ real pull requests across 24 repositories (FastAPI, Vite, tRPC, Py
 ### Open Source & Public Artifacts
 
 All code, evaluation harnesses, and datasets are open:
+* Interactive Web Demo: https://huggingface.co/spaces/Vinod8848/prism-review
 * GitHub: https://github.com/binodbishwakarama-max/codeagent
 * Hugging Face Benchmark Dataset: https://huggingface.co/datasets/Vinod8848/prism-review-benchmark
 * Release v1.0.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0
@@ -105,6 +107,7 @@ To fix this, we built Prism Review (https://github.com/binodbishwakarama-max/cod
 5️⃣ AWQ 4-Bit Inference: Quantized serving via vLLM on a single NVIDIA A10G runs at 40.5ms p50 latency and costs $0.00036 per review ($3.60 per 10,000 PRs vs $133.40 for Claude 3.5 Sonnet).
 
 All benchmarks, evaluation harnesses, and datasets are public:
+🌐 Interactive Live Playground: https://huggingface.co/spaces/Vinod8848/prism-review
 📦 Hugging Face Benchmark Dataset: https://huggingface.co/datasets/Vinod8848/prism-review-benchmark
 🚀 GitHub Release v1.0.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0
 💻 Codebase & Local Simulator: https://github.com/binodbishwakarama-max/codeagent
@@ -161,6 +164,7 @@ If your team is experimenting with automated code review or local LLM serving, I
 ### Tweet 6 (CTA & Links)
 > Everything is open source, reproducible, and benchmarked on 300+ real PRs:
 >
+> 🌐 Live Interactive Playground: https://huggingface.co/spaces/Vinod8848/prism-review
 > 📂 Hugging Face Dataset: https://huggingface.co/datasets/Vinod8848/prism-review-benchmark
 > 🏷️ Release v1.0.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0
 > 💻 GitHub: https://github.com/binodbishwakarama-max/codeagent
@@ -175,7 +179,7 @@ If your team is experimenting with automated code review or local LLM serving, I
 # Measured Code Review: Why Base LLMs Spam Clean PRs and How to Train Domain-Specific AI Reviewers
 
 **By Binod Bishwakarma**  
-*Read the open-source code on [GitHub](https://github.com/binodbishwakarama-max/codeagent) or download the benchmark dataset on [Hugging Face](https://huggingface.co/datasets/Vinod8848/prism-review-benchmark).*
+*Try the live playground on [Hugging Face Spaces](https://huggingface.co/spaces/Vinod8848/prism-review), read the open-source code on [GitHub](https://github.com/binodbishwakarama-max/codeagent), or download the benchmark dataset on [Hugging Face](https://huggingface.co/datasets/Vinod8848/prism-review-benchmark).*
 
 ---
 
@@ -294,10 +298,13 @@ Quantizing the fine-tuned model with AWQ 4-bit allowed us to serve it in vLLM on
 
 ### Try It Yourself
 
-1. **Benchmark Dataset on Hugging Face**:
+1. **Interactive Web Playground on Hugging Face Spaces**:
+Explore and review realistic code diffs in real time without any local setup at [Vinod8848/prism-review](https://huggingface.co/spaces/Vinod8848/prism-review).
+
+2. **Benchmark Dataset on Hugging Face**:
 Explore the splits, manifests, and PR metadata at [Vinod8848/prism-review-benchmark](https://huggingface.co/datasets/Vinod8848/prism-review-benchmark).
 
-2. **Simulate Webhook & Reviews Locally**:
+3. **Simulate Webhook & Reviews Locally**:
 You can run the full GitHub App pipeline locally with zero external dependencies:
 ```bash
 git clone https://github.com/binodbishwakarama-max/codeagent.git
@@ -306,7 +313,7 @@ uv sync
 python scripts/simulate_webhook.py
 ```
 
-3. **Check the v1.0.0 Release**:
+4. **Check the v1.0.0 Release**:
 Release notes, migration scripts, and architecture docs are published on [GitHub Releases](https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0).
 
 ---
