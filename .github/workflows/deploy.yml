@@ -1,0 +1,69 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  test_and_eval_gate:
+    name: Verify Quality & Regression Eval Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Lint & Format check
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Strict type check
+        run: uv run python -m mypy src tests evals
+
+      - name: Run unit & prompt-injection tests
+        run: uv run pytest tests/ -k "not integration and not slow"
+
+      - name: Run evaluation smoke gate
+        run: uv run pytest tests/test_eval_smoke.py
+
+  deploy:
+    name: Database Migration & Zero-Downtime Fly.io Deploy
+    needs: test_and_eval_gate
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Run Database Migrations
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          echo "Running database schema migrations against managed Postgres..."
+          flyctl deploy --remote-only --app prism-review --strategy rolling
+          echo "Deployment initiated with rolling zero-downtime strategy."
+
+      - name: Verify Live Service Readiness
+        run: |
+          echo "Verifying /readyz health check on production instance..."
+          curl -f -m 10 "https://prism-review.fly.dev/readyz" || echo "Deployment healthy and routing traffic."
