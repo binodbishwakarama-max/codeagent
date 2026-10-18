@@ -119,12 +119,42 @@ size_categories:
     print(f"Directory: {output_dir}")
     print("\nTo publish to the Hugging Face Hub, run:")
     print("  huggingface-cli login")
-    print("  huggingface-cli repo create prism-review-benchmark --type dataset")
     print(
-        "  git clone https://huggingface.co/datasets/<your-username>/prism-review-benchmark hf_repo"
+        "  uv run python scripts/publish_dataset.py --upload --repo-id <username>/prism-review-benchmark"
     )
-    print(f"  cp -r {output_dir}/* hf_repo/")
-    print("  cd hf_repo && git add . && git commit -m 'Initial benchmark release' && git push")
+    print("=" * 80 + "\n")
+
+
+def upload_to_hub(output_dir: Path, repo_id: str, token: str | None = None) -> None:
+    """Upload packaged dataset export directly to Hugging Face Hub."""
+    import os
+
+    from huggingface_hub import HfApi
+
+    resolved_token = token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+    if not resolved_token:
+        token_path = Path.home() / ".cache" / "huggingface" / "token"
+        if token_path.exists():
+            resolved_token = token_path.read_text(encoding="utf-8").strip()
+
+    if not resolved_token:
+        raise ValueError(
+            "No Hugging Face token found. Please set the HF_TOKEN environment variable, "
+            "run `huggingface-cli login`, or pass `--token <hf_token>`."
+        )
+
+    logger.info("Connecting to Hugging Face Hub (repo: %s)...", repo_id)
+    api = HfApi(token=resolved_token)
+    api.create_repo(repo_id=repo_id, repo_type="dataset", exist_ok=True)
+    logger.info("Uploading dataset files from %s to %s...", output_dir, repo_id)
+    api.upload_folder(
+        folder_path=str(output_dir),
+        repo_id=repo_id,
+        repo_type="dataset",
+        commit_message="Initial benchmark dataset release v1.0.0",
+    )
+    print("\n" + "=" * 80)
+    print(f"🎉 SUCCESS: Published dataset to https://huggingface.co/datasets/{repo_id}")
     print("=" * 80 + "\n")
 
 
@@ -141,9 +171,20 @@ def main() -> None:
     parser.add_argument(
         "--dataset-card", type=Path, default=Path("DATASET_CARD.md"), help="Dataset Card path"
     )
+    parser.add_argument("--upload", action="store_true", help="Upload directly to Hugging Face Hub")
+    parser.add_argument(
+        "--repo-id",
+        type=str,
+        default="binodbishwakarama/prism-review-benchmark",
+        help="Hugging Face repo ID",
+    )
+    parser.add_argument("--token", type=str, default=None, help="Hugging Face access token")
     args = parser.parse_args()
 
     prepare_hf_export(args.source_dir, args.output_dir, args.dataset_card)
+
+    if args.upload:
+        upload_to_hub(args.output_dir, args.repo_id, args.token)
 
 
 if __name__ == "__main__":
