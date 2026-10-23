@@ -112,6 +112,26 @@ def get_local_git_diff(staged: bool = False) -> tuple[str, str]:
     return repo_name, raw_diff
 
 
+def get_local_git_diff_against_base(base_ref: str = "main") -> tuple[str, str]:
+    """Extract git diff against a base branch in CI runners."""
+    repo_name = "local/working-tree"
+    for ref_spec in [f"origin/{base_ref}...HEAD", f"{base_ref}...HEAD", "HEAD~1"]:
+        try:
+            proc = subprocess.run(
+                ["git", "diff", ref_spec],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                check=True,
+            )
+            if proc.stdout.strip():
+                return repo_name, proc.stdout
+        except Exception:
+            continue
+    return get_local_git_diff(staged=False)
+
+
 def evaluate_deterministic_rules(file_diffs: list[FileDiff]) -> list[ReviewFinding]:
     """Deterministic static standards verification engine (fallback when no LLM API is configured)."""
     findings: list[ReviewFinding] = []

@@ -24,7 +24,11 @@ from prism.github.client import GitHubClient
 from prism.github.comments import post_pull_request_review
 from prism.github.diff import parse_unified_diff
 from prism.models import ReviewFinding, ReviewResult, Severity
-from prism.review.cli import evaluate_deterministic_rules, get_local_git_diff
+from prism.review.cli import (
+    evaluate_deterministic_rules,
+    get_local_git_diff,
+    get_local_git_diff_against_base,
+)
 from prism.review.llm import create_llm_client
 from prism.review.pipeline import PRContext, review_pr
 from prism.review.standards import load_default_standards, parse_repo_standards
@@ -180,7 +184,15 @@ async def run_action() -> int:
     try:
         if pr_number > 0:
             logger.info("Fetching unified diff from GitHub API for %s#%d...", repo, pr_number)
-            raw_diff = await client.fetch_pull_request_diff(repo, pr_number)
+            try:
+                raw_diff = await client.fetch_pull_request_diff(repo, pr_number)
+            except Exception as api_exc:
+                logger.warning(
+                    "GitHub API diff fetch failed (%s); falling back to local git diff against base branch...",
+                    api_exc,
+                )
+                base_ref = str(pr_data.get("base", {}).get("ref", "main")) if pr_data else "main"
+                _, raw_diff = get_local_git_diff_against_base(base_ref)
         else:
             logger.info("No pull_request event context found; reading local git diff...")
             _, raw_diff = get_local_git_diff(staged=False)

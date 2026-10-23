@@ -1,6 +1,5 @@
 """Unit tests for GitHub Actions automated pull request review runner."""
 
-import os
 import pytest
 
 from prism.github.action import (
