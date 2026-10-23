@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import time
+from pathlib import Path
 from typing import Literal
 
 import httpx
@@ -385,10 +386,82 @@ async def run_cli(
     )
 
 
+def handle_init_command(argv: list[str]) -> int:
+    """Handle `prism init` subcommand to scaffold .prism/standards.yml."""
+    parser = argparse.ArgumentParser(
+        prog="prism init",
+        description="Initialize tailored .prism/standards.yml and optional GitHub Action workflow.",
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="Target directory to initialize (default: current directory)",
+    )
+    parser.add_argument(
+        "--workflow",
+        action="store_true",
+        help="Also create GitHub Actions review workflow (.github/workflows/prism.yml)",
+    )
+    parser.add_argument(
+        "--force",
+        "-f",
+        action="store_true",
+        help="Overwrite existing standards file if already present",
+    )
+    parser.add_argument(
+        "--stack",
+        choices=["python", "typescript", "go", "rust"],
+        help="Explicitly override auto-detected tech stack",
+    )
+    args = parser.parse_args(argv)
+
+    target_path = Path(args.directory).resolve()
+    print("=" * 80)
+    print("[*] Prism Review - Repository Standards Initialization")
+    print("=" * 80)
+    print(f"Inspecting repository at: {target_path}...")
+
+    try:
+        from prism.review.init import scaffold_prism
+
+        standards_path, workflow_path, languages, frameworks, count = scaffold_prism(
+            target_dir=target_path,
+            force=args.force,
+            include_workflow=args.workflow,
+            stack_override=args.stack,
+        )
+    except FileExistsError as err:
+        print(f"\n[ERROR] {err}\n", file=sys.stderr)
+        return 1
+    except Exception as exc:
+        print(f"\n[ERROR] Failed to initialize standards: {exc}\n", file=sys.stderr)
+        return 1
+
+    stack_desc = ", ".join(languages)
+    if frameworks:
+        stack_desc += f" with {', '.join(frameworks)}"
+
+    print(f"\n[+] Detected Stack: {stack_desc}")
+    print(f"[+] Generated {count} tailored standards in: {standards_path}")
+    if workflow_path:
+        print(f"[+] Created GitHub Action workflow in: {workflow_path}")
+
+    print("\nNext steps:")
+    print("  1. Review and customize your rules in .prism/standards.yml")
+    print("  2. Test local changes before pushing: 'prism --git'")
+    print("  3. Commit and push: 'git add .prism && git commit -m \"chore: add prism standards\"'")
+    print("=" * 80)
+    return 0
+
+
 def main() -> None:
     """CLI entrypoint."""
+    if len(sys.argv) > 1 and sys.argv[1] == "init":
+        sys.exit(handle_init_command(sys.argv[2:]))
+
     parser = argparse.ArgumentParser(
-        description="Prism Automated PR Review CLI - Review GitHub PRs, local git diffs, or patch files."
+        description="Prism Automated PR Review CLI - Review GitHub PRs, local git diffs, patch files, or initialize standards (prism init)."
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(

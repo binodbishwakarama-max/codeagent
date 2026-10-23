@@ -227,14 +227,18 @@ Review live GitHub pull requests, local working trees, or patch files from your 
 # 1. Install Prism CLI
 pip install git+https://github.com/binodbishwakarama-max/codeagent.git
 
-# 2. Review any public GitHub pull request by URL
+# 2. Auto-detect tech stack and scaffold tailored .prism/standards.yml
+prism init
+prism init --workflow   # Also scaffolds .github/workflows/prism.yml
+
+# 3. Review any public GitHub pull request by URL
 prism --url https://github.com/fastapi/fastapi/pull/11020
 
-# 3. Review uncommitted or staged local changes
+# 4. Review uncommitted or staged local changes
 prism --git
 prism --staged
 
-# 4. Review a git patch or piped diff
+# 5. Review a git patch or piped diff
 git diff origin/main | prism --diff -
 ```
 
