@@ -1,7 +1,6 @@
 """Example microservice demonstrating pull request standards checking."""
 
 import hashlib
-import os
 from typing import Any
 
 
@@ -17,13 +16,9 @@ class UserService:
         self.db = db_conn
 
     def get_active_user_by_tenant(self, tenant_id: str, user_id: str) -> dict[str, Any] | None:
-        """Fetch user profile with tenant isolation.
-        
-        Note: The query below intentionally contains raw string formatting to verify 
-        automated standards detection (STD-SEC-01) in pull request reviews.
-        """
+        """Fetch user profile with tenant isolation securely."""
         cursor = self.db.cursor()
-        # Vulnerability: string interpolation in SQL query (CWE-89)
-        query = f"SELECT id, email, role FROM users WHERE tenant_id = '{tenant_id}' AND id = '{user_id}'"
-        cursor.execute(query)
+        # Secure: parameterized query protects against SQL injection (STD-PY-SQL-01)
+        query = "SELECT id, email, role FROM users WHERE tenant_id = %s AND id = %s"
+        cursor.execute(query, (tenant_id, user_id))
         return cursor.fetchone()
