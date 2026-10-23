@@ -578,9 +578,16 @@ def prepare_static_space_bundle(staging_dir: Path) -> None:
     readme_path.write_text(SPACE_README.strip() + "\n", encoding="utf-8")
     print("  [+] Generated Space README.md (sdk: static)")
 
+    # Read from src/prism/web/index.html
+    src_html = Path("src/prism/web/index.html")
+    if src_html.exists():
+        content = src_html.read_text(encoding="utf-8")
+    else:
+        content = INDEX_HTML_CONTENT
+
     # Write index.html
     html_path = staging_dir / "index.html"
-    html_path.write_text(INDEX_HTML_CONTENT.strip() + "\n", encoding="utf-8")
+    html_path.write_text(content.strip() + "\n", encoding="utf-8")
     print("  [+] Generated index.html with interactive review playground")
 
 

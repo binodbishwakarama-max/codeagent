@@ -528,6 +528,11 @@ index 123456..789012 100644
 @app.get("/", response_class=HTMLResponse, tags=["Dashboard"])
 async def landing_page() -> str:
     """Serve interactive web dashboard and code review playground."""
+    from pathlib import Path
+
+    web_index = Path(__file__).parent / "web" / "index.html"
+    if web_index.exists():
+        return web_index.read_text(encoding="utf-8")
     return LANDING_PAGE_HTML
 
 
