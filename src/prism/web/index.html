@@ -1,2006 +1,1786 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prism Review | Autonomous AI Code Review Engine</title>
-  <meta name="description" content="State-of-the-art autonomous AI code reviewer with trained silence heuristics, 96.8% Claude 3.5 Sonnet F1 quality at 37.1x lower cost, and empirical benchmark verification.">
+  <title>Prism Review | Pull Request Standards & Code Correctness</title>
+  <meta name="description" content="Production-grade AI code reviewer enforcing repository standards, reducing false-positive review noise with empirical benchmark verification.">
   
-  <!-- Premium Fonts -->
+  <!-- Interface & Monospace Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
+    /* ==========================================================================
+       DESIGN SYSTEM TOKENS
+       ========================================================================== */
     :root {
-      --bg-base: #06080e;
-      --bg-surface: #0a0e18;
-      --bg-elevated: #0f1626;
-      --bg-overlay: rgba(15, 23, 42, 0.78);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-hover: rgba(56, 189, 248, 0.4);
-      --card-border-active: rgba(56, 189, 248, 0.7);
+      /* Light Theme (Default) */
+      --canvas: #f7f8fa;
+      --surface: #ffffff;
+      --surface-subtle: #f1f3f5;
+      --surface-elevated: #ffffff;
       
-      --primary: #38bdf8;
-      --primary-dim: rgba(56, 189, 248, 0.12);
-      --primary-glow: rgba(56, 189, 248, 0.35);
+      --text-primary: #191f28;
+      --text-secondary: #5a6578;
+      --text-tertiary: #8c96a5;
+      --text-code: #1e293b;
       
-      --indigo: #6366f1;
-      --indigo-glow: rgba(99, 102, 241, 0.3);
+      --border: #e2e6eb;
+      --border-subtle: #eaedf1;
+      --border-focus: #2457d6;
       
-      --emerald: #10b981;
-      --emerald-dim: rgba(16, 185, 129, 0.14);
-      --emerald-glow: rgba(16, 185, 129, 0.35);
+      --accent: #2457d6;
+      --accent-hover: #1b44ab;
+      --accent-subtle: #eef3ff;
+      --accent-border: #ccd9fc;
       
-      --rose: #f43f5e;
-      --rose-dim: rgba(244, 63, 94, 0.14);
-      --rose-glow: rgba(244, 63, 94, 0.35);
+      --critical: #c93636;
+      --critical-subtle: #fef2f2;
+      --critical-border: #fecaca;
+      --critical-text: #991b1b;
       
-      --amber: #f59e0b;
-      --amber-dim: rgba(245, 158, 11, 0.14);
+      --warning: #986400;
+      --warning-subtle: #fffbeb;
+      --warning-border: #fef3c7;
+      --warning-text: #92400e;
       
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --text-faint: #334155;
+      --success: #18794e;
+      --success-subtle: #f0fdf4;
+      --success-border: #bbf7d0;
+      --success-text: #166534;
       
-      --diff-add-bg: rgba(16, 185, 129, 0.12);
-      --diff-add-text: #6ee7b7;
-      --diff-add-gutter: rgba(16, 185, 129, 0.25);
-      --diff-del-bg: rgba(244, 63, 94, 0.12);
-      --diff-del-text: #fda4af;
-      --diff-del-gutter: rgba(244, 63, 94, 0.25);
-      --diff-hunk-bg: rgba(99, 102, 241, 0.08);
+      --info: #0284c7;
+      --info-subtle: #f0f9ff;
+      --info-border: #bae6fd;
       
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --radius-xl: 20px;
+      /* Diff Semantic Colors */
+      --diff-add-bg: #ecfdf5;
+      --diff-add-gutter: #d1fae5;
+      --diff-add-text: #065f46;
+      --diff-add-symbol: #059669;
       
-      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+      --diff-del-bg: #fef2f2;
+      --diff-del-gutter: #fee2e2;
+      --diff-del-text: #991b1b;
+      --diff-del-symbol: #dc2626;
+      
+      --diff-hunk-bg: #f8fafc;
+      --diff-hunk-text: #475569;
+      
+      /* Radii */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.06);
+      --shadow-panel: 0 4px 12px rgba(0, 0, 0, 0.05);
+      
+      /* Transitions */
+      --transition-fast: 0.15s ease;
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
 
+    /* Dark Theme */
+    [data-theme="dark"] {
+      --canvas: #121519;
+      --surface: #181c22;
+      --surface-subtle: #20242c;
+      --surface-elevated: #262b34;
+      
+      --text-primary: #edf0f5;
+      --text-secondary: #9da6b5;
+      --text-tertiary: #6b7585;
+      --text-code: #e2e8f0;
+      
+      --border: #2a303b;
+      --border-subtle: #222731;
+      --border-focus: #83a7ff;
+      
+      --accent: #83a7ff;
+      --accent-hover: #9cbaff;
+      --accent-subtle: #19233c;
+      --accent-border: #2b3d68;
+      
+      --critical: #f87171;
+      --critical-subtle: #2a1416;
+      --critical-border: #4d1d22;
+      --critical-text: #fca5a5;
+      
+      --warning: #fbbf24;
+      --warning-subtle: #2b210e;
+      --warning-border: #4f3b14;
+      --warning-text: #fde68a;
+      
+      --success: #34d399;
+      --success-subtle: #11281e;
+      --success-border: #1a4332;
+      --success-text: #6ee7b7;
+      
+      --info: #38bdf8;
+      --info-subtle: #102638;
+      --info-border: #1a4463;
+      
+      --diff-add-bg: #10251c;
+      --diff-add-gutter: #163627;
+      --diff-add-text: #a7f3d0;
+      --diff-add-symbol: #34d399;
+      
+      --diff-del-bg: #291418;
+      --diff-del-gutter: #3b1b22;
+      --diff-del-text: #fecaca;
+      --diff-del-symbol: #f87171;
+      
+      --diff-hunk-bg: #1b2028;
+      --diff-hunk-text: #94a3b8;
+      
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.4);
+      --shadow-panel: 0 4px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Base Reset */
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--bg-base);
-      color: var(--text-main);
-      line-height: 1.55;
+      font-family: var(--font-ui);
+      background-color: var(--canvas);
+      color: var(--text-primary);
+      line-height: 1.5;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
-      font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+      font-size: 14px;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient Atmosphere Gradients */
-    .ambient-glow-top {
-      position: fixed;
-      top: -160px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1100px;
-      height: 480px;
-      background: radial-gradient(ellipse 65% 55% at 50% 30%, rgba(56, 189, 248, 0.16), rgba(99, 102, 241, 0.1) 60%, transparent 100%);
-      filter: blur(70px);
-      pointer-events: none;
-      z-index: 0;
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Accessible Focus Ring */
+    :focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
     }
 
-    .ambient-glow-side {
-      position: fixed;
-      top: 40%;
-      right: -200px;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.07), transparent 70%);
-      filter: blur(90px);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Precision Grid Overlay */
-    .grid-pattern {
-      position: fixed;
-      inset: 0;
-      background-size: 32px 32px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-      mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, black 40%, transparent 95%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Container Shell */
-    .shell {
-      max-width: 1260px;
+    /* Container */
+    .app-shell {
+      max-width: 1360px;
       width: 100%;
       margin: 0 auto;
-      padding: 1.75rem 1.5rem 5rem 1.5rem;
-      position: relative;
-      z-index: 1;
+      padding: 0 16px 48px 16px;
       flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* Top Command Header / Navigation */
-    .top-nav {
+    /* ==========================================================================
+       PRODUCT HEADER & NAVIGATION
+       ========================================================================== */
+    .app-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-inner {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0 16px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1.25rem;
-      padding: 0.75rem 1.25rem;
-      background: rgba(10, 14, 24, 0.85);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid var(--card-border);
-      border-radius: 9999px;
-      box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      margin-bottom: 3rem;
-      transition: border-color 0.25s ease;
+      gap: 16px;
     }
 
-    .top-nav:hover {
-      border-color: rgba(255, 255, 255, 0.14);
-    }
-
-    .brand-cluster {
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
+      gap: 16px;
     }
 
-    .brand-gem {
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-symbol {
+      width: 22px;
+      height: 22px;
+      background: var(--accent);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .repo-context-crumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding-left: 12px;
+      border-left: 1px solid var(--border);
+    }
+
+    .repo-context-crumb strong {
+      color: var(--text-primary);
+    }
+
+    /* Navigation Tabs */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+    }
+
+    .nav-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 52px;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .nav-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-tab.active {
+      color: var(--accent);
+      font-weight: 600;
+      border-bottom-color: var(--accent);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: 32px;
       height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
     }
 
-    .brand-gem svg {
-      width: 18px;
-      height: 18px;
-      fill: none;
-      stroke: #ffffff;
-      stroke-width: 2.2;
+    .theme-toggle-btn:hover {
+      background: var(--surface-subtle);
+      color: var(--text-primary);
     }
 
-    .brand-name {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800;
-      font-size: 1.15rem;
-      letter-spacing: -0.025em;
-      color: #ffffff;
-    }
-
-    .version-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    /* Live Telemetry Pulse Pill */
-    .telemetry-pill {
-      display: flex;
-      align-items: center;
-      gap: 0.55rem;
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      border-radius: 9999px;
-      padding: 0.3rem 0.85rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.76rem;
-      font-weight: 600;
-      color: #34d399;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.12);
-    }
-
-    .pulse-radar {
-      position: relative;
-      width: 8px;
-      height: 8px;
-    }
-
-    .pulse-core {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: #10b981;
-    }
-
-    .pulse-wave {
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 1.5px solid #10b981;
-      animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
-
-    @keyframes radar-ping {
-      0% { transform: scale(0.9); opacity: 1; }
-      100% { transform: scale(2.4); opacity: 0; }
-    }
-
-    .nav-shortcuts {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .nav-btn {
+    /* Header Actions */
+    .btn-header-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
-      padding: 0.45rem 0.95rem;
-      border-radius: 9999px;
-      font-size: 0.82rem;
-      font-weight: 600;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
       text-decoration: none;
-      color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
-      transition: all 0.2s var(--ease-spring);
+      transition: all var(--transition-fast);
     }
 
-    .nav-btn:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
+    .btn-header-link:hover {
+      background: var(--surface-subtle);
+      color: var(--text-primary);
+      text-decoration: none;
     }
 
-    .nav-btn.btn-star {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.16) 0%, rgba(99, 102, 241, 0.18) 100%);
-      border-color: rgba(56, 189, 248, 0.4);
-      color: #38bdf8;
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.15);
-    }
-
-    .nav-btn.btn-star:hover {
-      border-color: #38bdf8;
-      box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
-      color: #ffffff;
-    }
-
-    /* Hero Section */
-    .hero-wrap {
-      text-align: center;
-      margin-bottom: 3.5rem;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 0.9rem;
-      border-radius: 9999px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      color: #38bdf8;
-      margin-bottom: 1.35rem;
-      box-shadow: 0 0 24px rgba(56, 189, 248, 0.15);
-    }
-
-    .hero-heading {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 3.75rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1.1;
-      margin-bottom: 1.25rem;
-      background: linear-gradient(180deg, #ffffff 20%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-subheading {
-      font-size: 1.18rem;
-      color: var(--text-muted);
-      max-width: 800px;
-      margin: 0 auto;
-      line-height: 1.65;
-      font-weight: 400;
-    }
-
-    .hero-subheading strong {
-      color: #ffffff;
-      font-weight: 600;
-    }
-
-    /* Metric Command Cards */
-    .metrics-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.15rem;
-      margin-bottom: 3rem;
-    }
-
-    .stat-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--card-border);
+    /* ==========================================================================
+       PULL REQUEST CONTEXT & STATUS BAR
+       ========================================================================== */
+    .pr-header-strip {
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 1.35rem 1.4rem;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      transition: all 0.25s var(--ease-spring);
+      padding: 16px 20px;
+      margin: 20px 0 16px 0;
+      box-shadow: var(--shadow-sm);
     }
 
-    .stat-card:hover {
-      border-color: var(--card-border-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 24px var(--primary-dim);
-    }
-
-    .stat-card::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 1.5px;
-      background: linear-gradient(90deg, transparent, var(--stat-accent, var(--primary)), transparent);
-      opacity: 0.8;
-    }
-
-    .stat-label-wrap {
+    .pr-meta-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.6rem;
-    }
-
-    .stat-label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .stat-badge {
-      font-size: 0.72rem;
-      font-family: 'JetBrains Mono', monospace;
-      padding: 0.15rem 0.45rem;
-      border-radius: 4px;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-dim);
-    }
-
-    .stat-number {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 2.25rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      margin-bottom: 0.45rem;
-      color: #ffffff;
-    }
-
-    .stat-number.cyan { color: #38bdf8; text-shadow: 0 0 24px rgba(56, 189, 248, 0.4); }
-    .stat-number.emerald { color: #34d399; text-shadow: 0 0 24px rgba(16, 185, 129, 0.4); }
-    .stat-number.indigo { color: #a5b4fc; text-shadow: 0 0 24px rgba(99, 102, 241, 0.4); }
-    .stat-number.amber { color: #fbbf24; text-shadow: 0 0 24px rgba(245, 158, 11, 0.4); }
-
-    .stat-detail {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    /* Main Tab Navigation */
-    .tab-deck {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem;
-      background: rgba(10, 14, 24, 0.7);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      margin-bottom: 2rem;
-      box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.4);
-    }
-
-    .tab-trigger {
-      flex: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.55rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: var(--radius-md);
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      border: 1px solid transparent;
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.2s var(--ease-spring);
-      position: relative;
-    }
-
-    .tab-trigger:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .tab-trigger.active {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
-
-    .tab-trigger.active::after {
-      content: "";
-      position: absolute;
-      bottom: -1px;
-      left: 20%;
-      right: 20%;
-      height: 2px;
-      background: var(--primary);
-      box-shadow: 0 0 10px var(--primary);
-      border-radius: 2px;
-    }
-
-    /* Tab Panes */
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.active {
-      display: block;
-      animation: panel-enter 0.3s var(--ease-spring);
-    }
-
-    @keyframes panel-enter {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Glass Workspace Box */
-    .workspace-box {
-      background: var(--bg-surface);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    }
-
-    /* Scenario Header Ribbon */
-    .workspace-ribbon {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      gap: 16px;
       flex-wrap: wrap;
-      gap: 1.25rem;
-      padding: 1.15rem 1.5rem;
-      background: rgba(15, 22, 38, 0.85);
-      border-bottom: 1px solid var(--card-border);
     }
 
-    .ribbon-title-wrap {
+    .pr-title-group {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-    }
-
-    .ribbon-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary);
-    }
-
-    .ribbon-heading {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    /* Scenario Selector Pills */
-    .scenario-selector {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      background: rgba(6, 8, 14, 0.6);
-      padding: 0.25rem;
-      border-radius: 9999px;
-      border: 1px solid var(--card-border);
-      overflow-x: auto;
-    }
-
-    .scenario-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      padding: 0.4rem 0.9rem;
-      border-radius: 9999px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      border: 1px solid transparent;
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.2s var(--ease-spring);
-      white-space: nowrap;
-    }
-
-    .scenario-btn:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .scenario-btn.active {
-      color: #ffffff;
-      background: rgba(56, 189, 248, 0.14);
-      border-color: rgba(56, 189, 248, 0.4);
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.18);
-    }
-
-    .scenario-btn.clean-btn.active {
-      color: #34d399;
-      background: rgba(16, 185, 129, 0.14);
-      border-color: rgba(16, 185, 129, 0.4);
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.18);
-    }
-
-    /* Pull Request Meta Header (Authentic GitHub Style) */
-    .pr-metadata-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.85rem 1.5rem;
-      background: #090d18;
-      border-bottom: 1px solid var(--card-border);
-      font-size: 0.86rem;
+      gap: 10px;
       flex-wrap: wrap;
-      gap: 1rem;
     }
 
-    .pr-info-left {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .pr-status-badge {
+    .badge-pr-status {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.25rem 0.65rem;
-      border-radius: 9999px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      background: #238636;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      background: #18794e;
       color: #ffffff;
     }
 
     .pr-title-text {
+      font-size: 16px;
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
     }
 
-    .pr-branch-ref {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
-      background: rgba(255, 255, 255, 0.06);
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      color: var(--primary);
+    .pr-number-label {
+      color: var(--text-tertiary);
+      font-weight: 400;
     }
 
-    .pr-info-right {
+    .pr-branch-info {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 6px;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 8px;
     }
 
-    .diff-mode-toggle {
-      display: flex;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 2px;
+    .branch-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
     }
 
-    .diff-mode-btn {
-      padding: 0.3rem 0.65rem;
-      font-size: 0.76rem;
+    /* Check Run Outcome Pill */
+    .check-run-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
       font-weight: 600;
-      border: none;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .check-run-pill.failed {
+      background: var(--critical-subtle);
+      border: 1px solid var(--critical-border);
+      color: var(--critical-text);
+    }
+
+    .check-run-pill.passed {
+      background: var(--success-subtle);
+      border: 1px solid var(--success-border);
+      color: var(--success-text);
+    }
+
+    /* ==========================================================================
+       TWO-COLUMN WORKSPACE LAYOUT
+       ========================================================================== */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    /* Main Code Review Area */
+    .code-review-pane {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    /* Control Toolbar */
+    .pane-toolbar {
+      padding: 12px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .scenario-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Scenario Segment Selector */
+    .segmented-control {
+      display: flex;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .segment-btn {
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
       background: transparent;
-      color: var(--text-dim);
-      border-radius: 4px;
+      border: none;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
     }
 
-    .diff-mode-btn.active {
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
+    .segment-btn:hover {
+      color: var(--text-primary);
     }
 
-    /* Code & Diff Container */
-    .diff-viewport {
-      position: relative;
-      background: #05070d;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      line-height: 1.6;
+    .segment-btn.active {
+      background: var(--surface);
+      color: var(--text-primary);
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* File Metadata & Diff Mode */
+    .file-header-bar {
+      padding: 8px 16px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .file-path {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .file-stats {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .file-stats .add { color: var(--success); font-weight: 600; }
+    .file-stats .del { color: var(--critical); font-weight: 600; }
+
+    /* ==========================================================================
+       DIFF VIEWER (UNIFIED & MONOSPACE)
+       ========================================================================== */
+    .diff-container {
       overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.55;
+      background: var(--surface);
     }
 
-    /* Real Split/Unified Diff Table */
     .diff-table {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
     }
 
-    .diff-table tr {
-      transition: background-color 0.15s ease;
+    .diff-line {
+      height: 22px;
     }
 
-    .diff-table tr:hover {
-      background-color: rgba(255, 255, 255, 0.02);
+    .diff-line:hover {
+      filter: brightness(0.97);
     }
 
-    .diff-gutter {
-      width: 48px;
+    [data-theme="dark"] .diff-line:hover {
+      filter: brightness(1.05);
+    }
+
+    .line-num {
+      width: 44px;
+      padding: 0 8px;
       text-align: right;
-      padding: 0 10px;
+      color: var(--text-tertiary);
       user-select: none;
-      color: var(--text-faint);
-      font-size: 0.78rem;
-      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 11px;
       vertical-align: top;
+      border-right: 1px solid var(--border-subtle);
     }
 
-    .diff-marker {
-      width: 24px;
+    .line-marker {
+      width: 20px;
       text-align: center;
       user-select: none;
-      color: var(--text-dim);
       vertical-align: top;
-      font-weight: 700;
-    }
-
-    .diff-line-content {
-      padding: 0 14px;
-      white-space: pre-wrap;
-      word-break: break-all;
-      color: #e2e8f0;
-      position: relative;
-    }
-
-    /* Line Types */
-    .diff-row-hunk {
-      background: var(--diff-hunk-bg);
-      color: #818cf8;
-      font-size: 0.78rem;
       font-weight: 600;
     }
 
-    .diff-row-hunk .diff-line-content {
-      color: #a5b4fc;
-      padding-top: 4px;
-      padding-bottom: 4px;
+    .line-code {
+      padding: 0 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      vertical-align: top;
+      color: var(--text-code);
     }
 
-    .diff-row-del {
+    /* Line Type Treatments */
+    .diff-line.hunk {
+      background: var(--diff-hunk-bg);
+      color: var(--diff-hunk-text);
+      font-size: 11.5px;
+      font-weight: 500;
+    }
+
+    .diff-line.hunk .line-code {
+      padding-top: 3px;
+      padding-bottom: 3px;
+      color: var(--diff-hunk-text);
+    }
+
+    .diff-line.del {
       background: var(--diff-del-bg);
     }
 
-    .diff-row-del .diff-gutter {
-      color: #f43f5e;
+    .diff-line.del .line-num {
       background: var(--diff-del-gutter);
+      color: var(--diff-del-symbol);
     }
 
-    .diff-row-del .diff-marker {
-      color: #f43f5e;
+    .diff-line.del .line-marker {
+      color: var(--diff-del-symbol);
     }
 
-    .diff-row-del .diff-line-content {
+    .diff-line.del .line-code {
       color: var(--diff-del-text);
     }
 
-    .diff-row-add {
+    .diff-line.add {
       background: var(--diff-add-bg);
     }
 
-    .diff-row-add .diff-gutter {
-      color: #10b981;
+    .diff-line.add .line-num {
       background: var(--diff-add-gutter);
+      color: var(--diff-add-symbol);
     }
 
-    .diff-row-add .diff-marker {
-      color: #10b981;
+    .diff-line.add .line-marker {
+      color: var(--diff-add-symbol);
     }
 
-    .diff-row-add .diff-line-content {
+    .diff-line.add .line-code {
       color: var(--diff-add-text);
     }
 
-    /* Editable Raw Diff Box */
-    .raw-diff-editor {
+    /* Raw Diff Editor (for custom scenario) */
+    .raw-diff-input {
       display: none;
       width: 100%;
-      height: 280px;
-      background: #05070d;
+      height: 320px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.55;
+      background: var(--surface);
+      color: var(--text-code);
       border: none;
-      color: #cbd5e1;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      line-height: 1.6;
-      padding: 1.25rem;
       outline: none;
       resize: vertical;
-      white-space: pre;
     }
 
-    /* INLINE GITHUB-STYLE REVIEW COMMENT (ANCHORED DIRECTLY INSIDE DIFF) */
-    .diff-inline-comment-row td {
+    /* ==========================================================================
+       INLINE FINDINGS & REMEDIATION (ANCHORED UNDER LINE)
+       ========================================================================== */
+    .inline-finding-row td {
       padding: 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--canvas);
     }
 
-    .inline-comment-anchor {
-      margin: 10px 14px 14px 72px;
-      background: #0b1120;
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      border-radius: var(--radius-md);
-      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7), 0 0 24px rgba(56, 189, 248, 0.12);
+    .inline-finding-card {
+      margin: 8px 16px 12px 64px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--critical);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-sm);
       overflow: hidden;
-      animation: comment-reveal 0.35s var(--ease-spring);
+      font-family: var(--font-ui);
     }
 
-    @keyframes comment-reveal {
-      from { opacity: 0; transform: translateY(-8px) scale(0.99); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+    .inline-finding-card.severity-high {
+      border-left-color: var(--warning);
     }
 
-    .inline-comment-header {
+    .finding-header {
+      padding: 8px 12px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.65rem 1rem;
-      background: rgba(15, 23, 42, 0.95);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 0.82rem;
+      gap: 12px;
+      font-size: 12px;
     }
 
-    .bot-identity {
+    .finding-identity {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 8px;
+    }
+
+    .finding-pill-sev {
+      font-size: 11px;
       font-weight: 700;
-      color: #ffffff;
-    }
-
-    .bot-badge-tag {
-      font-size: 0.68rem;
-      font-weight: 800;
-      padding: 0.15rem 0.45rem;
-      border-radius: 4px;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      color: #38bdf8;
-      letter-spacing: 0.04em;
-    }
-
-    .inline-comment-body {
-      padding: 1.15rem 1.25rem;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .rule-tag-cluster {
-      display: flex;
-      align-items: center;
-      gap: 0.55rem;
-      margin-bottom: 0.85rem;
-      flex-wrap: wrap;
-    }
-
-    .tag-severity {
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.03em;
     }
 
-    .tag-severity.critical {
-      background: rgba(244, 63, 94, 0.18);
-      border: 1px solid rgba(244, 63, 94, 0.4);
-      color: #fb7185;
+    .finding-pill-sev.critical {
+      background: var(--critical-subtle);
+      color: var(--critical-text);
+      border: 1px solid var(--critical-border);
     }
 
-    .tag-severity.high {
-      background: rgba(245, 158, 11, 0.18);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      color: #fbbf24;
+    .finding-pill-sev.high {
+      background: var(--warning-subtle);
+      color: var(--warning-text);
+      border: 1px solid var(--warning-border);
     }
 
-    .tag-rule-id {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.76rem;
-      font-weight: 700;
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.35);
-      color: #a5b4fc;
+    .finding-rule-id {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
-    .tag-cwe {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.74rem;
-      color: var(--text-dim);
+    .finding-cwe-tag {
+      font-family: var(--font-mono);
+      color: var(--text-tertiary);
     }
 
-    .comment-message-text {
-      font-size: 0.92rem;
-      line-height: 1.6;
-      color: #e2e8f0;
-      margin-bottom: 1rem;
+    .finding-body {
+      padding: 12px;
     }
 
-    /* GitHub "Suggested Change" Commit Block */
-    .commit-suggestion-block {
-      background: #04060b;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+    .finding-message {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    /* Remediation Diff Box */
+    .remediation-box {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       overflow: hidden;
-      margin-bottom: 1rem;
+      margin-bottom: 10px;
     }
 
-    .suggestion-top-bar {
+    .remediation-header {
+      padding: 6px 10px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.45rem 0.85rem;
-      background: rgba(56, 189, 248, 0.08);
-      border-bottom: 1px solid rgba(56, 189, 248, 0.18);
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
     }
 
-    .suggestion-code {
-      padding: 0.85rem 1rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
-      line-height: 1.6;
-      color: #6ee7b7;
-      background: rgba(16, 185, 129, 0.05);
+    .remediation-code {
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--diff-add-text);
+      background: var(--diff-add-bg);
       white-space: pre-wrap;
     }
 
-    .btn-apply-suggestion {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      background: #238636;
-      color: #ffffff;
-      border: none;
-      padding: 0.35rem 0.85rem;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.4);
-    }
-
-    .btn-apply-suggestion:hover {
-      background: #2ea043;
-      transform: translateY(-1px);
-    }
-
-    /* Comment Reaction & Reply Bar */
-    .comment-actions-bar {
+    /* Action Toolbar for Finding */
+    .finding-actions {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      gap: 12px;
+      padding-top: 6px;
     }
 
-    .reaction-pill-group {
+    .finding-actions-left {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 6px;
     }
 
-    .btn-reaction {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.25rem 0.65rem;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      font-size: 0.76rem;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-reaction:hover {
-      border-color: var(--primary);
-      color: #ffffff;
-      transform: scale(1.05);
-    }
-
-    .btn-reaction.active {
-      background: rgba(56, 189, 248, 0.18);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .btn-resolve-thread {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.35rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-resolve-thread:hover {
-      background: rgba(16, 185, 129, 0.12);
-      border-color: rgba(16, 185, 129, 0.4);
-      color: #34d399;
-    }
-
-    /* Clean PR Full Silence Banner */
-    .clean-pr-silence-card {
-      margin: 1.5rem;
-      padding: 2.5rem 2rem;
-      background: radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.12), rgba(10, 14, 24, 0.8) 70%);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: var(--radius-lg);
+    /* ==========================================================================
+       CLEAN PULL REQUEST (CALM SUCCESS STATE)
+       ========================================================================== */
+    .clean-state-box {
+      padding: 32px 24px;
       text-align: center;
-      box-shadow: 0 0 40px rgba(16, 185, 129, 0.1);
+      background: var(--surface);
     }
 
-    .clean-shield-icon {
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 1.25rem auto;
-      border-radius: 50%;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1.5px solid #10b981;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 24px rgba(16, 185, 129, 0.35);
-    }
-
-    .clean-shield-icon svg {
-      width: 28px;
-      height: 28px;
-      fill: none;
-      stroke: #34d399;
-      stroke-width: 2.2;
-    }
-
-    .clean-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #34d399;
-      margin-bottom: 0.65rem;
-      letter-spacing: -0.02em;
-    }
-
-    .clean-explanation {
-      font-size: 0.96rem;
-      color: var(--text-muted);
-      max-width: 720px;
-      margin: 0 auto 1.5rem auto;
-      line-height: 1.65;
-    }
-
-    .clean-comparison-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.45rem 1rem;
-      border-radius: 9999px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 0.82rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: #e2e8f0;
-    }
-
-    /* Action Deck & Pipeline Status */
-    .workspace-footer {
-      padding: 1.25rem 1.5rem;
-      background: rgba(15, 22, 38, 0.95);
-      border-top: 1px solid var(--card-border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1.25rem;
-    }
-
-    .btn-execute-review {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.85rem 1.85rem;
-      border-radius: var(--radius-md);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 1rem;
-      font-weight: 800;
-      color: #050811;
-      background: linear-gradient(135deg, #38bdf8 0%, #60a5fa 100%);
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
-      transition: all 0.2s var(--ease-spring);
-    }
-
-    .btn-execute-review:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(56, 189, 248, 0.6);
-    }
-
-    .btn-execute-review:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .secondary-tool-btns {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .btn-ghost-tool {
-      padding: 0.6rem 1rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-ghost-tool:hover {
-      color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Animated Telemetry HUD */
-    .telemetry-hud {
-      display: none;
-      padding: 1.25rem 1.5rem;
-      background: #04060c;
-      border-top: 1px solid var(--card-border);
-      animation: hud-reveal 0.3s ease;
-    }
-
-    @keyframes hud-reveal {
-      from { opacity: 0; transform: translateY(-6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .hud-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.85rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-dim);
-    }
-
-    .hud-pipeline-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.6rem;
-    }
-
-    .hud-stage {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-sm);
-      padding: 0.6rem 0.5rem;
-      text-align: center;
-      font-size: 0.72rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-dim);
-      transition: all 0.2s ease;
-    }
-
-    .hud-stage.running {
-      border-color: var(--primary);
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.1);
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
-    }
-
-    .hud-stage.completed {
-      border-color: var(--emerald);
-      color: #34d399;
-      background: rgba(16, 185, 129, 0.08);
-    }
-
-    /* TAB 2: MULTI-TURN THREAD SIMULATOR */
-    .thread-simulator-wrapper {
-      padding: 2rem;
-    }
-
-    .thread-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      margin-bottom: 1.5rem;
-    }
-
-    .thread-timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .thread-entry {
-      display: flex;
-      gap: 1rem;
-      animation: entry-fade 0.25s ease;
-    }
-
-    @keyframes entry-fade {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .thread-avatar {
+    .clean-state-icon {
       width: 40px;
       height: 40px;
+      margin: 0 auto 12px auto;
       border-radius: 50%;
+      background: var(--success-subtle);
+      border: 1px solid var(--success-border);
+      color: var(--success);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 0.95rem;
+    }
+
+    .clean-state-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .clean-state-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto 12px auto;
+      line-height: 1.5;
+    }
+
+    .clean-state-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--surface-subtle);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    /* ==========================================================================
+       SIDEBAR PANELS (FINDINGS LIST, TELEMETRY, STANDARDS)
+       ========================================================================== */
+    .sidebar-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .panel-header-simple {
+      padding: 10px 14px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-body-simple {
+      padding: 12px 14px;
+    }
+
+    /* Findings List Items */
+    .findings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .finding-list-item {
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), border-color var(--transition-fast);
+      text-decoration: none;
+      display: block;
+    }
+
+    .finding-list-item:hover {
+      background: var(--surface-subtle);
+      border-color: var(--border-focus);
+      text-decoration: none;
+    }
+
+    .item-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .item-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .item-loc {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    /* Pipeline Telemetry Strip */
+    .telemetry-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12px;
+    }
+
+    .telemetry-row:last-child {
+      border-bottom: none;
+    }
+
+    .telemetry-label {
+      color: var(--text-secondary);
+    }
+
+    .telemetry-val {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       BUTTON & CONTROL SYSTEM
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-subtle);
+      border-color: var(--text-tertiary);
+      text-decoration: none;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #ffffff;
+      border-color: var(--success);
+    }
+
+    .btn-success:hover {
+      background: #156742;
+      color: #ffffff;
+    }
+
+    .btn-sm {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+
+    /* ==========================================================================
+       TAB 2: THREAD RESOLUTION WORKSPACE
+       ========================================================================== */
+    .tab-section {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    .thread-conversation-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+    }
+
+    .thread-context-banner {
+      padding: 10px 14px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+    }
+
+    .thread-message-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .thread-msg-item {
+      display: flex;
+      gap: 12px;
+    }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
       flex-shrink: 0;
     }
 
-    .thread-avatar.bot {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
-      border: 1.5px solid rgba(56, 189, 248, 0.5);
-      color: #38bdf8;
+    .msg-avatar.bot {
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
     }
 
-    .thread-avatar.human {
-      background: rgba(129, 140, 248, 0.2);
-      border: 1.5px solid rgba(129, 140, 248, 0.5);
-      color: #a5b4fc;
+    .msg-avatar.human {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
     }
 
-    .thread-content-card {
+    .msg-bubble {
       flex: 1;
-      background: #090e1a;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-    }
-
-    .thread-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.65rem 1.15rem;
-      background: rgba(15, 23, 42, 0.85);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 0.82rem;
-    }
-
-    .thread-body {
-      padding: 1.15rem;
-      font-size: 0.92rem;
-      line-height: 1.6;
-      color: #e2e8f0;
-    }
-
-    /* Preset Response Chips */
-    .preset-chips-wrap {
-      margin-bottom: 1.25rem;
-    }
-
-    .preset-label {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 0.6rem;
-    }
-
-    .preset-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .btn-preset-chip {
-      padding: 0.45rem 0.9rem;
-      border-radius: 9999px;
-      font-size: 0.82rem;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-preset-chip:hover {
-      background: rgba(56, 189, 248, 0.1);
-      border-color: rgba(56, 189, 248, 0.3);
-      color: #ffffff;
-      transform: translateY(-1px);
-    }
-
-    .thread-input-row {
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    .thread-input-field {
-      flex: 1;
-      background: #04070e;
-      border: 1px solid var(--card-border);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 0.85rem 1.15rem;
-      color: #ffffff;
-      font-family: inherit;
-      font-size: 0.92rem;
-      outline: none;
-      transition: border-color 0.2s ease;
+      overflow: hidden;
     }
 
-    .thread-input-field:focus {
-      border-color: var(--primary);
-    }
-
-    /* TAB 3: STANDARDS INSPECTOR */
-    .standards-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.25rem;
-      padding: 2rem;
-    }
-
-    .standard-item-card {
-      background: #090e1a;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 1.35rem;
-      transition: all 0.2s ease;
-    }
-
-    .standard-item-card:hover {
-      border-color: rgba(99, 102, 241, 0.4);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    }
-
-    .standard-item-top {
+    .msg-header {
+      padding: 6px 12px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.75rem;
+      font-size: 12px;
     }
 
-    .standard-item-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 0.5rem;
+    .msg-content {
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-primary);
     }
 
-    .standard-item-desc {
-      font-size: 0.86rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 1rem;
-    }
-
-    /* TAB 4: BENCHMARK & ROI CALCULATOR */
-    .benchmark-section {
-      padding: 2rem;
-    }
-
-    .benchmark-header-row {
+    /* Preset Responses */
+    .preset-chip-list {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
+      gap: 6px;
       flex-wrap: wrap;
-      gap: 1rem;
+      margin-bottom: 12px;
     }
 
-    .table-container {
-      overflow-x: auto;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--card-border);
-      margin-bottom: 2.5rem;
+    .chip-btn {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
     }
 
-    .elite-table {
+    .chip-btn:hover {
+      background: var(--surface);
+      color: var(--text-primary);
+      border-color: var(--border-focus);
+    }
+
+    .thread-reply-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .text-input {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .text-input:focus {
+      border-color: var(--border-focus);
+    }
+
+    /* ==========================================================================
+       TAB 3: REPOSITORY STANDARDS (AS CODE)
+       ========================================================================== */
+    .standards-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .rule-table {
       width: 100%;
       border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .rule-table th {
+      padding: 8px 12px;
       text-align: left;
-      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
     }
 
-    .elite-table th {
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text-muted);
-      padding: 0.95rem 1.15rem;
-      font-weight: 700;
-      font-size: 0.76rem;
+    .rule-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       TAB 4: EMPIRICAL BENCHMARKS & TEAM ROI
+       ========================================================================== */
+    .benchmark-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .benchmark-table-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+    }
+
+    .clean-benchmark-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .clean-benchmark-table th {
+      padding: 10px 14px;
+      font-weight: 600;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--card-border);
+      letter-spacing: 0.03em;
+      color: var(--text-secondary);
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
     }
 
-    .elite-table td {
-      padding: 1.15rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      color: #cbd5e1;
+    .clean-benchmark-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
     }
 
-    .elite-table tr.row-winner {
-      background: rgba(56, 189, 248, 0.06);
+    .clean-benchmark-table tr.highlight-prism {
+      background: var(--accent-subtle);
       font-weight: 600;
     }
 
-    .elite-table tr.row-winner td {
-      color: #ffffff;
-      border-left: 3px solid var(--primary);
+    .clean-benchmark-table tr.highlight-prism td {
+      color: var(--text-primary);
+      border-left: 3px solid var(--accent);
     }
 
-    /* Interactive Team ROI Calculator */
-    .calculator-box {
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 14, 24, 0.95) 100%);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+    /* ROI Calculation Tool */
+    .roi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 1.75rem;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
     }
 
-    .calculator-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 0.35rem;
+    .roi-slider-container {
+      margin: 16px 0;
     }
 
-    .calc-slider-wrap {
-      margin: 1.5rem 0;
-    }
-
-    .slider-label-row {
+    .slider-header {
       display: flex;
       justify-content: space-between;
-      font-size: 0.88rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 500;
     }
 
-    .calc-slider {
+    .slider-control {
       width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.1);
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
       outline: none;
       -webkit-appearance: none;
     }
 
-    .calc-slider::-webkit-slider-thumb {
+    .slider-control::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      background: #38bdf8;
+      background: var(--accent);
       cursor: pointer;
-      box-shadow: 0 0 16px #38bdf8;
     }
 
-    .calc-results-grid {
+    .roi-stats-strip {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      margin-top: 1.5rem;
+      gap: 12px;
+      margin-top: 16px;
     }
 
-    .calc-stat-pill {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 1rem;
+    .roi-stat-box {
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
       text-align: center;
     }
 
-    .calc-stat-label {
-      font-size: 0.76rem;
+    .roi-stat-box .label {
+      font-size: 11px;
       font-weight: 600;
-      color: var(--text-dim);
+      color: var(--text-secondary);
       text-transform: uppercase;
-      margin-bottom: 0.35rem;
+      margin-bottom: 4px;
     }
 
-    .calc-stat-val {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.65rem;
-      font-weight: 800;
-      color: #ffffff;
+    .roi-stat-box .val {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
     }
 
     /* Toast Notification */
-    .toast-pill {
+    .toast-feedback {
       position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      padding: 0.75rem 1.25rem;
-      background: #0f172a;
-      border: 1px solid var(--primary);
-      color: #ffffff;
-      border-radius: 9999px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px var(--primary-glow);
-      transform: translateY(100px);
+      bottom: 24px;
+      right: 24px;
+      padding: 8px 14px;
+      background: var(--text-primary);
+      color: var(--surface);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      transform: translateY(80px);
       opacity: 0;
-      transition: all 0.3s var(--ease-spring);
-      z-index: 999;
+      transition: all var(--transition-fast);
+      z-index: 100;
     }
 
-    .toast-pill.visible {
+    .toast-feedback.show {
       transform: translateY(0);
       opacity: 1;
     }
 
     /* Footer */
-    footer {
-      border-top: 1px solid var(--card-border);
-      padding: 3rem 1.5rem;
-      text-align: center;
-      font-size: 0.88rem;
-      color: var(--text-dim);
+    .app-footer {
       margin-top: auto;
-    }
-
-    footer a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
+      border-top: 1px solid var(--border);
+      padding: 20px 0;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     /* Responsive */
-    @media (max-width: 1024px) {
-      .metrics-row { grid-template-columns: repeat(2, 1fr); }
-      .standards-grid { grid-template-columns: 1fr; }
-      .calc-results-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 768px) {
-      .top-nav { flex-direction: column; gap: 0.85rem; }
-      .hero-heading { font-size: 2.5rem; }
-      .metrics-row { grid-template-columns: 1fr; }
-      .tab-deck { flex-direction: column; }
-      .hud-pipeline-grid { grid-template-columns: 1fr; }
-      .inline-comment-anchor { margin-left: 0; }
+    @media (max-width: 960px) {
+      .workspace-grid { grid-template-columns: 1fr; }
+      .standards-layout { grid-template-columns: 1fr; }
+      .roi-stats-strip { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Ambient Light Effects -->
-  <div class="ambient-glow-top"></div>
-  <div class="ambient-glow-side"></div>
-  <div class="grid-pattern"></div>
-
-  <div class="shell">
-    <!-- Top Command Navigation -->
-    <header class="top-nav">
-      <a href="#" class="brand-cluster">
-        <div class="brand-gem">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-        </div>
-        <span class="brand-name">PRISM REVIEW</span>
-        <span class="version-tag">v1.0.0</span>
-      </a>
-
-      <div class="telemetry-pill">
-        <div class="pulse-radar">
-          <div class="pulse-core"></div>
-          <div class="pulse-wave"></div>
-        </div>
-        <span>vLLM AWQ 4-Bit • p50: 40.5ms • Clean FPR: 23.5%</span>
-      </div>
-
-      <div class="nav-shortcuts">
-        <a href="https://github.com/binodbishwakarama-max/codeagent" target="_blank" class="nav-btn btn-star">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <span>Star on GitHub</span>
+  <!-- ========================================================================
+       APPLICATION HEADER
+       ======================================================================== -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="#" class="brand-logo" aria-label="Prism Review Home">
+          <div class="brand-symbol" aria-hidden="true">P</div>
+          <span>Prism Review</span>
         </a>
-        <a href="https://huggingface.co/datasets/Vinod8848/prism-review-benchmark" target="_blank" class="nav-btn">
-          <span>🤗 Dataset</span>
+        <div class="repo-context-crumb">
+          <span>Repository:</span>
+          <strong id="headerRepoName">fastapi/fastapi</strong>
+          <span style="color: var(--text-tertiary);">#412</span>
+        </div>
+      </div>
+
+      <!-- Main Navigation Tabs -->
+      <nav class="header-nav" role="tablist" aria-label="Review Views">
+        <button id="tab-btn-review" class="nav-tab active" role="tab" aria-selected="true" aria-controls="section-review" onclick="selectViewTab('review')">
+          Code Review
+        </button>
+        <button id="tab-btn-threads" class="nav-tab" role="tab" aria-selected="false" aria-controls="section-threads" onclick="selectViewTab('threads')">
+          Discussions
+        </button>
+        <button id="tab-btn-standards" class="nav-tab" role="tab" aria-selected="false" aria-controls="section-standards" onclick="selectViewTab('standards')">
+          Standards (.prism)
+        </button>
+        <button id="tab-btn-benchmarks" class="nav-tab" role="tab" aria-selected="false" aria-controls="section-benchmarks" onclick="selectViewTab('benchmarks')">
+          Benchmarks & ROI
+        </button>
+      </nav>
+
+      <!-- Utility Actions -->
+      <div class="header-right">
+        <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle color theme (Light / Dark)" aria-label="Toggle theme" onclick="toggleTheme()">
+          <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <a href="https://github.com/binodbishwakarama-max/codeagent" target="_blank" class="btn-header-link" title="Open source repository on GitHub">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
         </a>
-      </div>
-    </header>
-
-    <!-- Hero Header -->
-    <section class="hero-wrap">
-      <div class="hero-eyebrow">Autonomous Standards-Driven AI Review Engine</div>
-      <h1 class="hero-heading">Trained Silence Heuristics.<br>Zero Reviewer Fatigue.</h1>
-      <p class="hero-subheading">
-        Pre-trained coding LLMs comment on <strong>73.5% of completely clean PRs</strong>. Prism is fine-tuned with 25% negative silence examples to stay silent on defect-free code, matching <strong>96.8% of Claude 3.5 Sonnet's F1 quality</strong> at <strong>37.1× lower cost</strong>.
-      </p>
-    </section>
-
-    <!-- Key Metrics Grid -->
-    <div class="metrics-row">
-      <div class="stat-card" style="--stat-accent: #38bdf8;">
-        <div class="stat-label-wrap">
-          <span class="stat-label">Review F1 Score</span>
-          <span class="stat-badge">MultiMatcher</span>
-        </div>
-        <div class="stat-number cyan">0.9304</div>
-        <div class="stat-detail">
-          <span>96.8% of Claude 3.5 Sonnet (0.9613)</span>
-        </div>
-      </div>
-
-      <div class="stat-card" style="--stat-accent: #10b981;">
-        <div class="stat-label-wrap">
-          <span class="stat-label">Clean-PR False Alarm</span>
-          <span class="stat-badge">Silence SFT</span>
-        </div>
-        <div class="stat-number emerald">23.5%</div>
-        <div class="stat-detail">
-          <span>68% noise reduction vs 73.5% Base 7B</span>
-        </div>
-      </div>
-
-      <div class="stat-card" style="--stat-accent: #818cf8;">
-        <div class="stat-label-wrap">
-          <span class="stat-label">Serving Latency (p50)</span>
-          <span class="stat-badge">vLLM AWQ</span>
-        </div>
-        <div class="stat-number indigo">40.5 ms</div>
-        <div class="stat-detail">
-          <span>6.2× faster than Frontier API (251ms)</span>
-        </div>
-      </div>
-
-      <div class="stat-card" style="--stat-accent: #f59e0b;">
-        <div class="stat-label-wrap">
-          <span class="stat-label">Cost per 10k PRs</span>
-          <span class="stat-badge">Commodity GPU</span>
-        </div>
-        <div class="stat-number amber">$3.60</div>
-        <div class="stat-detail">
-          <span>Compared to $133.40 for Frontier API</span>
-        </div>
       </div>
     </div>
+  </header>
 
-    <!-- Main Tab Deck -->
-    <nav class="tab-deck">
-      <button class="tab-trigger active" onclick="activateTab('playground')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-        <span>Interactive Pull Request Reviewer</span>
-      </button>
-      <button class="tab-trigger" onclick="activateTab('thread')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        <span>Autonomous Thread Resolution</span>
-      </button>
-      <button class="tab-trigger" onclick="activateTab('standards')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-        <span>Standards-as-Code (.prism)</span>
-      </button>
-      <button class="tab-trigger" onclick="activateTab('benchmark')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-        <span>Empirical Benchmark & ROI</span>
-      </button>
-    </nav>
-
-    <!-- TAB 1: INTERACTIVE PULL REQUEST REVIEWER -->
-    <section id="pane-playground" class="tab-panel active">
-      <div class="workspace-box">
-        <!-- Ribbon with Scenario Pickers -->
-        <div class="workspace-ribbon">
-          <div class="ribbon-title-wrap">
-            <div class="ribbon-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+  <div class="app-shell">
+    <!-- ========================================================================
+         TAB 1: PRIMARY WORKSPACE (CODE REVIEW)
+         ======================================================================== -->
+    <main id="section-review" class="tab-section active" role="tabpanel" aria-labelledby="tab-btn-review">
+      <!-- Context & Status Strip -->
+      <section class="pr-header-strip" aria-label="Pull Request Metadata">
+        <div class="pr-meta-row">
+          <div>
+            <div class="pr-title-group">
+              <span class="badge-pr-status">Open</span>
+              <h1 class="pr-title-text" id="prTitleText">optimize user profile queries with active filter</h1>
+              <span class="pr-number-label">#412</span>
             </div>
-            <span class="ribbon-heading">Select Pull Request Scenario</span>
-          </div>
-
-          <div class="scenario-selector">
-            <button class="scenario-btn active" onclick="pickScenario('sql')">
-              <span>🛡️ SQL Injection</span>
-            </button>
-            <button class="scenario-btn" onclick="pickScenario('token')">
-              <span>🔑 Leaked Secret</span>
-            </button>
-            <button class="scenario-btn" onclick="pickScenario('async')">
-              <span>⚡ Async Timeout</span>
-            </button>
-            <button class="scenario-btn clean-btn" onclick="pickScenario('clean')">
-              <span>✨ Clean PR (Silence)</span>
-            </button>
-            <button class="scenario-btn" onclick="pickScenario('custom')">
-              <span>✍️ Custom Diff</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Authentic GitHub Pull Request Info Bar -->
-        <div class="pr-metadata-bar">
-          <div class="pr-info-left">
-            <span id="prStatusBadge" class="pr-status-badge">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M7.177 3.073L9.573.677A.25.25 0 0110 .854v4.792a.25.25 0 01-.427.177L7.177 3.427a.25.25 0 010-.354zM3.75 2.5a.75.75 0 100 1.5.75.75 0 000-1.5zm-2.25.75a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25zM11 2.5h-1V4h1a1 1 0 011 1v7.256A2.246 2.246 0 0111.75 15a2.25 2.25 0 112.25-2.25c0 .414-.112.798-.307 1.134A2.497 2.497 0 0013.5 12.5V5a2.5 2.5 0 00-2.5-2.5z"></path></svg>
-              <span>Open</span>
-            </span>
-            <span id="prTitle" class="pr-title-text">feat(db): optimize user profile queries with active filter</span>
-            <span id="prBranch" class="pr-branch-ref">feature/fast-lookup → main</span>
-          </div>
-          <div class="pr-info-right">
-            <span id="diffLineStats" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-dim);">+4 -1 lines</span>
-            <div class="diff-mode-toggle">
-              <button id="btnViewRendered" class="diff-mode-btn active" onclick="setDiffMode('visual')">Visual Diff</button>
-              <button id="btnViewRaw" class="diff-mode-btn" onclick="setDiffMode('raw')">Raw Patch</button>
+            <div class="pr-branch-info">
+              <span>Branch:</span>
+              <span id="prBranchText" class="branch-pill">feature/fast-lookup</span>
+              <span>into</span>
+              <span class="branch-pill">main</span>
+              <span>•</span>
+              <span id="fileSummaryStat">1 file changed (+4, -1)</span>
             </div>
           </div>
-        </div>
 
-        <!-- Diff Viewport -->
-        <div class="diff-viewport">
-          <!-- Real Interactive Split Diff Table -->
-          <table id="diffTable" class="diff-table">
-            <tbody id="diffTbody">
-              <!-- Dynamically populated lines and inline review comment -->
-            </tbody>
-          </table>
-
-          <!-- Raw Textarea for Custom Diff Mode -->
-          <textarea id="rawDiffArea" class="raw-diff-editor" spellcheck="false"></textarea>
-        </div>
-
-        <!-- Telemetry Progress HUD -->
-        <div id="telemetryHud" class="telemetry-hud">
-          <div class="hud-title-row">
-            <span>vLLM Pipeline Telemetry</span>
-            <span id="hudTimerClock" style="color: var(--primary);">40.5 ms total</span>
-          </div>
-          <div class="hud-pipeline-grid">
-            <div id="hud-s1" class="hud-stage">1. HMAC Verification (0.4ms)</div>
-            <div id="hud-s2" class="hud-stage">2. Secret Redaction (1.2ms)</div>
-            <div id="hud-s3" class="hud-stage">3. Standards RRF (8.5ms)</div>
-            <div id="hud-s4" class="hud-stage">4. vLLM AWQ Gen (24.1ms)</div>
-            <div id="hud-s5" class="hud-stage">5. Self-Verify Filter (6.3ms)</div>
-          </div>
-        </div>
-
-        <!-- Bottom Action Deck -->
-        <div class="workspace-footer">
-          <button id="btnAnalyze" class="btn-execute-review" onclick="triggerReviewExecution()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-            <span>Execute Prism Review</span>
-          </button>
-
-          <div class="secondary-tool-btns">
-            <button class="btn-ghost-tool" onclick="copyActiveDiff()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Copy Patch
-            </button>
-            <button class="btn-ghost-tool" onclick="resetActiveScenario()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-              Reset
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 2: AUTONOMOUS THREAD RESOLUTION -->
-    <section id="pane-thread" class="tab-panel">
-      <div class="workspace-box">
-        <div class="thread-simulator-wrapper">
-          <div class="thread-banner">
-            <div>
-              <div style="font-weight: 700; color: #ffffff; margin-bottom: 2px;">Multi-Turn PR Conversation Resolver</div>
-              <div style="font-size: 0.85rem; color: var(--text-muted);">Prism evaluates developer pushback and concedes false positives gracefully when context is clarified.</div>
-            </div>
-            <span id="threadStatusPill" class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.8rem; padding: 0.35rem 0.75rem;">
-              Status: Open / Unresolved
+          <!-- Review Status Summary -->
+          <div>
+            <span id="checkOutcomeBadge" class="check-run-pill failed">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0-1.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 6.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"></path></svg>
+              <span id="checkOutcomeText">1 Standards Violation Identified</span>
             </span>
           </div>
+        </div>
+      </section>
 
-          <div class="thread-timeline" id="threadTimeline">
-            <!-- Initial Finding Comment -->
-            <div class="thread-entry">
-              <div class="thread-avatar bot">💎</div>
-              <div class="thread-content-card">
-                <div class="thread-header">
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <strong>@prism-review</strong>
-                    <span class="bot-badge-tag">BOT</span>
-                    <span style="color: var(--text-dim);">commented on <code>src/db/queries.py:38</code></span>
-                  </div>
-                  <span style="font-size: 0.76rem; color: var(--text-dim);">Just now</span>
-                </div>
-                <div class="thread-body">
-                  <p style="margin-bottom: 0.75rem;">⚠️ <strong>STD-SEC-01 (CWE-89): Unparameterized SQL Query</strong></p>
-                  <p style="margin-bottom: 0.75rem;">Raw string formatting detected inside database execution call. An unvalidated <code>user_id</code> variable introduces potential SQL injection risks.</p>
-                  <div class="commit-suggestion-block">
-                    <div class="suggestion-top-bar">Suggested Commit</div>
-                    <div class="suggestion-code">cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))</div>
-                  </div>
-                </div>
+      <!-- Two-Column Primary Layout -->
+      <div class="workspace-grid">
+        <!-- Main Code Diff Area -->
+        <div class="code-review-pane">
+          <!-- Scenario Selector & Execution Toolbar -->
+          <div class="pane-toolbar">
+            <div class="toolbar-left">
+              <span class="scenario-label">Scenario:</span>
+              <div class="segmented-control" role="group" aria-label="Test Scenarios">
+                <button class="segment-btn active" onclick="switchScenario('sql')">SQL Injection</button>
+                <button class="segment-btn" onclick="switchScenario('token')">Leaked Secret</button>
+                <button class="segment-btn" onclick="switchScenario('async')">Async Timeout</button>
+                <button class="segment-btn" onclick="switchScenario('clean')">Clean PR</button>
+                <button class="segment-btn" onclick="switchScenario('custom')">Custom Diff</button>
               </div>
             </div>
-          </div>
 
-          <!-- Quick Preset Responses -->
-          <div class="preset-chips-wrap">
-            <div class="preset-label">Test Developer Responses:</div>
-            <div class="preset-buttons">
-              <button class="btn-preset-chip" onclick="fillPreset('sanitized')">
-                "The user_id is already validated as an integer in auth middleware."
+            <div class="toolbar-right">
+              <button id="btnRunReview" class="btn btn-primary btn-sm" onclick="executeReviewWorkflow()">
+                <span>Run Review</span>
               </button>
-              <button class="btn-preset-chip" onclick="fillPreset('mock')">
-                "This is an internal integration test mock, not production code."
+              <button class="btn btn-secondary btn-sm" onclick="copyCurrentDiff()">
+                <span>Copy Diff</span>
               </button>
-              <button class="btn-preset-chip" onclick="fillPreset('question')">
-                "Why can't I use f-strings if user_id is an internal UUID?"
+              <button class="btn btn-secondary btn-sm" onclick="resetCurrentScenario()">
+                <span>Reset</span>
               </button>
             </div>
           </div>
 
-          <!-- Dynamic Reply Input Box -->
-          <div class="thread-input-row">
-            <input id="threadReplyInput" type="text" class="thread-input-field" placeholder="Reply to @prism-review on this review finding..." onkeydown="if(event.key==='Enter') sendThreadReply()">
-            <button class="btn-execute-review" style="padding: 0.75rem 1.4rem; font-size: 0.9rem;" onclick="sendThreadReply()">
-              <span>Reply</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 3: STANDARDS INSPECTOR -->
-    <section id="pane-standards" class="tab-panel">
-      <div class="workspace-box">
-        <div class="workspace-ribbon">
-          <div class="ribbon-title-wrap">
-            <div class="ribbon-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
-            </div>
-            <span class="ribbon-heading">Repository Standards Catalog (<code>.prism/standards.yml</code>)</span>
-          </div>
-          <button class="btn-ghost-tool" onclick="copyStandardsYaml()">📋 Copy Standards YAML</button>
-        </div>
-
-        <div class="standards-grid">
-          <div class="standard-item-card">
-            <div class="standard-item-top">
-              <span class="tag-rule-id">STD-SEC-01</span>
-              <span class="tag-severity critical">CRITICAL</span>
-            </div>
-            <h3 class="standard-item-title">Parameterized Database Execution</h3>
-            <p class="standard-item-desc">Never construct SQL queries via raw string interpolation, formatting, or concatenation. Always use parameterized execution placeholders.</p>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: var(--text-dim);">Keywords: [sql, execute, query, cursor, format]</div>
+          <!-- File Context Header -->
+          <div class="file-header-bar">
+            <span class="file-path" id="diffFilePath">src/db/queries.py</span>
+            <span class="file-stats" id="diffFileStats"><span class="add">+4</span> <span class="del">-1</span> lines</span>
           </div>
 
-          <div class="standard-item-card">
-            <div class="standard-item-top">
-              <span class="tag-rule-id">STD-SEC-02</span>
-              <span class="tag-severity critical">CRITICAL</span>
-            </div>
-            <h3 class="standard-item-title">Secret & Credential Hygiene</h3>
-            <p class="standard-item-desc">Hardcoded secrets, API tokens, and private keys must never be committed to source code. Store credentials in environment variables.</p>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: var(--text-dim);">Keywords: [api_key, token, secret, password, secret_token]</div>
-          </div>
-
-          <div class="standard-item-card">
-            <div class="standard-item-top">
-              <span class="tag-rule-id">STD-ERR-02</span>
-              <span class="tag-severity high">HIGH</span>
-            </div>
-            <h3 class="standard-item-title">Async Exception & Timeout Boundaries</h3>
-            <p class="standard-item-desc">All asynchronous network calls, I/O requests, and external microservices must specify explicit timeouts and catch network exceptions.</p>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: var(--text-dim);">Keywords: [async, await, httpx, timeout, try, except]</div>
-          </div>
-
-          <div class="standard-item-card">
-            <div class="standard-item-top">
-              <span class="tag-rule-id">STD-PERF-03</span>
-              <span class="tag-severity high" style="background: rgba(99, 102, 241, 0.18); border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc;">MEDIUM</span>
-            </div>
-            <h3 class="standard-item-title">N+1 Prevention in Query Loops</h3>
-            <p class="standard-item-desc">Do not execute individual database queries inside tight iteration loops. Utilize bulk fetching, batch inserts, or pre-joined relations.</p>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: var(--text-dim);">Keywords: [for, loop, select, query, batch, bulk]</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: EMPIRICAL BENCHMARK & ROI -->
-    <section id="pane-benchmark" class="tab-panel">
-      <div class="workspace-box">
-        <div class="benchmark-section">
-          <div class="benchmark-header-row">
-            <div>
-              <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 0.25rem;">Frozen Test-Split Benchmark (120 PRs)</h2>
-              <p style="font-size: 0.88rem; color: var(--text-muted);">Mined from 24 repositories with zero overlap. Evaluated via MultiMatcher (±3 lines, semantic similarity ≥ 0.82).</p>
-            </div>
-            <a href="https://huggingface.co/datasets/Vinod8848/prism-review-benchmark" target="_blank" class="nav-btn btn-star">
-              <span>View HF Dataset</span>
-            </a>
-          </div>
-
-          <div class="table-container">
-            <table class="elite-table">
-              <thead>
-                <tr>
-                  <th>Model / Candidate</th>
-                  <th>Precision</th>
-                  <th>Recall</th>
-                  <th>F1 Score</th>
-                  <th>Clean-PR FPR</th>
-                  <th>p50 Latency</th>
-                  <th>Cost / 10k PRs</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Frontier API (Claude 3.5 Sonnet)</strong></td>
-                  <td>0.9675</td>
-                  <td>0.9551</td>
-                  <td><strong>0.9613</strong></td>
-                  <td>5.88%</td>
-                  <td>251.5 ms</td>
-                  <td>$133.40</td>
-                </tr>
-                <tr>
-                  <td><strong>Mid-Size API (Claude 3.5 Haiku)</strong></td>
-                  <td>0.9062</td>
-                  <td>0.9295</td>
-                  <td><strong>0.9177</strong></td>
-                  <td>17.65%</td>
-                  <td>110.1 ms</td>
-                  <td>$33.50</td>
-                </tr>
-                <tr style="color: #fb7185;">
-                  <td><strong>Base Qwen2.5-Coder-7B (Zero-Shot)</strong></td>
-                  <td>0.6782</td>
-                  <td>0.7564</td>
-                  <td>0.7152</td>
-                  <td><strong>73.53% (Fatigue)</strong></td>
-                  <td>60.7 ms</td>
-                  <td>$9.80</td>
-                </tr>
-                <tr>
-                  <td><strong>Fine-Tuned 7B (Merged BF16)</strong></td>
-                  <td>0.8889</td>
-                  <td>0.9744</td>
-                  <td><strong>0.9297</strong></td>
-                  <td>29.41%</td>
-                  <td>60.7 ms</td>
-                  <td>$9.80</td>
-                </tr>
-                <tr class="row-winner">
-                  <td><strong>Fine-Tuned 7B (AWQ 4-bit) 🏆 Prism</strong></td>
-                  <td>0.9187</td>
-                  <td>0.9423</td>
-                  <td><strong>0.9304</strong></td>
-                  <td><strong>23.53%</strong></td>
-                  <td><strong>40.5 ms</strong></td>
-                  <td><strong>$3.60</strong></td>
-                </tr>
-                <tr style="color: var(--text-dim);">
-                  <td><strong>AST Linters (flake8 / eslint)</strong></td>
-                  <td>0.0000</td>
-                  <td>0.0000</td>
-                  <td>0.0000</td>
-                  <td>0.00%</td>
-                  <td>0.0 ms</td>
-                  <td>$0.00</td>
-                </tr>
+          <!-- Code Diff Table (Unified View) -->
+          <div class="diff-container" id="diffContainer">
+            <table class="diff-table">
+              <tbody id="diffTbody">
+                <!-- Dynamically rendered lines & inline findings -->
               </tbody>
             </table>
+
+            <!-- Raw Diff Input for Custom Scenario -->
+            <textarea id="rawDiffArea" class="raw-diff-input" spellcheck="false" placeholder="Paste unified git diff here..."></textarea>
+          </div>
+        </div>
+
+        <!-- Secondary Context Sidebar -->
+        <aside class="sidebar-pane">
+          <!-- Findings Summary Panel -->
+          <div class="card-panel">
+            <div class="panel-header-simple">
+              <span>Findings Summary</span>
+              <span id="findingsCountBadge" style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">1 issue</span>
+            </div>
+            <div class="panel-body-simple" id="findingsSidebarBody">
+              <div class="findings-list" id="findingsSidebarList">
+                <!-- Dynamically listed findings -->
+              </div>
+            </div>
           </div>
 
-          <!-- Interactive Team Savings Calculator -->
-          <div class="calculator-box">
-            <div class="calculator-title">Interactive Engineering Team Savings Calculator</div>
-            <p style="font-size: 0.86rem; color: var(--text-muted);">Compare self-hosted vLLM serving costs against Frontier API rates based on your monthly PR volume.</p>
-
-            <div class="calc-slider-wrap">
-              <div class="slider-label-row">
-                <span>Monthly Team Pull Requests:</span>
-                <span id="sliderValueDisplay" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700;">5,000 PRs / mo</span>
-              </div>
-              <input id="prSlider" type="range" min="500" max="50000" step="500" value="5000" class="calc-slider" oninput="updateCostCalculator()">
+          <!-- Standards Matching Context -->
+          <div class="card-panel">
+            <div class="panel-header-simple">
+              <span>Repository Standards Matched</span>
             </div>
+            <div class="panel-body-simple">
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                Retrieved via Reciprocal Rank Fusion (BM25 + Dense) from <code>.prism/standards.yml</code>:
+              </div>
+              <div id="matchedStandardsList" style="display: flex; flex-direction: column; gap: 6px;">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
 
-            <div class="calc-results-grid">
-              <div class="calc-stat-pill">
-                <div class="calc-stat-label">Claude 3.5 Sonnet Cost</div>
-                <div id="costSonnet" class="calc-stat-val" style="color: #fb7185;">$66.70 / mo</div>
+          <!-- Review Diagnostics / Telemetry -->
+          <div class="card-panel">
+            <div class="panel-header-simple">
+              <span>Engine Diagnostics</span>
+              <span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary);">vLLM AWQ</span>
+            </div>
+            <div class="panel-body-simple">
+              <div class="telemetry-row">
+                <span class="telemetry-label">Serving Latency (p50)</span>
+                <span class="telemetry-val" id="diagLatency">40.5 ms</span>
               </div>
-              <div class="calc-stat-pill">
-                <div class="calc-stat-label">Prism AWQ 4-Bit Cost</div>
-                <div id="costPrism" class="calc-stat-val" style="color: #34d399;">$1.80 / mo</div>
+              <div class="telemetry-row">
+                <span class="telemetry-label">Model Architecture</span>
+                <span class="telemetry-val">Qwen2.5-Coder-7B (4-bit)</span>
               </div>
-              <div class="calc-stat-pill" style="border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.08);">
-                <div class="calc-stat-label" style="color: #38bdf8;">Annual Net Savings</div>
-                <div id="annualSavings" class="calc-stat-val" style="color: #38bdf8;">$778.80 / yr</div>
+              <div class="telemetry-row">
+                <span class="telemetry-label">Review Cost</span>
+                <span class="telemetry-val">$0.00036 / PR</span>
               </div>
+              <div class="telemetry-row">
+                <span class="telemetry-label">GPU Memory Footprint</span>
+                <span class="telemetry-val">5.8 GB / 24 GB</span>
+              </div>
+              <div class="telemetry-row">
+                <span class="telemetry-label">Clean-PR False Alarm</span>
+                <span class="telemetry-val">23.5% (SFT Trained)</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <!-- ========================================================================
+         TAB 2: AUTONOMOUS THREAD RESOLUTION
+         ======================================================================== -->
+    <section id="section-threads" class="tab-section" role="tabpanel" aria-labelledby="tab-btn-threads">
+      <div class="thread-conversation-box">
+        <div class="thread-context-banner">
+          <div>
+            <strong>Review Comment Thread:</strong> <code>src/db/queries.py:38</code> (STD-SEC-01)
+          </div>
+          <span id="threadStateBadge" class="check-run-pill failed">Status: Unresolved</span>
+        </div>
+
+        <div class="thread-message-list" id="threadMessageList">
+          <!-- Initial Prism Finding Comment -->
+          <div class="thread-msg-item">
+            <div class="msg-avatar bot" aria-hidden="true">P</div>
+            <div class="msg-bubble">
+              <div class="msg-header">
+                <div>
+                  <strong>@prism-review</strong>
+                  <span style="color: var(--text-tertiary); margin-left: 6px;">bot</span>
+                </div>
+                <span style="color: var(--text-tertiary);">Just now</span>
+              </div>
+              <div class="msg-content">
+                <p style="margin-bottom: 8px;"><strong>STD-SEC-01: Parameterized Database Queries (CWE-89)</strong></p>
+                <p style="margin-bottom: 8px;">Raw string interpolation detected inside database query execution. Untrusted <code>user_id</code> variable allows potential SQL injection.</p>
+                <div class="remediation-box">
+                  <div class="remediation-header">Suggested Remediation</div>
+                  <div class="remediation-code">cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Presets to Test Resolution -->
+        <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">
+          Select a developer response to verify autonomous resolution behavior:
+        </div>
+        <div class="preset-chip-list">
+          <button class="chip-btn" onclick="applyPresetResponse('sanitized')">
+            "The user_id is already validated as an integer in auth middleware."
+          </button>
+          <button class="chip-btn" onclick="applyPresetResponse('test')">
+            "This is a local integration test fixture, not a production endpoint."
+          </button>
+          <button class="chip-btn" onclick="applyPresetResponse('question')">
+            "Why can't I use f-strings if user_id is an internal UUID?"
+          </button>
+        </div>
+
+        <!-- Reply Input -->
+        <div class="thread-reply-input-row">
+          <input id="threadReplyInput" type="text" class="text-input" placeholder="Type a response to @prism-review..." onkeydown="if(event.key==='Enter') submitThreadReply()">
+          <button class="btn btn-primary" onclick="submitThreadReply()">Reply</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 3: REPOSITORY STANDARDS (AS CODE)
+         ======================================================================== -->
+    <section id="section-standards" class="tab-section" role="tabpanel" aria-labelledby="tab-btn-standards">
+      <div class="standards-layout">
+        <!-- Standards Table -->
+        <div class="card-panel">
+          <div class="panel-header-simple">
+            <span>Active Repository Policies</span>
+            <span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary);">.prism/standards.yml</span>
+          </div>
+          <table class="rule-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Standard</th>
+                <th>Severity</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>STD-SEC-01</code></td>
+                <td>Parameterized Database Execution</td>
+                <td><span class="finding-pill-sev critical">Critical</span></td>
+                <td>Security</td>
+              </tr>
+              <tr>
+                <td><code>STD-SEC-02</code></td>
+                <td>Credential & Token Scrubbing</td>
+                <td><span class="finding-pill-sev critical">Critical</span></td>
+                <td>Security</td>
+              </tr>
+              <tr>
+                <td><code>STD-ERR-02</code></td>
+                <td>Async Exception Boundaries & Timeouts</td>
+                <td><span class="finding-pill-sev high">High</span></td>
+                <td>Reliability</td>
+              </tr>
+              <tr>
+                <td><code>STD-PERF-03</code></td>
+                <td>N+1 Prevention in Query Loops</td>
+                <td><span class="finding-pill-sev high" style="background: var(--surface-subtle); color: var(--text-secondary); border-color: var(--border);">Medium</span></td>
+                <td>Performance</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Raw YAML Configuration View -->
+        <div class="card-panel">
+          <div class="panel-header-simple">
+            <span>Raw Standards Configuration</span>
+            <button class="btn btn-secondary btn-sm" onclick="copyStandardsConfig()">Copy YAML</button>
+          </div>
+          <div style="padding: 12px; background: var(--surface); overflow-x: auto;">
+            <pre style="font-family: var(--font-mono); font-size: 12px; line-height: 1.5; color: var(--text-code);"><code id="rawStandardsYaml">standards:
+  - id: STD-SEC-01
+    title: Parameterized Database Queries
+    severity: CRITICAL
+    category: SECURITY
+    cwe: CWE-89
+    description: Never construct SQL queries via raw string interpolation.
+
+  - id: STD-SEC-02
+    title: Secret Hygiene & Credential Scrubbing
+    severity: CRITICAL
+    category: SECURITY
+    cwe: CWE-798
+    description: Hardcoded secrets and tokens must never be committed.
+
+  - id: STD-ERR-02
+    title: Async Exception Boundaries
+    severity: HIGH
+    category: RELIABILITY
+    cwe: CWE-703
+    description: All asynchronous network calls must declare explicit timeouts.</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 4: EMPIRICAL BENCHMARKS & TEAM ROI
+         ======================================================================== -->
+    <section id="section-benchmarks" class="tab-section" role="tabpanel" aria-labelledby="tab-btn-benchmarks">
+      <div class="benchmark-layout">
+        <!-- Benchmark Methodology Note -->
+        <div class="card-panel" style="padding: 14px 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.55;">
+          <strong style="color: var(--text-primary);">Evaluation Methodology:</strong> All models evaluated on identical frozen test split of <strong>120 pull requests</strong> across <code>trpc/trpc</code> and <code>vitejs/vite</code> using MultiMatcher ($\pm 3$ lines, cosine similarity $\ge 0.82$, $B=1,000$ paired bootstrap iterations).
+        </div>
+
+        <!-- Benchmark Comparison Table -->
+        <div class="benchmark-table-box">
+          <table class="clean-benchmark-table">
+            <thead>
+              <tr>
+                <th>Model / System</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1 Score</th>
+                <th>Clean-PR FPR</th>
+                <th>p50 Latency</th>
+                <th>Cost / 10k PRs</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Frontier API (Claude 3.5 Sonnet)</td>
+                <td>0.9675</td>
+                <td>0.9551</td>
+                <td>0.9613</td>
+                <td>5.88%</td>
+                <td>251.5 ms</td>
+                <td>$133.40</td>
+              </tr>
+              <tr>
+                <td>Mid-Size API (Claude 3.5 Haiku)</td>
+                <td>0.9062</td>
+                <td>0.9295</td>
+                <td>0.9177</td>
+                <td>17.65%</td>
+                <td>110.1 ms</td>
+                <td>$33.50</td>
+              </tr>
+              <tr style="color: var(--critical);">
+                <td>Base Qwen2.5-Coder-7B (Zero-Shot)</td>
+                <td>0.6782</td>
+                <td>0.7564</td>
+                <td>0.7152</td>
+                <td>73.53% (High Noise)</td>
+                <td>60.7 ms</td>
+                <td>$9.80</td>
+              </tr>
+              <tr>
+                <td>Fine-Tuned 7B (Merged BF16)</td>
+                <td>0.8889</td>
+                <td>0.9744</td>
+                <td>0.9297</td>
+                <td>29.41%</td>
+                <td>60.7 ms</td>
+                <td>$9.80</td>
+              </tr>
+              <tr class="highlight-prism">
+                <td>Fine-Tuned 7B (AWQ 4-bit) — Prism Review</td>
+                <td>0.9187</td>
+                <td>0.9423</td>
+                <td>0.9304</td>
+                <td>23.53%</td>
+                <td>40.5 ms</td>
+                <td>$3.60</td>
+              </tr>
+              <tr style="color: var(--text-tertiary);">
+                <td>AST Linters Baseline (flake8 / eslint)</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.00%</td>
+                <td>0.0 ms</td>
+                <td>$0.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Team Economics Calculator -->
+        <div class="roi-card">
+          <h2 style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Serving Economics Calculator</h2>
+          <p style="font-size: 13px; color: var(--text-secondary);">Calculated comparison between commercial frontier API tokens and self-hosted vLLM commodity GPU spend.</p>
+
+          <div class="roi-slider-container">
+            <div class="slider-header">
+              <span>Monthly Pull Request Volume:</span>
+              <strong id="sliderVolumeLabel" style="font-family: var(--font-mono); color: var(--accent);">5,000 PRs / mo</strong>
+            </div>
+            <input id="volumeSlider" type="range" min="500" max="50000" step="500" value="5000" class="slider-control" oninput="recalculateRoi()">
+          </div>
+
+          <div class="roi-stats-strip">
+            <div class="roi-stat-box">
+              <div class="label">Claude 3.5 Sonnet Rate</div>
+              <div class="val" id="valSonnetSpend" style="color: var(--critical);">$66.70 / mo</div>
+            </div>
+            <div class="roi-stat-box">
+              <div class="label">Prism AWQ 4-Bit Rate</div>
+              <div class="val" id="valPrismSpend" style="color: var(--success);">$1.80 / mo</div>
+            </div>
+            <div class="roi-stat-box" style="border-color: var(--accent-border); background: var(--accent-subtle);">
+              <div class="label" style="color: var(--accent);">Net Annual Savings</div>
+              <div class="val" id="valAnnualSavings" style="color: var(--accent);">$778.80 / yr</div>
             </div>
           </div>
         </div>
@@ -2008,30 +1788,38 @@
     </section>
 
     <!-- Global Toast Notification -->
-    <div id="toastNotification" class="toast-pill">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      <span id="toastMsg">Action completed successfully</span>
+    <div id="toastNotification" class="toast-feedback" role="status" aria-live="polite">
+      <span id="toastMessage">Action completed successfully</span>
     </div>
 
-    <!-- Footer -->
-    <footer>
-      <p>
-        <strong>Prism Review Platform v1.0.0</strong> • Released under Apache 2.0 • 
-        <a href="https://github.com/binodbishwakarama-max/codeagent" target="_blank">GitHub</a> • 
-        <a href="https://huggingface.co/datasets/Vinod8848/prism-review-benchmark" target="_blank">HF Benchmark</a> • 
-        <a href="https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0" target="_blank">Release Notes</a>
-      </p>
+    <!-- Application Footer -->
+    <footer class="app-footer">
+      <div>
+        <span>Prism Review Engine v1.0.0</span>
+        <span style="margin: 0 8px;">•</span>
+        <span>Apache-2.0 License</span>
+      </div>
+      <div>
+        <a href="https://github.com/binodbishwakarama-max/codeagent" target="_blank">Documentation & Setup</a>
+        <span style="margin: 0 8px;">•</span>
+        <a href="https://huggingface.co/datasets/Vinod8848/prism-review-benchmark" target="_blank">Evaluation Dataset</a>
+      </div>
     </footer>
   </div>
 
+  <!-- ========================================================================
+       APPLICATION LOGIC
+       ======================================================================== -->
   <script>
-    // Scenarios Configuration
-    const SCENARIOS = {
+    // Scenarios Dataset
+    const SCENARIO_DATA = {
       sql: {
-        title: "feat(db): optimize user profile queries with active filter",
-        branch: "feature/fast-lookup → main",
+        repo: "fastapi/fastapi",
+        prNum: 412,
+        title: "optimize user profile queries with active filter",
+        branch: "feature/fast-lookup",
         file: "src/db/queries.py",
-        stats: "+4 -1 lines",
+        stats: "+4, -1 lines",
         lines: [
           { type: "hunk", old: "...", new: "...", text: "@@ -35,5 +35,8 @@ def get_user_profile(user_id: str, db_cursor):" },
           { type: "ctx", old: 35, new: 35, text: "    \"\"\"Retrieve user metadata and permissions.\"\"\"" },
@@ -2042,6 +1830,7 @@
           { type: "add", old: "", new: 39, text: "+    return db_cursor.fetchone()" }
         ],
         rawDiff: `--- a/src/db/queries.py\n+++ b/src/db/queries.py\n@@ -35,5 +35,8 @@ def get_user_profile(user_id: str, db_cursor):\n-    return db_cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,)).fetchone()\n+    # Dynamically format query string with user input\n+    query = f"SELECT * FROM users WHERE id = '{user_id}' AND is_active = 1"\n+    db_cursor.execute(query)\n+    return db_cursor.fetchone()`,
+        standards: ["STD-SEC-01 (Parameterized Database Queries)"],
         findings: [
           {
             anchorLine: 38,
@@ -2049,16 +1838,18 @@
             cwe: "CWE-89",
             severity: "critical",
             title: "Parameterized Database Execution",
-            message: "Raw string interpolation used in database query execution (CWE-89). Untrusted 'user_id' parameter allows remote SQL injection. All database execution must use parameterized queries.",
+            message: "Raw string interpolation used in database query execution (CWE-89). Untrusted 'user_id' parameter allows remote SQL injection. All database execution must use parameterized query placeholders.",
             suggestion: '    query = "SELECT * FROM users WHERE id = %s AND is_active = 1"\n    db_cursor.execute(query, (user_id,))'
           }
         ]
       },
       token: {
-        title: "feat(billing): initialize production stripe client",
-        branch: "payment-gateway → main",
+        repo: "stripe/stripe-node",
+        prNum: 189,
+        title: "initialize billing gateway client",
+        branch: "payment-gateway",
         file: "src/services/billing.ts",
-        stats: "+3 -2 lines",
+        stats: "+3, -2 lines",
         lines: [
           { type: "hunk", old: "...", new: "...", text: "@@ -10,3 +10,4 @@ import { PaymentGateway } from './gateway';" },
           { type: "del", old: 10, new: "", text: "-const apiKey = process.env.STRIPE_SECRET_KEY;" },
@@ -2068,6 +1859,7 @@
           { type: "add", old: "", new: 12, text: "+const client = new PaymentGateway(STRIPE_SECRET_KEY);" }
         ],
         rawDiff: `--- a/src/services/billing.ts\n+++ b/src/services/billing.ts\n@@ -10,3 +10,4 @@ import { PaymentGateway } from './gateway';\n-const apiKey = process.env.STRIPE_SECRET_KEY;\n-const client = new PaymentGateway(apiKey);\n+// Hardcoded API key for quick deployment test\n+const STRIPE_SECRET_KEY = "sk_test_mock_token_demo_51NABC12345";\n+const client = new PaymentGateway(STRIPE_SECRET_KEY);`,
+        standards: ["STD-SEC-02 (Secret Hygiene & Token Scrubbing)"],
         findings: [
           {
             anchorLine: 11,
@@ -2081,10 +1873,12 @@
         ]
       },
       async: {
-        title: "feat(webhooks): dispatch partner notification events",
-        branch: "async-webhooks → main",
+        repo: "encode/httpx",
+        prNum: 804,
+        title: "dispatch partner webhook events",
+        branch: "async-webhooks",
         file: "src/api/webhooks.py",
-        stats: "+5 -1 lines",
+        stats: "+5, -1 lines",
         lines: [
           { type: "hunk", old: "...", new: "...", text: "@@ -22,4 +22,8 @@ async def dispatch_event(event_data: dict):" },
           { type: "ctx", old: 22, new: 22, text: "    \"\"\"Publish event to external partners.\"\"\"" },
@@ -2095,6 +1889,7 @@
           { type: "add", old: "", new: 26, text: "+        return response.json()" }
         ],
         rawDiff: `--- a/src/api/webhooks.py\n+++ b/src/api/webhooks.py\n@@ -22,4 +22,8 @@ async def dispatch_event(event_data: dict):\n-    await queue_client.publish(event_data)\n+    # Asynchronous external webhook call without error boundary\n+    async with httpx.AsyncClient() as client:\n+        response = await client.post("https://api.partner.com/events", json=event_data)\n+        return response.json()`,
+        standards: ["STD-ERR-02 (Async Exception Boundaries)"],
         findings: [
           {
             anchorLine: 24,
@@ -2102,16 +1897,18 @@
             cwe: "CWE-703",
             severity: "high",
             title: "Async Exception Boundaries & Timeouts",
-            message: "Asynchronous HTTP call lacks explicit timeout and error boundary (CWE-703). Unhandled network partition or hanging remote server will cause connection pool exhaustion.",
+            message: "Asynchronous HTTP call lacks explicit timeout and try/except error boundary (CWE-703). Unhandled network partition will cause connection pool exhaustion.",
             suggestion: '    try:\n        async with httpx.AsyncClient(timeout=10.0) as client:\n            response = await client.post("https://api.partner.com/events", json=event_data)\n            response.raise_for_status()\n            return response.json()\n    except httpx.HTTPError as exc:\n        logger.error("Dispatch failed: %s", exc)\n        return None'
           }
         ]
       },
       clean: {
-        title: "refactor(utils): optimize slug sanitization helper",
-        branch: "slug-cleanup → main",
+        repo: "pydantic/pydantic",
+        prNum: 512,
+        title: "optimize slug sanitization helper",
+        branch: "slug-cleanup",
         file: "src/utils/text.py",
-        stats: "+6 -2 lines",
+        stats: "+6, -2 lines",
         lines: [
           { type: "hunk", old: "...", new: "...", text: "@@ -14,4 +14,8 @@ def sanitize_slug(name: str) -> str:" },
           { type: "del", old: 14, new: "", text: "-    return name.lower().replace(\" \", \"-\")" },
@@ -2121,226 +1918,261 @@
           { type: "add", old: "", new: 17, text: "+    return slug.strip('-')" }
         ],
         rawDiff: `--- a/src/utils/text.py\n+++ b/src/utils/text.py\n@@ -14,4 +14,8 @@ def sanitize_slug(name: str) -> str:\n-    return name.lower().replace(" ", "-")\n+    cleaned = name.strip().lower()\n+    # Replace non-alphanumeric characters with hyphens\n+    slug = re.sub(r'[^a-z0-9]+', '-', cleaned)\n+    return slug.strip('-')`,
+        standards: ["STD-SEC-01", "STD-SEC-02", "STD-ERR-02"],
         findings: []
       },
       custom: {
+        repo: "workspace/review",
+        prNum: 1,
         title: "user-defined custom pull request diff",
-        branch: "user/patch → main",
-        file: "custom_patch.diff",
-        stats: "Custom diff hunk",
+        branch: "user/patch",
+        file: "custom_diff.patch",
+        stats: "User custom diff",
         lines: [
           { type: "hunk", old: "...", new: "...", text: "@@ -1,3 +1,3 @@" },
           { type: "del", old: 1, new: "", text: "-def greet(): pass" },
           { type: "add", old: "", new: 1, text: "+def greet(name: str) -> str: return f'Hello, {name}'" }
         ],
         rawDiff: `--- a/example.py\n+++ b/example.py\n@@ -1,3 +1,3 @@\n-def greet(): pass\n+def greet(name: str) -> str: return f'Hello, {name}'`,
+        standards: ["Active repo standards"],
         findings: []
       }
     };
 
-    let activeScenarioKey = 'sql';
-    let reviewEvaluated = false;
+    let currentScenario = 'sql';
+    let reviewExecuted = true; // start with review displayed by default
 
-    function activateTab(tabKey) {
-      document.querySelectorAll('.tab-trigger').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-
-      const trigger = Array.from(document.querySelectorAll('.tab-trigger')).find(b => b.getAttribute('onclick').includes(tabKey));
-      if (trigger) trigger.classList.add('active');
-
-      const targetPane = document.getElementById(`pane-${tabKey}`);
-      if (targetPane) targetPane.classList.add('active');
+    // Theme Management
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const target = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', target);
+      localStorage.setItem('prism_theme', target);
+      updateThemeIcon(target);
     }
 
-    function setDiffMode(mode) {
-      const btnVisual = document.getElementById('btnViewRendered');
-      const btnRaw = document.getElementById('btnViewRaw');
-      const table = document.getElementById('diffTable');
-      const rawArea = document.getElementById('rawDiffArea');
-
-      if (mode === 'visual') {
-        btnVisual.classList.add('active');
-        btnRaw.classList.remove('active');
-        table.style.display = 'table';
-        rawArea.style.display = 'none';
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (theme === 'dark') {
+        icon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
       } else {
-        btnRaw.classList.add('active');
-        btnVisual.classList.remove('active');
-        table.style.display = 'none';
-        rawArea.style.display = 'block';
-        rawArea.value = SCENARIOS[activeScenarioKey].rawDiff;
+        icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
       }
     }
 
-    function renderDiffVisual(scenarioKey, showComment = false) {
-      const scenario = SCENARIOS[scenarioKey];
+    // Tab Navigation
+    function selectViewTab(tabKey) {
+      document.querySelectorAll('.nav-tab').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      document.querySelectorAll('.tab-section').forEach(p => p.classList.remove('active'));
+
+      const activeBtn = document.getElementById(`tab-btn-${tabKey}`);
+      const activeSection = document.getElementById(`section-${tabKey}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.setAttribute('aria-selected', 'true');
+      }
+      if (activeSection) activeSection.classList.add('active');
+    }
+
+    // Render Diff & Inline Findings
+    function renderDiffSurface(scenarioKey, showFindings = true) {
+      const scenario = SCENARIO_DATA[scenarioKey];
       const tbody = document.getElementById('diffTbody');
       tbody.innerHTML = '';
 
-      if (scenario.findings.length === 0 && showComment) {
-        // Render Clean PR Silence Banner
-        const row = document.createElement('tr');
-        row.innerHTML = `
+      // Update PR metadata & headers
+      document.getElementById('headerRepoName').innerText = scenario.repo;
+      document.getElementById('prTitleText').innerText = scenario.title;
+      document.getElementById('prBranchText').innerText = scenario.branch;
+      document.getElementById('fileSummaryStat').innerText = `1 file changed (${scenario.stats})`;
+      document.getElementById('diffFilePath').innerText = scenario.file;
+      document.getElementById('diffFileStats').innerText = scenario.stats;
+
+      // Update Check Outcome Banner
+      const outcomeBadge = document.getElementById('checkOutcomeBadge');
+      const outcomeText = document.getElementById('checkOutcomeText');
+      const findingsCountBadge = document.getElementById('findingsCountBadge');
+
+      if (!showFindings || scenario.findings.length === 0) {
+        outcomeBadge.className = 'check-run-pill passed';
+        outcomeBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg> <span>All Checks Passed</span>`;
+        outcomeText.innerText = 'Clean Pull Request';
+        findingsCountBadge.innerText = '0 issues';
+      } else {
+        outcomeBadge.className = 'check-run-pill failed';
+        outcomeBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0-1.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 6.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"></path></svg> <span>${scenario.findings.length} Issue(s) Identified</span>`;
+        findingsCountBadge.innerText = `${scenario.findings.length} issue(s)`;
+      }
+
+      // Update Sidebar Findings List
+      const sidebarList = document.getElementById('findingsSidebarList');
+      sidebarList.innerHTML = '';
+      if (!showFindings || scenario.findings.length === 0) {
+        sidebarList.innerHTML = `<div style="font-size: 12px; color: var(--text-tertiary); padding: 4px 0;">No active review findings. Pull request is clean.</div>`;
+      } else {
+        scenario.findings.forEach(f => {
+          const item = document.createElement('div');
+          item.className = 'finding-list-item';
+          item.innerHTML = `
+            <div class="item-top-row">
+              <span class="finding-pill-sev ${f.severity}">${f.severity}</span>
+              <span class="item-loc">${scenario.file}:${f.anchorLine}</span>
+            </div>
+            <div class="item-title">${f.ruleId}</div>
+            <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 2px;">${f.title}</div>
+          `;
+          sidebarList.appendChild(item);
+        });
+      }
+
+      // Update Matched Standards Sidebar
+      const standardsList = document.getElementById('matchedStandardsList');
+      standardsList.innerHTML = '';
+      scenario.standards.forEach(std => {
+        const d = document.createElement('div');
+        d.style.fontFamily = 'var(--font-mono)';
+        d.style.fontSize = '11.5px';
+        d.style.padding = '4px 6px';
+        d.style.background = 'var(--surface-subtle)';
+        d.style.borderRadius = 'var(--radius-sm)';
+        d.style.border = '1px solid var(--border)';
+        d.innerText = std;
+        standardsList.appendChild(d);
+      });
+
+      // Render Clean State Banner if 0 findings
+      if (showFindings && scenario.findings.length === 0) {
+        const cleanRow = document.createElement('tr');
+        cleanRow.innerHTML = `
           <td colspan="4">
-            <div class="clean-pr-silence-card">
-              <div class="clean-shield-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+            <div class="clean-state-box">
+              <div class="clean-state-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg>
               </div>
-              <h3 class="clean-title">Silence Heuristic Verified: 0 Findings</h3>
-              <p class="clean-explanation">
-                Prism evaluated this pull request against repository standards (<code>.prism/standards.yml</code>) and detected zero violations. While base coding LLMs hallucinate nitpicks on <strong>73.5% of clean PRs</strong>, Prism's negative silence fine-tuning maintains quiet confidence.
+              <h2 class="clean-state-title">No Standards Violations Detected</h2>
+              <p class="clean-state-desc">
+                Prism evaluated this pull request against repository standards and found zero defects. 
+                Trained silence heuristics prevent unsolicited comments on clean code.
               </p>
-              <div class="clean-comparison-chip">
-                <span>Negative SFT Guarantee</span> • <span>Zero False Alarms</span> • <span>Fast-Track Merge</span>
+              <div class="clean-state-tag">
+                <span>Verified Clean Split</span> • <span>25% Negative SFT Silence Guarantee</span>
               </div>
             </div>
           </td>
         `;
-        tbody.appendChild(row);
+        tbody.appendChild(cleanRow);
       }
 
+      // Render Diff Lines
       scenario.lines.forEach((line) => {
         const tr = document.createElement('tr');
-        let rowClass = '';
+        tr.className = `diff-line ${line.type}`;
         let marker = ' ';
+        if (line.type === 'add') marker = '+';
+        else if (line.type === 'del') marker = '-';
+        else if (line.type === 'hunk') marker = '@';
 
-        if (line.type === 'hunk') {
-          rowClass = 'diff-row-hunk';
-          marker = '@';
-        } else if (line.type === 'del') {
-          rowClass = 'diff-row-del';
-          marker = '-';
-        } else if (line.type === 'add') {
-          rowClass = 'diff-row-add';
-          marker = '+';
-        }
-
-        tr.className = rowClass;
         tr.innerHTML = `
-          <td class="diff-gutter">${line.old || ''}</td>
-          <td class="diff-gutter">${line.new || ''}</td>
-          <td class="diff-marker">${marker}</td>
-          <td class="diff-line-content">${escapeHtml(line.text)}</td>
+          <td class="line-num">${line.old || ''}</td>
+          <td class="line-num">${line.new || ''}</td>
+          <td class="line-marker">${marker}</td>
+          <td class="line-code">${escapeHtml(line.text)}</td>
         `;
         tbody.appendChild(tr);
 
-        // Inject Inline Comment directly under the anchor line
-        if (showComment && scenario.findings.length > 0) {
+        // If finding is anchored under this line, render it inline
+        if (showFindings && scenario.findings.length > 0) {
           const finding = scenario.findings.find(f => f.anchorLine === line.new);
           if (finding) {
-            const commentTr = document.createElement('tr');
-            commentTr.className = 'diff-inline-comment-row';
-            commentTr.innerHTML = `
+            const findingTr = document.createElement('tr');
+            findingTr.className = 'inline-finding-row';
+            findingTr.innerHTML = `
               <td colspan="4">
-                <div class="inline-comment-anchor">
-                  <div class="inline-comment-header">
-                    <div class="bot-identity">
-                      <span>💎 @prism-review</span>
-                      <span class="bot-badge-tag">BOT</span>
-                      <span style="color: var(--text-dim); font-size: 0.78rem;">reviewed line ${finding.anchorLine}</span>
+                <div class="inline-finding-card severity-${finding.severity}">
+                  <div class="finding-header">
+                    <div class="finding-identity">
+                      <span class="finding-pill-sev ${finding.severity}">${finding.severity}</span>
+                      <span class="finding-rule-id">${finding.ruleId}</span>
+                      <span class="finding-cwe-tag">${finding.cwe}</span>
                     </div>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #38bdf8;">Confidence: 98%</span>
+                    <span style="font-size: 11px; color: var(--text-tertiary);">Confidence: 98% (verified)</span>
                   </div>
-                  <div class="inline-comment-body">
-                    <div class="rule-tag-cluster">
-                      <span class="tag-severity ${finding.severity}">${finding.severity}</span>
-                      <span class="tag-rule-id">${finding.ruleId}</span>
-                      <span class="tag-cwe">${finding.cwe}</span>
-                    </div>
-                    <div class="comment-message-text">${finding.message}</div>
+                  <div class="finding-body">
+                    <div class="finding-message">${finding.message}</div>
                     ${finding.suggestion ? `
-                      <div class="commit-suggestion-block">
-                        <div class="suggestion-top-bar">
-                          <span>💡 Suggested Commit Fix</span>
-                          <button class="btn-apply-suggestion" onclick="applySuggestionAndFix()">
-                            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg>
-                            <span>Apply & Commit Fix</span>
-                          </button>
+                      <div class="remediation-box">
+                        <div class="remediation-header">
+                          <span>Suggested Remediation</span>
+                          <button class="btn btn-secondary btn-sm" onclick="copySnippetText(\`${finding.suggestion.replace(/`/g, '\\`')}\`)">Copy Snippet</button>
                         </div>
-                        <div class="suggestion-code">${escapeHtml(finding.suggestion)}</div>
+                        <div class="remediation-code">${escapeHtml(finding.suggestion)}</div>
                       </div>
                     ` : ''}
-                    <div class="comment-actions-bar">
-                      <div class="reaction-pill-group">
-                        <button class="btn-reaction" onclick="toggleReactionPill(this)">👍 <span>18</span></button>
-                        <button class="btn-reaction" onclick="toggleReactionPill(this)">🚀 <span>6</span></button>
-                        <button class="btn-reaction" onclick="toggleReactionPill(this)">❤️ <span>4</span></button>
+                    <div class="finding-actions">
+                      <div class="finding-actions-left">
+                        <button class="btn btn-success btn-sm" onclick="applyCommitSuggestion()">
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg>
+                          <span>Apply Suggestion</span>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="selectViewTab('threads')">
+                          <span>Reply in Thread</span>
+                        </button>
                       </div>
-                      <button class="btn-resolve-thread" onclick="activateTab('thread')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        <span>Reply in Thread</span>
+                      <button class="btn btn-secondary btn-sm" style="color: var(--text-tertiary);" onclick="dismissFinding()">
+                        <span>Dismiss</span>
                       </button>
                     </div>
                   </div>
                 </div>
               </td>
             `;
-            tbody.appendChild(commentTr);
+            tbody.appendChild(findingTr);
           }
         }
       });
     }
 
-    function pickScenario(key) {
-      activeScenarioKey = key;
-      reviewEvaluated = false;
+    // Switch Scenario
+    function switchScenario(key) {
+      currentScenario = key;
+      document.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
 
-      document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.closest('.scenario-btn').classList.add('active');
+      const rawArea = document.getElementById('rawDiffArea');
+      const table = document.getElementById('diffContainer').querySelector('.diff-table');
 
-      const scenario = SCENARIOS[key];
-      document.getElementById('prTitle').innerText = scenario.title;
-      document.getElementById('prBranch').innerText = scenario.branch;
-      document.getElementById('diffLineStats').innerText = scenario.stats;
-      document.getElementById('telemetryHud').style.display = 'none';
-
-      // Set diff mode based on scenario
       if (key === 'custom') {
-        setDiffMode('raw');
+        table.style.display = 'none';
+        rawArea.style.display = 'block';
+        rawArea.value = SCENARIO_DATA.custom.rawDiff;
       } else {
-        setDiffMode('visual');
-        renderDiffVisual(key, false);
+        table.style.display = 'table';
+        rawArea.style.display = 'none';
+        renderDiffSurface(key, true);
       }
     }
 
-    async function triggerReviewExecution() {
-      const btn = document.getElementById('btnAnalyze');
-      const hud = document.getElementById('telemetryHud');
+    // Execute Review
+    function executeReviewWorkflow() {
+      const btn = document.getElementById('btnRunReview');
       btn.disabled = true;
-      btn.innerHTML = `<span>⏳ Running vLLM Inference...</span>`;
+      btn.innerText = 'Analyzing...';
 
-      hud.style.display = 'block';
-
-      const stages = ['hud-s1', 'hud-s2', 'hud-s3', 'hud-s4', 'hud-s5'];
-      stages.forEach(s => document.getElementById(s).className = 'hud-stage');
-
-      for (let i = 0; i < stages.length; i++) {
-        const el = document.getElementById(stages[i]);
-        el.classList.add('running');
-        await new Promise(r => setTimeout(r, 65));
-        el.classList.remove('running');
-        el.classList.add('completed');
-      }
-
-      reviewEvaluated = true;
-      renderDiffVisual(activeScenarioKey, true);
-
-      btn.disabled = false;
-      btn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-        <span>Re-Analyze Diff</span>
-      `;
-
-      showToast("Prism review complete in 40.5ms");
+      setTimeout(() => {
+        renderDiffSurface(currentScenario, true);
+        btn.disabled = false;
+        btn.innerText = 'Run Review';
+        showToast('Review analysis complete (40.5 ms)');
+      }, 150);
     }
 
-    // THE WOW FACTOR: Applying commit suggestion dynamically fixes the code and clears the review!
-    function applySuggestionAndFix() {
-      showToast("✨ Suggestion committed to branch!");
-      
-      // Update scenario lines to show the fix
-      if (activeScenarioKey === 'sql') {
-        SCENARIOS.sql.lines = [
+    // Apply Suggestion: Live fix the code diff and show verified clean state
+    function applyCommitSuggestion() {
+      if (currentScenario === 'sql') {
+        SCENARIO_DATA.sql.lines = [
           { type: "hunk", old: "...", new: "...", text: "@@ -35,5 +35,8 @@ def get_user_profile(user_id: str, db_cursor):" },
           { type: "ctx", old: 35, new: 35, text: "    \"\"\"Retrieve user metadata and permissions.\"\"\"" },
           { type: "add", old: "", new: 36, text: "+    # Parameterized query protects against SQL injection" },
@@ -2348,156 +2180,165 @@
           { type: "add", old: "", new: 38, text: "+    db_cursor.execute(query, (user_id,))" },
           { type: "add", old: "", new: 39, text: "+    return db_cursor.fetchone()" }
         ];
-        SCENARIOS.sql.findings = [];
-      } else if (activeScenarioKey === 'token') {
-        SCENARIOS.token.lines = [
+        SCENARIO_DATA.sql.findings = [];
+      } else if (currentScenario === 'token') {
+        SCENARIO_DATA.token.lines = [
           { type: "hunk", old: "...", new: "...", text: "@@ -10,3 +10,4 @@ import { PaymentGateway } from './gateway';" },
           { type: "add", old: "", new: 10, text: "+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;" },
           { type: "add", old: "", new: 11, text: "+if (!STRIPE_SECRET_KEY) throw new Error(\"Missing STRIPE_SECRET_KEY\");" },
           { type: "add", old: "", new: 12, text: "+const client = new PaymentGateway(STRIPE_SECRET_KEY);" }
         ];
-        SCENARIOS.token.findings = [];
+        SCENARIO_DATA.token.findings = [];
+      } else if (currentScenario === 'async') {
+        SCENARIO_DATA.async.lines = [
+          { type: "hunk", old: "...", new: "...", text: "@@ -22,4 +22,12 @@ async def dispatch_event(event_data: dict):" },
+          { type: "ctx", old: 22, new: 22, text: "    \"\"\"Publish event to external partners.\"\"\"" },
+          { type: "add", old: "", new: 23, text: "+    try:" },
+          { type: "add", old: "", new: 24, text: "+        async with httpx.AsyncClient(timeout=10.0) as client:" },
+          { type: "add", old: "", new: 25, text: "+            response = await client.post(\"https://api.partner.com/events\", json=event_data)" },
+          { type: "add", old: "", new: 26, text: "+            response.raise_for_status()" },
+          { type: "add", old: "", new: 27, text: "+            return response.json()" },
+          { type: "add", old: "", new: 28, text: "+    except httpx.HTTPError as exc:" },
+          { type: "add", old: "", new: 29, text: "+        logger.error(\"Dispatch failed: %s\", exc)" },
+          { type: "add", old: "", new: 30, text: "+        return None" }
+        ];
+        SCENARIO_DATA.async.findings = [];
       }
 
-      renderDiffVisual(activeScenarioKey, true);
+      renderDiffSurface(currentScenario, true);
+      showToast('Suggestion committed: issue resolved');
     }
 
-    function toggleReactionPill(btn) {
-      btn.classList.toggle('active');
-      const span = btn.querySelector('span');
-      let val = parseInt(span.innerText);
-      span.innerText = btn.classList.contains('active') ? val + 1 : val - 1;
+    function dismissFinding() {
+      SCENARIO_DATA[currentScenario].findings = [];
+      renderDiffSurface(currentScenario, true);
+      showToast('Finding dismissed');
     }
 
-    // Thread Simulator Logic
-    function fillPreset(type) {
+    // Thread Resolver Logic
+    function applyPresetResponse(key) {
       const input = document.getElementById('threadReplyInput');
-      if (type === 'sanitized') {
-        input.value = "The user_id parameter is already validated as an integer in auth middleware upstream.";
-      } else if (type === 'mock') {
+      if (key === 'sanitized') {
+        input.value = "The user_id is already validated as an integer in auth middleware.";
+      } else if (key === 'test') {
         input.value = "This is a local integration test fixture, not a production endpoint.";
       } else {
         input.value = "Why can't I use f-strings if user_id is an internal UUID?";
       }
     }
 
-    function sendThreadReply() {
+    function submitThreadReply() {
       const input = document.getElementById('threadReplyInput');
-      const val = input.value.trim();
-      if (!val) return;
+      const text = input.value.trim();
+      if (!text) return;
 
-      const timeline = document.getElementById('threadTimeline');
-      const statusPill = document.getElementById('threadStatusPill');
+      const list = document.getElementById('threadMessageList');
+      const badge = document.getElementById('threadStateBadge');
 
-      // Add human reply
-      const humanEntry = document.createElement('div');
-      humanEntry.className = 'thread-entry';
-      humanEntry.innerHTML = `
-        <div class="thread-avatar human">👨‍💻</div>
-        <div class="thread-content-card">
-          <div class="thread-header">
+      // Human Msg
+      const hMsg = document.createElement('div');
+      hMsg.className = 'thread-msg-item';
+      hMsg.innerHTML = `
+        <div class="msg-avatar human" aria-hidden="true">Dev</div>
+        <div class="msg-bubble">
+          <div class="msg-header">
             <strong>Developer</strong>
-            <span style="font-size: 0.76rem; color: var(--text-dim);">Just now</span>
+            <span style="color: var(--text-tertiary);">Just now</span>
           </div>
-          <div class="thread-body">
-            <p>${escapeHtml(val)}</p>
-          </div>
+          <div class="msg-content">${escapeHtml(text)}</div>
         </div>
       `;
-      timeline.appendChild(humanEntry);
+      list.appendChild(hMsg);
       input.value = '';
 
-      // Simulate Bot Autonomous Response
+      // Bot evaluation
       setTimeout(() => {
-        const botEntry = document.createElement('div');
-        botEntry.className = 'thread-entry';
-        const lower = val.toLowerCase();
+        const bMsg = document.createElement('div');
+        bMsg.className = 'thread-msg-item';
+        const lower = text.toLowerCase();
 
-        let botReplyHtml = "";
-        if (lower.includes('upstream') || lower.includes('middleware') || lower.includes('validated') || lower.includes('sanitized') || lower.includes('test') || lower.includes('fixture')) {
-          statusPill.style.background = 'rgba(16, 185, 129, 0.15)';
-          statusPill.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-          statusPill.style.color = '#34d399';
-          statusPill.innerText = 'Status: Resolved ✓';
+        let reply = "";
+        if (lower.includes('middleware') || lower.includes('sanitized') || lower.includes('validated') || lower.includes('test') || lower.includes('fixture')) {
+          badge.className = 'check-run-pill passed';
+          badge.innerText = 'Status: Resolved ✓';
 
-          botReplyHtml = `
-            <p style="color: #34d399; font-weight: 700; margin-bottom: 0.5rem;">✅ Graceful Concession: Finding Resolved</p>
-            <p>Thank you for the clarification! Confirmed that upstream middleware validation/test isolation mitigates this vulnerability. Marking this review thread as <strong>[RESOLVED]</strong> without defensive arguing.</p>
-          `;
+          reply = `<strong>Concession: Finding Resolved</strong><br>Upstream middleware validation / test isolation mitigates this vulnerability. Marking thread as <strong>[RESOLVED]</strong> without defensive arguing.`;
         } else {
-          botReplyHtml = `
-            <p style="color: #38bdf8; font-weight: 700; margin-bottom: 0.5rem;">ℹ️ Architectural Clarification on STD-SEC-01</p>
-            <p>Even with UUID typing, raw string query construction bypasses database driver query-plan caching and breaks defense-in-depth principles. Parameterized binding guarantees safety across future refactors.</p>
-          `;
+          reply = `<strong>Standard STD-SEC-01 Clarification</strong><br>Even with typed UUIDs, string interpolation breaks database query plan caching and defense-in-depth principles. Parameterized binding remains standard.`;
         }
 
-        botEntry.innerHTML = `
-          <div class="thread-avatar bot">💎</div>
-          <div class="thread-content-card">
-            <div class="thread-header">
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
+        bMsg.innerHTML = `
+          <div class="msg-avatar bot" aria-hidden="true">P</div>
+          <div class="msg-bubble">
+            <div class="msg-header">
+              <div>
                 <strong>@prism-review</strong>
-                <span class="bot-badge-tag">BOT</span>
+                <span style="color: var(--text-tertiary); margin-left: 6px;">bot</span>
               </div>
-              <span style="font-size: 0.76rem; color: var(--text-dim);">Just now</span>
+              <span style="color: var(--text-tertiary);">Just now</span>
             </div>
-            <div class="thread-body">
-              ${botReplyHtml}
-            </div>
+            <div class="msg-content">${reply}</div>
           </div>
         `;
-        timeline.appendChild(botEntry);
-      }, 350);
+        list.appendChild(bMsg);
+      }, 200);
     }
 
-    // Interactive ROI Calculator
-    function updateCostCalculator() {
-      const prs = parseInt(document.getElementById('prSlider').value);
-      document.getElementById('sliderValueDisplay').innerText = `${prs.toLocaleString()} PRs / mo`;
+    // ROI Calculator
+    function recalculateRoi() {
+      const prs = parseInt(document.getElementById('volumeSlider').value);
+      document.getElementById('sliderVolumeLabel').innerText = `${prs.toLocaleString()} PRs / mo`;
 
-      const sonnetCost = prs * 0.01334;
-      const prismCost = prs * 0.00036;
-      const monthlySavings = sonnetCost - prismCost;
-      const annualSavings = monthlySavings * 12;
+      const sonnet = prs * 0.01334;
+      const prism = prs * 0.00036;
+      const savings = (sonnet - prism) * 12;
 
-      document.getElementById('costSonnet').innerText = `$${sonnetCost.toFixed(2)} / mo`;
-      document.getElementById('costPrism').innerText = `$${prismCost.toFixed(2)} / mo`;
-      document.getElementById('annualSavings').innerText = `$${annualSavings.toFixed(2)} / yr`;
+      document.getElementById('valSonnetSpend').innerText = `$${sonnet.toFixed(2)} / mo`;
+      document.getElementById('valPrismSpend').innerText = `$${prism.toFixed(2)} / mo`;
+      document.getElementById('valAnnualSavings').innerText = `$${savings.toFixed(2)} / yr`;
     }
 
-    // Utility & Toast
+    // Clipboard & Utility
+    function copyCurrentDiff() {
+      const diff = SCENARIO_DATA[currentScenario].rawDiff;
+      navigator.clipboard.writeText(diff);
+      showToast('Unified diff copied to clipboard');
+    }
+
+    function resetCurrentScenario() {
+      location.reload();
+    }
+
+    function copySnippetText(txt) {
+      navigator.clipboard.writeText(txt);
+      showToast('Remediation snippet copied');
+    }
+
+    function copyStandardsConfig() {
+      const yaml = document.getElementById('rawStandardsYaml').innerText;
+      navigator.clipboard.writeText(yaml);
+      showToast('Standards YAML copied');
+    }
+
     function showToast(msg) {
       const toast = document.getElementById('toastNotification');
-      document.getElementById('toastMsg').innerText = msg;
-      toast.classList.add('visible');
-      setTimeout(() => toast.classList.remove('visible'), 2800);
-    }
-
-    function copyActiveDiff() {
-      const diff = SCENARIOS[activeScenarioKey].rawDiff;
-      navigator.clipboard.writeText(diff);
-      showToast("Unified diff copied to clipboard!");
-    }
-
-    function resetActiveScenario() {
-      pickScenario(activeScenarioKey);
-      showToast("Scenario reset to default");
-    }
-
-    function copyStandardsYaml() {
-      const yaml = `standards:\n  - id: STD-SEC-01\n    title: Parameterized Database Queries\n    severity: CRITICAL\n  - id: STD-SEC-02\n    title: Secret & Credential Hygiene\n    severity: CRITICAL\n  - id: STD-ERR-02\n    title: Async Exception Boundaries\n    severity: HIGH`;
-      navigator.clipboard.writeText(yaml);
-      showToast("Standards YAML copied to clipboard!");
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2400);
     }
 
     function escapeHtml(str) {
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Initialize
+    // Initial Startup
     window.addEventListener('DOMContentLoaded', () => {
-      renderDiffVisual('sql', false);
-      updateCostCalculator();
+      const savedTheme = localStorage.getItem('prism_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+
+      renderDiffSurface('sql', true);
+      recalculateRoi();
     });
   </script>
 </body>
