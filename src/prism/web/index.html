@@ -507,6 +507,208 @@
       gap: 8px;
     }
 
+    /* ==========================================================================
+       LIVE PR URL & CUSTOM DIFF ANALYZER
+       ========================================================================== */
+    .live-pr-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .live-pr-bar-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .live-pr-input-group {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      align-items: center;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      transition: all var(--transition-fast);
+    }
+
+    .live-pr-input-group:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--accent-subtle);
+      background: var(--surface);
+    }
+
+    .live-pr-icon {
+      display: flex;
+      align-items: center;
+      color: var(--text-secondary);
+      margin-right: 10px;
+    }
+
+    .live-pr-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .live-pr-input::placeholder {
+      color: var(--text-tertiary);
+      font-family: var(--font-ui);
+    }
+
+    .btn-clear-input {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+      display: none;
+      border-radius: 50%;
+    }
+
+    .btn-clear-input:hover {
+      color: var(--text-primary);
+      background: var(--surface-subtle);
+    }
+
+    .live-pr-subbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .live-pr-chips {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chip-label {
+      color: var(--text-tertiary);
+      font-size: 11.5px;
+      font-weight: 500;
+    }
+
+    .sample-chip {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .sample-chip:hover {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      border-color: var(--accent-border);
+    }
+
+    .live-pr-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-tertiary);
+      font-size: 11.5px;
+    }
+
+    .badge-dot-ready {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      display: inline-block;
+    }
+
+    .badge-dot-loading {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    /* File Switcher in header */
+    .file-switcher {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      max-width: 55%;
+      padding-bottom: 2px;
+    }
+
+    .file-tab-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+
+    .file-tab-chip:hover {
+      border-color: var(--border-focus);
+      color: var(--text-primary);
+    }
+
+    .file-tab-chip.active {
+      background: var(--accent-subtle);
+      border-color: var(--accent-border);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Custom Diff Mode controls */
+    .custom-diff-toolbar {
+      display: none;
+      padding: 8px 14px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      gap: 8px;
+    }
+
+    .custom-diff-presets {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     /* File Metadata & Diff Mode */
     .file-header-bar {
       padding: 8px 16px;
@@ -1415,6 +1617,47 @@
               <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0-1.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 6.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"></path></svg>
               <span id="checkOutcomeText">1 Standards Violation Identified</span>
             </span>
+      <!-- Live PR & Custom Diff Controller Bar -->
+      <section class="live-pr-banner" aria-label="Review Any Pull Request">
+        <div class="live-pr-bar-inner">
+          <div class="live-pr-input-group">
+            <span class="live-pr-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+            </span>
+            <input 
+              type="text" 
+              id="livePrUrlInput" 
+              class="live-pr-input" 
+              placeholder="Paste any public GitHub PR (e.g. fastapi/fastapi#11020 or https://github.com/encode/httpx/pull/3142)"
+              autocomplete="off"
+              spellcheck="false"
+              onkeydown="if(event.key === 'Enter') handleFetchAndReviewPr()"
+              oninput="toggleClearBtn()"
+            />
+            <button id="btnClearPrInput" class="btn-clear-input" onclick="clearPrInput()" title="Clear">✕</button>
+          </div>
+
+          <button id="btnFetchAndReviewPr" class="btn btn-primary" onclick="handleFetchAndReviewPr()">
+            <svg id="fetchIcon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M7.177 3.073L9.573.677A.25.25 0 0110 .854v4.792a.25.25 0 01-.427.177L7.177 3.427a.25.25 0 010-.354zM3.75 2.5a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5zm-2.25 5a.75.75 0 000 1.5h13a.75.75 0 000-1.5h-13zm0 5a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z"/>
+            </svg>
+            <span id="fetchBtnText">Fetch & Review PR</span>
+          </button>
+        </div>
+
+        <div class="live-pr-subbar">
+          <div class="live-pr-chips">
+            <span class="chip-label">Quick test real PRs:</span>
+            <button class="sample-chip" onclick="quickLoadPr('fastapi/fastapi#11020')">fastapi/fastapi#11020</button>
+            <button class="sample-chip" onclick="quickLoadPr('pydantic/pydantic#9200')">pydantic/pydantic#9200</button>
+            <button class="sample-chip" onclick="quickLoadPr('encode/httpx#3142')">encode/httpx#3142</button>
+            <button class="sample-chip" onclick="quickLoadPr('pallets/flask#5300')">pallets/flask#5300</button>
+          </div>
+          <div class="live-pr-status" id="livePrStatus">
+            <span class="badge-dot-ready" id="statusDot"></span>
+            <span id="statusMessage">Ready for any public GitHub PR or custom git patch</span>
           </div>
         </div>
       </section>
@@ -1449,10 +1692,15 @@
             </div>
           </div>
 
-          <!-- File Context Header -->
+          <!-- File Context Header & Multi-File Switcher -->
           <div class="file-header-bar">
-            <span class="file-path" id="diffFilePath">src/db/queries.py</span>
-            <span class="file-stats" id="diffFileStats"><span class="add">+4</span> <span class="del">-1</span> lines</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="file-path" id="diffFilePath">src/db/queries.py</span>
+              <span class="file-stats" id="diffFileStats"><span class="add">+4</span> <span class="del">-1</span> lines</span>
+            </div>
+            <div class="file-switcher" id="fileSwitcher" style="display: none;">
+              <!-- Dynamically populated file pills for multi-file PRs -->
+            </div>
           </div>
 
           <!-- Code Diff Table (Unified View) -->
@@ -1463,8 +1711,22 @@
               </tbody>
             </table>
 
+            <!-- Custom Diff Toolbar -->
+            <div class="custom-diff-toolbar" id="customDiffToolbar">
+              <div class="custom-diff-presets">
+                <span style="color: var(--text-secondary); font-size: 11.5px; font-weight: 500;">Load sample:</span>
+                <button class="sample-chip" onclick="loadCustomPreset('sql')">SQL Injection</button>
+                <button class="sample-chip" onclick="loadCustomPreset('token')">Auth Secret</button>
+                <button class="sample-chip" onclick="loadCustomPreset('clean')">Clean Code</button>
+                <button class="sample-chip" onclick="clearCustomDiff()">Clear</button>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="analyzeCustomDiff()">
+                <span>Analyze Custom Patch ⚡</span>
+              </button>
+            </div>
+
             <!-- Raw Diff Input for Custom Scenario -->
-            <textarea id="rawDiffArea" class="raw-diff-input" spellcheck="false" placeholder="Paste unified git diff here..."></textarea>
+            <textarea id="rawDiffArea" class="raw-diff-input" spellcheck="false" placeholder="Paste unified git diff here (e.g. diff --git a/... b/...)"></textarea>
           </div>
         </div>
 
@@ -1977,49 +2239,277 @@
       if (activeSection) activeSection.classList.add('active');
     }
 
+    // ==========================================================================
+    // UNIFIED DIFF PARSER & CLIENT-SIDE STANDARDS ENGINE
+    // ==========================================================================
+
+    function parseUnifiedDiff(rawDiff) {
+      if (!rawDiff || !rawDiff.trim()) return [];
+      const files = [];
+      let currentFile = null;
+      let oldLine = 0;
+      let newLine = 0;
+
+      const rawLines = rawDiff.split(/\r?\n/);
+      for (let i = 0; i < rawLines.length; i++) {
+        const line = rawLines[i];
+
+        // Match git diff header
+        if (line.startsWith('diff --git ')) {
+          const match = line.match(/^diff --git a\/(.+?) b\/(.+)$/);
+          const filePath = match ? match[2] : line.split(' ').pop().replace(/^[ab]\//, '');
+          currentFile = {
+            path: filePath,
+            lines: [],
+            additions: 0,
+            deletions: 0,
+            findings: []
+          };
+          files.push(currentFile);
+          continue;
+        }
+
+        // Match +++ b/path
+        if (line.startsWith('+++ b/')) {
+          const filePath = line.slice(6);
+          if (!currentFile || currentFile.path !== filePath) {
+            currentFile = {
+              path: filePath,
+              lines: [],
+              additions: 0,
+              deletions: 0,
+              findings: []
+            };
+            files.push(currentFile);
+          }
+          continue;
+        }
+
+        // Hunk header before diff header
+        if (line.startsWith('@@ ') && !currentFile) {
+          currentFile = {
+            path: 'patch.diff',
+            lines: [],
+            additions: 0,
+            deletions: 0,
+            findings: []
+          };
+          files.push(currentFile);
+        }
+
+        if (!currentFile) continue;
+
+        // Parse hunk header: @@ -oldStart,oldCount +newStart,newCount @@
+        if (line.startsWith('@@ ')) {
+          const match = line.match(/^@@\s+-(\d+)(?:,\d+)?\s+\+(\d+)(?:,\d+)?\s+@@(.*)/);
+          if (match) {
+            oldLine = parseInt(match[1], 10);
+            newLine = parseInt(match[2], 10);
+          }
+          currentFile.lines.push({
+            type: 'hunk',
+            old: '...',
+            new: '...',
+            text: line
+          });
+          continue;
+        }
+
+        if (line.startsWith('+') && !line.startsWith('+++')) {
+          currentFile.additions++;
+          currentFile.lines.push({
+            type: 'add',
+            old: '',
+            new: newLine++,
+            text: line.slice(1)
+          });
+        } else if (line.startsWith('-') && !line.startsWith('---')) {
+          currentFile.deletions++;
+          currentFile.lines.push({
+            type: 'del',
+            old: oldLine++,
+            new: '',
+            text: line.slice(1)
+          });
+        } else if (line.startsWith(' ') || line === '') {
+          currentFile.lines.push({
+            type: 'ctx',
+            old: oldLine++,
+            new: newLine++,
+            text: line.startsWith(' ') ? line.slice(1) : line
+          });
+        }
+      }
+
+      files.forEach(f => {
+        f.stats = `+${f.additions}, -${f.deletions} lines`;
+      });
+      return files;
+    }
+
+    function evaluateDiffStandards(file) {
+      const findings = [];
+      const lines = file.lines || [];
+
+      lines.forEach(line => {
+        if (line.type !== 'add' || !line.new) return;
+        const text = line.text;
+
+        // 1. SQL Injection (STD-SEC-01 / CWE-89)
+        if (
+          text.includes('f"SELECT') || text.includes("f'SELECT") ||
+          (text.includes('SELECT') && text.includes('{') && !text.includes('SELECT %s')) ||
+          (text.includes('SELECT') && text.includes('+') && (text.includes('WHERE') || text.includes('FROM')))
+        ) {
+          findings.push({
+            anchorLine: line.new,
+            severity: 'critical',
+            ruleId: 'STD-SEC-01',
+            cwe: 'CWE-89',
+            title: 'SQL Injection via String Interpolation',
+            message: 'Untrusted input is dynamically formatted directly into an SQL statement. This exposes database records to SQL injection attacks.',
+            suggestion: '    query = "SELECT * FROM users WHERE id = %s AND is_active = 1"\n    cursor.execute(query, (user_id,))'
+          });
+        }
+
+        // 2. Hardcoded Secrets (STD-SEC-02 / CWE-798)
+        const secretPatterns = [
+          { regex: /sk-[a-zA-Z0-9]{20,}/, label: 'OpenAI API Token' },
+          { regex: /ghp_[a-zA-Z0-9]{30,}/, label: 'GitHub Personal Access Token' },
+          { regex: /github_pat_[a-zA-Z0-9]{22,}/, label: 'GitHub PAT' },
+          { regex: /AKIA[0-9A-Z]{16}/, label: 'AWS Access Key ID' },
+          { regex: /sk_live_[a-zA-Z0-9]{24,}/, label: 'Stripe Live Key' },
+          { regex: /-----BEGIN (?:RSA|EC|OPENSSH) PRIVATE KEY-----/, label: 'Private Cryptographic Key' }
+        ];
+        for (const p of secretPatterns) {
+          if (p.regex.test(text) || text.includes('[REDACTED_SECRET]')) {
+            findings.push({
+              anchorLine: line.new,
+              severity: 'critical',
+              ruleId: 'STD-SEC-02',
+              cwe: 'CWE-798',
+              title: `Hardcoded Secret (${p.label})`,
+              message: `Hardcoded API credential detected in patch. Secrets must be strictly stored in environment variables or vault secret managers.`,
+              suggestion: '    api_key = os.environ.get("SERVICE_API_KEY")\n    if not api_key: raise RuntimeError("Missing API key configuration")'
+            });
+            break;
+          }
+        }
+
+        // 3. Missing Timeout in HTTP Calls (STD-ERR-02 / CWE-703)
+        if (
+          (text.includes('httpx.') || text.includes('requests.') || text.includes('aiohttp.')) &&
+          (text.includes('.get(') || text.includes('.post(') || text.includes('.put(') || text.includes('.delete(')) &&
+          !text.includes('timeout=')
+        ) {
+          findings.push({
+            anchorLine: line.new,
+            severity: 'high',
+            ruleId: 'STD-ERR-02',
+            cwe: 'CWE-703',
+            title: 'Missing Network Timeout Boundary',
+            message: 'Asynchronous HTTP request lacks an explicit timeout deadline. An unresponsive upstream server will cause worker connection pool exhaustion.',
+            suggestion: '    response = await client.post("https://api.partner.com/events", timeout=10.0)'
+          });
+        }
+
+        // 4. Bare Exception (STD-ERR-01 / CWE-391)
+        if (text.trim().startsWith('except:')) {
+          findings.push({
+            anchorLine: line.new,
+            severity: 'high',
+            ruleId: 'STD-ERR-01',
+            cwe: 'CWE-391',
+            title: 'Bare Exception Suppression',
+            message: 'Bare `except:` blocks intercept system interruption signals (SIGINT, SIGTERM) and obscure unhandled runtime faults.',
+            suggestion: '    except Exception as exc:\n        logger.error("Operation failed: %s", exc)\n        raise'
+          });
+        }
+
+        // 5. Insecure Subprocess (STD-SEC-03 / CWE-78)
+        if (
+          (text.includes('subprocess.run(') || text.includes('subprocess.Popen(') || text.includes('os.system(')) &&
+          (text.includes('shell=True') || text.includes('f"') || text.includes("f'"))
+        ) {
+          findings.push({
+            anchorLine: line.new,
+            severity: 'critical',
+            ruleId: 'STD-SEC-03',
+            cwe: 'CWE-78',
+            title: 'Command Injection via Subprocess',
+            message: 'Executing shell commands with string interpolation allows arbitrary command injection. Avoid shell=True and pass command arguments as a list.',
+            suggestion: '    subprocess.run(["git", "status"], check=True, capture_output=True)'
+          });
+        }
+      });
+
+      return findings;
+    }
+
     // Render Diff & Inline Findings
     function renderDiffSurface(scenarioKey, showFindings = true) {
       const scenario = SCENARIO_DATA[scenarioKey];
+      if (!scenario) return;
       const tbody = document.getElementById('diffTbody');
       tbody.innerHTML = '';
+
+      // Check if multi-file scenario
+      if (scenario.files && scenario.files.length > 1) {
+        renderFileSwitcher(scenario.files, scenario.activeFileIndex || 0);
+        document.getElementById('fileSummaryStat').innerText = `${scenario.files.length} files changed (${scenario.stats || ''})`;
+      } else {
+        const switcher = document.getElementById('fileSwitcher');
+        if (switcher) switcher.style.display = 'none';
+        document.getElementById('fileSummaryStat').innerText = `1 file changed (${scenario.stats})`;
+      }
 
       // Update PR metadata & headers
       document.getElementById('headerRepoName').innerText = scenario.repo;
       document.getElementById('prTitleText').innerText = scenario.title;
       document.getElementById('prBranchText').innerText = scenario.branch;
-      document.getElementById('fileSummaryStat').innerText = `1 file changed (${scenario.stats})`;
       document.getElementById('diffFilePath').innerText = scenario.file;
       document.getElementById('diffFileStats').innerText = scenario.stats;
+
+      // Calculate total findings across all files if multi-file, or current file
+      let totalFindings = scenario.findings || [];
+      if (scenario.files && scenario.files.length > 0) {
+        let allCount = 0;
+        scenario.files.forEach(f => { if (f.findings) allCount += f.findings.length; });
+        if (allCount > 0 && totalFindings.length === 0) {
+          totalFindings = scenario.files.flatMap(f => f.findings || []);
+        }
+      }
 
       // Update Check Outcome Banner
       const outcomeBadge = document.getElementById('checkOutcomeBadge');
       const outcomeText = document.getElementById('checkOutcomeText');
       const findingsCountBadge = document.getElementById('findingsCountBadge');
 
-      if (!showFindings || scenario.findings.length === 0) {
+      if (!showFindings || totalFindings.length === 0) {
         outcomeBadge.className = 'check-run-pill passed';
         outcomeBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg> <span>All Checks Passed</span>`;
         outcomeText.innerText = 'Clean Pull Request';
         findingsCountBadge.innerText = '0 issues';
       } else {
         outcomeBadge.className = 'check-run-pill failed';
-        outcomeBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0-1.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 6.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"></path></svg> <span>${scenario.findings.length} Issue(s) Identified</span>`;
-        findingsCountBadge.innerText = `${scenario.findings.length} issue(s)`;
+        outcomeBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0-1.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 6.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"></path></svg> <span>${totalFindings.length} Issue(s) Identified</span>`;
+        findingsCountBadge.innerText = `${totalFindings.length} issue(s)`;
       }
 
       // Update Sidebar Findings List
       const sidebarList = document.getElementById('findingsSidebarList');
       sidebarList.innerHTML = '';
-      if (!showFindings || scenario.findings.length === 0) {
+      if (!showFindings || totalFindings.length === 0) {
         sidebarList.innerHTML = `<div style="font-size: 12px; color: var(--text-tertiary); padding: 4px 0;">No active review findings. Pull request is clean.</div>`;
       } else {
-        scenario.findings.forEach(f => {
+        totalFindings.forEach(f => {
           const item = document.createElement('div');
           item.className = 'finding-list-item';
+          const fileLoc = f.filePath || scenario.file;
           item.innerHTML = `
             <div class="item-top-row">
               <span class="finding-pill-sev ${f.severity}">${f.severity}</span>
-              <span class="item-loc">${scenario.file}:${f.anchorLine}</span>
+              <span class="item-loc">${fileLoc}:${f.anchorLine}</span>
             </div>
             <div class="item-title">${f.ruleId}</div>
             <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 2px;">${f.title}</div>
@@ -2031,7 +2521,7 @@
       // Update Matched Standards Sidebar
       const standardsList = document.getElementById('matchedStandardsList');
       standardsList.innerHTML = '';
-      scenario.standards.forEach(std => {
+      (scenario.standards || ["STD-SEC-01", "STD-SEC-02", "STD-ERR-01"]).forEach(std => {
         const d = document.createElement('div');
         d.style.fontFamily = 'var(--font-mono)';
         d.style.fontSize = '11.5px';
@@ -2044,7 +2534,7 @@
       });
 
       // Render Clean State Banner if 0 findings
-      if (showFindings && scenario.findings.length === 0) {
+      if (showFindings && totalFindings.length === 0) {
         const cleanRow = document.createElement('tr');
         cleanRow.innerHTML = `
           <td colspan="4">
@@ -2066,8 +2556,8 @@
         tbody.appendChild(cleanRow);
       }
 
-      // Render Diff Lines
-      scenario.lines.forEach((line) => {
+      // Render Diff Lines for current active file
+      (scenario.lines || []).forEach((line) => {
         const tr = document.createElement('tr');
         tr.className = `diff-line ${line.type}`;
         let marker = ' ';
@@ -2083,8 +2573,8 @@
         `;
         tbody.appendChild(tr);
 
-        // If finding is anchored under this line, render it inline
-        if (showFindings && scenario.findings.length > 0) {
+        // If finding is anchored under this line in current file, render it inline
+        if (showFindings && scenario.findings && scenario.findings.length > 0) {
           const finding = scenario.findings.find(f => f.anchorLine === line.new);
           if (finding) {
             const findingTr = document.createElement('tr');
@@ -2135,22 +2625,65 @@
       });
     }
 
+    // Render multi-file switcher tabs
+    function renderFileSwitcher(files, activeIndex) {
+      const switcher = document.getElementById('fileSwitcher');
+      if (!switcher) return;
+      if (!files || files.length <= 1) {
+        switcher.style.display = 'none';
+        return;
+      }
+      switcher.innerHTML = '';
+      switcher.style.display = 'flex';
+
+      files.forEach((f, idx) => {
+        const chip = document.createElement('button');
+        chip.className = `file-tab-chip ${idx === activeIndex ? 'active' : ''}`;
+        const filename = f.path.split('/').pop() || f.path;
+        const findingsMark = f.findings && f.findings.length > 0 ? ` ⚠️ ${f.findings.length}` : '';
+        chip.innerHTML = `<span>${filename}</span><span style="font-size: 10px; opacity: 0.75; margin-left: 4px;">(+${f.additions}, -${f.deletions})${findingsMark}</span>`;
+        chip.onclick = () => switchActivePrFile(idx);
+        switcher.appendChild(chip);
+      });
+    }
+
+    function switchActivePrFile(index) {
+      const scenario = SCENARIO_DATA[currentScenario];
+      if (!scenario || !scenario.files || !scenario.files[index]) return;
+
+      scenario.activeFileIndex = index;
+      const f = scenario.files[index];
+      scenario.file = f.path;
+      scenario.stats = f.stats;
+      scenario.lines = f.lines;
+      scenario.findings = f.findings;
+
+      renderFileSwitcher(scenario.files, index);
+      renderDiffSurface(currentScenario, true);
+    }
+
     // Switch Scenario
     function switchScenario(key) {
       currentScenario = key;
       document.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      if (event && event.target && event.target.classList.contains('segment-btn')) {
+        event.target.classList.add('active');
+      }
 
       const rawArea = document.getElementById('rawDiffArea');
+      const customToolbar = document.getElementById('customDiffToolbar');
       const table = document.getElementById('diffContainer').querySelector('.diff-table');
 
       if (key === 'custom') {
         table.style.display = 'none';
         rawArea.style.display = 'block';
+        customToolbar.style.display = 'flex';
         rawArea.value = SCENARIO_DATA.custom.rawDiff;
+        document.getElementById('fileSwitcher').style.display = 'none';
       } else {
         table.style.display = 'table';
         rawArea.style.display = 'none';
+        customToolbar.style.display = 'none';
         renderDiffSurface(key, true);
       }
     }
@@ -2167,6 +2700,215 @@
         btn.innerText = 'Run Review';
         showToast('Review analysis complete (40.5 ms)');
       }, 150);
+    }
+
+    // Live GitHub PR Fetch & Review Handler
+    async function handleFetchAndReviewPr() {
+      const input = document.getElementById('livePrUrlInput').value.trim();
+      if (!input) {
+        showToast('Please enter a GitHub PR URL (e.g. fastapi/fastapi#11020)');
+        return;
+      }
+      await fetchAndReviewLivePr(input);
+    }
+
+    async function fetchAndReviewLivePr(urlOrSpec) {
+      const input = urlOrSpec.trim();
+      let owner = '', repo = '', prNum = 0;
+
+      const matchFull = input.match(/(?:https?:\/\/)?github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/i);
+      const matchShort = input.match(/^([^/]+)\/([^#\s]+)#(\d+)$/);
+      const matchSlash = input.match(/^([^/]+)\/([^/\s]+)\/pull\/(\d+)$/i);
+
+      if (matchFull) {
+        owner = matchFull[1];
+        repo = matchFull[2];
+        prNum = parseInt(matchFull[3], 10);
+      } else if (matchShort) {
+        owner = matchShort[1];
+        repo = matchShort[2];
+        prNum = parseInt(matchShort[3], 10);
+      } else if (matchSlash) {
+        owner = matchSlash[1];
+        repo = matchSlash[2];
+        prNum = parseInt(matchSlash[3], 10);
+      } else {
+        showToast('Invalid PR format. Try: owner/repo#123 or https://github.com/owner/repo/pull/123');
+        return;
+      }
+
+      const btn = document.getElementById('btnFetchAndReviewPr');
+      const btnText = document.getElementById('fetchBtnText');
+      const statusMsg = document.getElementById('statusMessage');
+      const statusDot = document.getElementById('statusDot');
+
+      btn.disabled = true;
+      btnText.innerText = 'Fetching...';
+      statusDot.className = 'badge-dot-loading';
+      statusMsg.innerText = `Fetching ${owner}/${repo}#${prNum} from GitHub...`;
+
+      const startTime = performance.now();
+
+      try {
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/pulls/${prNum}`;
+
+        // 1. Fetch metadata
+        const metaRes = await fetch(apiUrl);
+        if (!metaRes.ok) {
+          if (metaRes.status === 404) throw new Error(`PR #${prNum} in ${owner}/${repo} not found or is private.`);
+          if (metaRes.status === 403) throw new Error('GitHub API rate limit exceeded. Try again in a minute or review custom diff.');
+          throw new Error(`GitHub API error HTTP ${metaRes.status}`);
+        }
+        const meta = await metaRes.json();
+
+        // 2. Fetch raw diff
+        const diffRes = await fetch(apiUrl, {
+          headers: { 'Accept': 'application/vnd.github.v3.diff' }
+        });
+        if (!diffRes.ok) throw new Error(`Failed to fetch diff: HTTP ${diffRes.status}`);
+        const rawDiff = await diffRes.text();
+
+        if (!rawDiff || !rawDiff.trim()) {
+          throw new Error('This pull request has an empty diff or contains only binary assets.');
+        }
+
+        // 3. Parse diff
+        const parsedFiles = parseUnifiedDiff(rawDiff);
+        if (!parsedFiles || parsedFiles.length === 0) {
+          throw new Error('Could not parse changed code files from unified diff.');
+        }
+
+        // 4. Run standards evaluation across all files
+        let allFindingsCount = 0;
+        parsedFiles.forEach(f => {
+          f.findings = evaluateDiffStandards(f);
+          f.findings.forEach(finding => finding.filePath = f.path);
+          allFindingsCount += f.findings.length;
+        });
+
+        const elapsedMs = (performance.now() - startTime).toFixed(1);
+
+        // 5. Store in SCENARIO_DATA as live_pr
+        SCENARIO_DATA.live_pr = {
+          repo: `${owner}/${repo}`,
+          prNum: prNum,
+          title: meta.title || `Pull Request #${prNum}`,
+          branch: `${meta.head ? meta.head.ref : 'feature'} into ${meta.base ? meta.base.ref : 'main'}`,
+          files: parsedFiles,
+          activeFileIndex: 0,
+          file: parsedFiles[0].path,
+          stats: parsedFiles[0].stats,
+          lines: parsedFiles[0].lines,
+          standards: ["STD-SEC-01", "STD-SEC-02", "STD-ERR-01", "STD-ERR-02", "STD-SEC-03"],
+          findings: parsedFiles[0].findings,
+          rawDiff: rawDiff
+        };
+
+        // 6. Switch to live_pr
+        currentScenario = 'live_pr';
+        document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+
+        const table = document.getElementById('diffContainer').querySelector('.diff-table');
+        const rawArea = document.getElementById('rawDiffArea');
+        const customToolbar = document.getElementById('customDiffToolbar');
+        table.style.display = 'table';
+        rawArea.style.display = 'none';
+        customToolbar.style.display = 'none';
+
+        renderDiffSurface('live_pr', true);
+
+        statusDot.className = 'badge-dot-ready';
+        statusMsg.innerText = `Analyzed ${parsedFiles.length} file(s) across ${owner}/${repo}#${prNum} (${elapsedMs} ms)`;
+        showToast(`Reviewed ${owner}/${repo}#${prNum}: ${allFindingsCount} finding(s) in ${elapsedMs} ms`);
+
+      } catch (err) {
+        statusDot.className = 'badge-dot-ready';
+        statusMsg.innerText = `Fetch failed: ${err.message}`;
+        showToast(`Error: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = 'Fetch & Review PR';
+      }
+    }
+
+    // Quick test preset PRs
+    function quickLoadPr(spec) {
+      document.getElementById('livePrUrlInput').value = spec;
+      toggleClearBtn();
+      fetchAndReviewLivePr(spec);
+    }
+
+    function toggleClearBtn() {
+      const val = document.getElementById('livePrUrlInput').value;
+      const btn = document.getElementById('btnClearPrInput');
+      btn.style.display = val.length > 0 ? 'inline-block' : 'none';
+    }
+
+    function clearPrInput() {
+      document.getElementById('livePrUrlInput').value = '';
+      toggleClearBtn();
+    }
+
+    // Custom Diff Mode Functions
+    function analyzeCustomDiff() {
+      const rawText = document.getElementById('rawDiffArea').value.trim();
+      if (!rawText) {
+        showToast('Please enter a unified git diff first.');
+        return;
+      }
+
+      const parsedFiles = parseUnifiedDiff(rawText);
+      if (!parsedFiles || parsedFiles.length === 0) {
+        showToast('Could not parse unified diff. Ensure diff has @@ hunk headers or +/- lines.');
+        return;
+      }
+
+      let allCount = 0;
+      parsedFiles.forEach(f => {
+        f.findings = evaluateDiffStandards(f);
+        f.findings.forEach(finding => finding.filePath = f.path);
+        allCount += f.findings.length;
+      });
+
+      SCENARIO_DATA.custom = {
+        repo: "workspace/patch",
+        prNum: 1,
+        title: "User Custom Patch Review",
+        branch: "patch/local into main",
+        files: parsedFiles,
+        activeFileIndex: 0,
+        file: parsedFiles[0].path,
+        stats: parsedFiles[0].stats,
+        lines: parsedFiles[0].lines,
+        standards: ["STD-SEC-01", "STD-SEC-02", "STD-ERR-01", "STD-ERR-02"],
+        findings: parsedFiles[0].findings,
+        rawDiff: rawText
+      };
+
+      currentScenario = 'custom';
+      document.getElementById('rawDiffArea').style.display = 'none';
+      document.getElementById('customDiffToolbar').style.display = 'none';
+      document.querySelector('.diff-table').style.display = 'table';
+
+      renderDiffSurface('custom', true);
+      showToast(`Custom patch analyzed: ${allCount} finding(s) detected`);
+    }
+
+    function loadCustomPreset(type) {
+      const area = document.getElementById('rawDiffArea');
+      if (type === 'sql') {
+        area.value = SCENARIO_DATA.sql.rawDiff;
+      } else if (type === 'token') {
+        area.value = SCENARIO_DATA.token.rawDiff;
+      } else if (type === 'clean') {
+        area.value = SCENARIO_DATA.clean.rawDiff;
+      }
+      showToast(`Loaded ${type} diff preset`);
+    }
+
+    function clearCustomDiff() {
+      document.getElementById('rawDiffArea').value = '';
+      showToast('Cleared custom diff editor');
     }
 
     // Apply Suggestion: Live fix the code diff and show verified clean state

@@ -648,6 +648,43 @@ async def review_diff_direct(req: DirectDiffReviewRequest) -> dict[str, Any]:
     }
 
 
+class PRUrlReviewRequest(BaseModel):
+    url: str = Field(description="GitHub Pull Request URL or shorthand (e.g. https://github.com/owner/repo/pull/123)")
+    token: str | None = Field(default=None, description="Optional GitHub token for private repositories")
+    standards_yaml: str | None = Field(default=None, description="Optional custom standards YAML")
+
+
+@app.post("/api/v1/review/pr-url", tags=["Review"])
+async def review_pr_url(req: PRUrlReviewRequest) -> dict[str, Any]:
+    """Fetch a public or private GitHub PR and execute automated review analysis."""
+    from prism.review.cli import fetch_pr_details_and_diff, parse_pr_url
+
+    try:
+        repo, pr_number = parse_pr_url(req.url)
+    except ValueError as err:
+        raise HTTPException(status_code=400, detail=str(err)) from err
+
+    try:
+        meta, raw_diff = await fetch_pr_details_and_diff(repo, pr_number, req.token)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=400, detail=f"Failed to fetch PR from GitHub: {exc}"
+        ) from exc
+
+    diff_req = DirectDiffReviewRequest(
+        diff=raw_diff,
+        title=meta.get("title", f"PR #{pr_number}"),
+        standards_yaml=req.standards_yaml,
+    )
+    result = await review_diff_direct(diff_req)
+    result["repo"] = repo
+    result["pr_number"] = pr_number
+    result["title"] = meta.get("title", f"PR #{pr_number}")
+    result["raw_diff"] = raw_diff
+    return result
+
+
+
 @app.get("/healthz", tags=["Health"])
 async def health_check() -> dict[str, str]:
     """Health check endpoint."""
