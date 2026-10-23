@@ -1342,33 +1342,536 @@
     }
 
     /* ==========================================================================
-       TAB 3: REPOSITORY STANDARDS (AS CODE)
+       TAB 3: INTERACTIVE STANDARDS ARCHITECT & VISUAL BUILDER
        ========================================================================== */
-    .standards-layout {
+    .standards-builder-container {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .builder-hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .builder-hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .builder-hero-title h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .builder-hero-title p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .preset-pills-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .preset-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-right: 4px;
+    }
+
+    .preset-btn {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all var(--transition-fast);
+    }
+
+    .preset-btn:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .preset-btn.active {
+      background: var(--accent-subtle);
+      border-color: var(--accent-border);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .builder-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .builder-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Column: Filter Toolbar, Settings, and Rule Cards */
+    .builder-left-col {
+      display: flex;
+      flex-direction: column;
       gap: 16px;
     }
 
-    .rule-table {
-      width: 100%;
-      border-collapse: collapse;
+    .builder-toolbar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toolbar-search-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .builder-search-box {
+      flex: 1;
+      min-width: 220px;
+      display: flex;
+      align-items: center;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
       font-size: 12.5px;
     }
 
-    .rule-table th {
-      padding: 8px 12px;
-      text-align: left;
-      font-weight: 600;
-      color: var(--text-secondary);
-      background: var(--surface-subtle);
-      border-bottom: 1px solid var(--border);
+    .builder-search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      font-family: inherit;
+      margin-left: 6px;
     }
 
-    .rule-table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-subtle);
+    .category-filter-chips {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .category-chip {
+      font-size: 11.5px;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .category-chip:hover {
+      background: var(--surface);
       color: var(--text-primary);
+    }
+
+    .category-chip.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Policy Global Settings Panel */
+    .settings-accordion {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .settings-header {
+      padding: 10px 16px;
+      background: var(--surface-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      user-select: none;
+    }
+
+    .settings-body {
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .settings-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .settings-field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .settings-field input, .settings-field select {
+      padding: 6px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface-subtle);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .settings-field input:focus, .settings-field select:focus {
+      border-color: var(--border-focus);
+      background: var(--surface);
+    }
+
+    /* Rules List */
+    .rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rule-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+      overflow: hidden;
+    }
+
+    .rule-card:hover {
+      border-color: var(--border-focus);
+    }
+
+    .rule-card.disabled {
+      opacity: 0.6;
+      background: var(--surface-subtle);
+    }
+
+    .rule-card-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .rule-card-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rule-toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 32px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .rule-toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--border);
+      transition: .2s;
+      border-radius: 18px;
+    }
+
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+
+    input:checked + .switch-slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .switch-slider:before {
+      transform: translateX(14px);
+    }
+
+    .rule-id-code {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: var(--surface-subtle);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .rule-title-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rule-card-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .rule-sev-select {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--text-primary);
+      text-transform: uppercase;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .rule-sev-select.critical { color: var(--critical-text); border-color: var(--critical-border); background: var(--critical-subtle); }
+    .rule-sev-select.high { color: var(--warning-text); border-color: var(--warning-border); background: var(--warning-subtle); }
+    .rule-sev-select.medium { color: var(--info); border-color: var(--info-border); background: var(--info-subtle); }
+    .rule-sev-select.low { color: var(--text-secondary); }
+
+    .rule-card-body {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--canvas);
+      font-size: 12.5px;
+      display: none;
+    }
+
+    .rule-card.expanded .rule-card-body {
+      display: block;
+    }
+
+    .rule-desc {
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .rule-suggestion-code {
+      margin: 6px 0 0 0;
+      padding: 8px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--diff-add-text);
+      white-space: pre-wrap;
+    }
+
+    /* Add Custom Rule Card */
+    .add-rule-card {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .add-rule-card:hover {
+      border-color: var(--accent);
+      background: var(--accent-subtle);
+    }
+
+    .custom-rule-form {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border-focus);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 10px;
+      box-shadow: var(--shadow-sm);
+      text-align: left;
+    }
+
+    .custom-rule-form.open {
+      display: block;
+    }
+
+    /* Right Column: Sticky Live YAML Preview */
+    .builder-right-col {
+      position: sticky;
+      top: 68px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .yaml-preview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .yaml-header {
+      padding: 10px 14px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .yaml-filepath-badge {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .yaml-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .yaml-code-view {
+      margin: 0;
+      padding: 14px;
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--text-code);
+      max-height: 480px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Rule Sandbox Tester */
+    .rule-tester-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 14px;
+    }
+
+    .tester-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .tester-textarea {
+      width: 100%;
+      height: 80px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--canvas);
+      color: var(--text-code);
+      resize: vertical;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .tester-textarea:focus {
+      border-color: var(--border-focus);
+    }
+
+    .tester-result-box {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-subtle);
     }
 
     /* ==========================================================================
@@ -2000,82 +2503,227 @@
     </section>
 
     <!-- ========================================================================
-         TAB 3: REPOSITORY STANDARDS (AS CODE)
+         TAB 3: REPOSITORY STANDARDS ARCHITECT & VISUAL BUILDER
          ======================================================================== -->
     <section id="section-standards" class="tab-section" role="tabpanel" aria-labelledby="tab-btn-standards">
-      <div class="standards-layout">
-        <!-- Standards Table -->
-        <div class="card-panel">
-          <div class="panel-header-simple">
-            <span>Active Repository Policies</span>
-            <span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary);">.prism/standards.yml</span>
+      <div class="standards-builder-container">
+        <!-- Hero & Presets -->
+        <div class="builder-hero">
+          <div class="builder-hero-top">
+            <div class="builder-hero-title">
+              <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent);">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <span>Repository Standards Architect</span>
+              </h2>
+              <p>Visually configure engineering standards, tune severity thresholds, add custom regex rules, and export to <code>.prism/standards.yml</code>.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary" onclick="applyStandardsToLivePlayground()" style="font-size: 12px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;" title="Update review playground with these configured standards">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                <span>Apply to Live Review</span>
+              </button>
+            </div>
           </div>
-          <table class="rule-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Standard</th>
-                <th>Severity</th>
-                <th>Category</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>STD-SEC-01</code></td>
-                <td>Parameterized Database Execution</td>
-                <td><span class="finding-pill-sev critical">Critical</span></td>
-                <td>Security</td>
-              </tr>
-              <tr>
-                <td><code>STD-SEC-02</code></td>
-                <td>Credential & Token Scrubbing</td>
-                <td><span class="finding-pill-sev critical">Critical</span></td>
-                <td>Security</td>
-              </tr>
-              <tr>
-                <td><code>STD-ERR-02</code></td>
-                <td>Async Exception Boundaries & Timeouts</td>
-                <td><span class="finding-pill-sev high">High</span></td>
-                <td>Reliability</td>
-              </tr>
-              <tr>
-                <td><code>STD-PERF-03</code></td>
-                <td>N+1 Prevention in Query Loops</td>
-                <td><span class="finding-pill-sev high" style="background: var(--surface-subtle); color: var(--text-secondary); border-color: var(--border);">Medium</span></td>
-                <td>Performance</td>
-              </tr>
-            </tbody>
-          </table>
+
+          <!-- Stack Presets -->
+          <div class="preset-pills-row">
+            <span class="preset-label">Stack Presets:</span>
+            <button class="preset-btn active" id="preset-all" onclick="loadStandardsPreset('all')">
+              <span>🚀 All Standards</span>
+            </button>
+            <button class="preset-btn" id="preset-python" onclick="loadStandardsPreset('python')">
+              <span>🐍 Python / FastAPI</span>
+            </button>
+            <button class="preset-btn" id="preset-node" onclick="loadStandardsPreset('node')">
+              <span>⚡ Node.js / TypeScript</span>
+            </button>
+            <button class="preset-btn" id="preset-go" onclick="loadStandardsPreset('go')">
+              <span>🐹 Go Microservices</span>
+            </button>
+            <button class="preset-btn" id="preset-security" onclick="loadStandardsPreset('security')">
+              <span>🛡️ Strict Security Mode</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Raw YAML Configuration View -->
-        <div class="card-panel">
-          <div class="panel-header-simple">
-            <span>Raw Standards Configuration</span>
-            <button class="btn btn-secondary btn-sm" onclick="copyStandardsConfig()">Copy YAML</button>
+        <!-- Builder Grid: Controls (Left) vs Synchronized YAML (Right) -->
+        <div class="builder-grid">
+          <!-- Left Column -->
+          <div class="builder-left-col">
+            <!-- Global Repository Settings -->
+            <div class="settings-accordion">
+              <div class="settings-header" onclick="toggleSettingsAccordion()">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  <span>Repository Policy Settings (CI/CD Gates)</span>
+                </div>
+                <span id="settingsAccordionArrow" style="font-size: 11px; color: var(--text-tertiary);">▼</span>
+              </div>
+              <div class="settings-body" id="settingsBody">
+                <div class="settings-field">
+                  <label for="cfgFailSeverity">Fail CI On Severity:</label>
+                  <select id="cfgFailSeverity" onchange="updateRepositorySettings()">
+                    <option value="critical">Critical Only</option>
+                    <option value="high" selected>High & Above (Recommended)</option>
+                    <option value="medium">Medium & Above (Strict)</option>
+                    <option value="none">Never (Advisory Comments Only)</option>
+                  </select>
+                </div>
+                <div class="settings-field">
+                  <label for="cfgMaxComments">Max Inline Comments:</label>
+                  <input type="number" id="cfgMaxComments" min="1" max="25" value="5" onchange="updateRepositorySettings()">
+                </div>
+                <div class="settings-field" style="grid-column: 1 / -1;">
+                  <label for="cfgIncludeGlobs">Included Path Patterns (comma-separated):</label>
+                  <input type="text" id="cfgIncludeGlobs" value="**/*.py, **/*.ts, **/*.js, **/*.go, **/*.rs" onchange="updateRepositorySettings()">
+                </div>
+                <div class="settings-field" style="grid-column: 1 / -1;">
+                  <label for="cfgExcludeGlobs">Ignored Path Patterns (comma-separated):</label>
+                  <input type="text" id="cfgExcludeGlobs" value="tests/**, vendor/**, node_modules/**, dist/**, *.generated.*" onchange="updateRepositorySettings()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div class="builder-toolbar-card">
+              <div class="toolbar-search-row">
+                <div class="builder-search-box">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-tertiary);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  <input type="text" id="ruleSearchInput" placeholder="Filter rules by title, CWE, or ID (e.g. SQL, CWE-89, STD-SEC)..." oninput="filterRulesList()">
+                </div>
+                <div id="rulesActiveCounter" style="font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">
+                  11 active • 0 disabled
+                </div>
+              </div>
+              <div class="category-filter-chips">
+                <button class="category-chip active" onclick="setCategoryFilter('all', this)">All Categories</button>
+                <button class="category-chip" onclick="setCategoryFilter('Security', this)">🛡️ Security</button>
+                <button class="category-chip" onclick="setCategoryFilter('Reliability', this)">⚡ Reliability</button>
+                <button class="category-chip" onclick="setCategoryFilter('Performance', this)">🏎️ Performance</button>
+                <button class="category-chip" onclick="setCategoryFilter('Quality', this)">✨ Code Quality</button>
+                <button class="category-chip" onclick="setCategoryFilter('Custom', this)">🛠️ Custom</button>
+              </div>
+            </div>
+
+            <!-- Interactive Rules List Container -->
+            <div class="rules-list" id="rulesCardsContainer">
+              <!-- Dynamically populated by JS renderRulesList() -->
+            </div>
+
+            <!-- Add Custom Rule Card -->
+            <div class="add-rule-card" onclick="toggleCustomRuleForm()">
+              <div style="font-size: 13px; font-weight: 600; color: var(--accent); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Custom Repository Standard</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 3px;">
+                Author internal team guidelines with custom regex matching and 1-click remediation suggestions
+              </div>
+            </div>
+
+            <!-- Custom Rule Form -->
+            <div class="custom-rule-form" id="customRuleForm">
+              <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 10px 0; color: var(--text-primary);">Create Custom Engineering Rule</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div class="settings-field">
+                  <label for="crId">Rule ID:</label>
+                  <input type="text" id="crId" placeholder="e.g. TEAM-LOG-01" value="TEAM-LOG-01">
+                </div>
+                <div class="settings-field">
+                  <label for="crCategory">Category:</label>
+                  <select id="crCategory">
+                    <option value="Security">Security</option>
+                    <option value="Reliability">Reliability</option>
+                    <option value="Performance">Performance</option>
+                    <option value="Quality" selected>Code Quality</option>
+                  </select>
+                </div>
+                <div class="settings-field" style="grid-column: 1 / -1;">
+                  <label for="crTitle">Standard Title:</label>
+                  <input type="text" id="crTitle" placeholder="e.g. No console.log in Production Commits" value="No console.log in Production Commits">
+                </div>
+                <div class="settings-field">
+                  <label for="crSeverity">Severity:</label>
+                  <select id="crSeverity">
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+                <div class="settings-field">
+                  <label for="crCwe">CWE Reference (optional):</label>
+                  <input type="text" id="crCwe" placeholder="e.g. CWE-489" value="CWE-489">
+                </div>
+                <div class="settings-field" style="grid-column: 1 / -1;">
+                  <label for="crDesc">Rule Description & Rationale:</label>
+                  <input type="text" id="crDesc" placeholder="Explain why this rule exists and how to comply..." value="Debug logging statements pollute production output and may leak sensitive request payloads.">
+                </div>
+                <div class="settings-field" style="grid-column: 1 / -1;">
+                  <label for="crRegex">Pattern / Matcher Regex:</label>
+                  <input type="text" id="crRegex" placeholder="e.g. console\.log\(|debugger;" value="console\.log\(|debugger;">
+                </div>
+                <div class="settings-field" style="grid-column: 1 / -1;">
+                  <label for="crSuggestion">Remediation Suggestion (replacement code):</label>
+                  <input type="text" id="crSuggestion" placeholder="e.g. logger.debug(...)" value="logger.info('Processing transaction: %s', txId)">
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn btn-secondary btn-sm" onclick="toggleCustomRuleForm()">Cancel</button>
+                <button class="btn btn-primary btn-sm" onclick="saveCustomRule()">Save Rule</button>
+              </div>
+            </div>
+
+            <!-- Interactive Rule Sandbox Tester -->
+            <div class="rule-tester-card">
+              <div class="tester-header">
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-primary);">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent);"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  <span>Interactive Rule Sandbox Tester</span>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="runSandboxTest()" style="font-size: 11.5px; padding: 3px 8px;">
+                  <span>Run Check</span>
+                </button>
+              </div>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 8px 0;">Paste arbitrary code lines to test active standards and custom rules against them in real time:</p>
+              <textarea id="sandboxCodeInput" class="tester-textarea" placeholder="Paste code snippet to test (e.g. db.execute(f'SELECT * FROM users WHERE id={uid}'))...">query = f"SELECT * FROM users WHERE id = '{user_id}' AND is_active = 1"
+db_cursor.execute(query)
+console.log("Found user profile")</textarea>
+              <div id="sandboxResultBox" class="tester-result-box">
+                <span style="color: var(--text-tertiary); font-style: italic;">Click "Run Check" to verify code snippet against currently enabled standards.</span>
+              </div>
+            </div>
           </div>
-          <div style="padding: 12px; background: var(--surface); overflow-x: auto;">
-            <pre style="font-family: var(--font-mono); font-size: 12px; line-height: 1.5; color: var(--text-code);"><code id="rawStandardsYaml">standards:
-  - id: STD-SEC-01
-    title: Parameterized Database Queries
-    severity: CRITICAL
-    category: SECURITY
-    cwe: CWE-89
-    description: Never construct SQL queries via raw string interpolation.
 
-  - id: STD-SEC-02
-    title: Secret Hygiene & Credential Scrubbing
-    severity: CRITICAL
-    category: SECURITY
-    cwe: CWE-798
-    description: Hardcoded secrets and tokens must never be committed.
+          <!-- Right Column: Sticky Live YAML Synchronizer -->
+          <div class="builder-right-col">
+            <div class="yaml-preview-card">
+              <div class="yaml-header">
+                <div class="yaml-filepath-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  <span>.prism/standards.yml</span>
+                </div>
+                <div class="yaml-actions">
+                  <button class="btn btn-secondary btn-sm" onclick="copyStandardsConfig()" style="font-size: 11px; padding: 4px 8px;" title="Copy configuration to clipboard">
+                    <span id="copyYamlBtnLabel">📋 Copy YAML</span>
+                  </button>
+                  <button class="btn btn-secondary btn-sm" onclick="downloadStandardsYaml()" style="font-size: 11px; padding: 4px 8px;" title="Download .prism/standards.yml">
+                    <span>💾 Download</span>
+                  </button>
+                </div>
+              </div>
+              <pre class="yaml-code-view" id="liveStandardsYamlView"><code># Initializing standards...</code></pre>
+            </div>
 
-  - id: STD-ERR-02
-    title: Async Exception Boundaries
-    severity: HIGH
-    category: RELIABILITY
-    cwe: CWE-703
-    description: All asynchronous network calls must declare explicit timeouts.</code></pre>
+            <!-- Quick Action Help Card -->
+            <div class="card-panel" style="padding: 14px; font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
+              <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                <span>💡 Production Adoption Tip</span>
+              </div>
+              <div>Commit <code>.prism/standards.yml</code> directly to your repository root or <code>.prism/</code> folder. The GitHub Action will automatically detect and enforce these rules on every pull request!</div>
+            </div>
           </div>
         </div>
       </div>
@@ -2583,103 +3231,544 @@ standards:
       return files;
     }
 
+    // ==========================================================================
+    // STANDARDS ARCHITECT & CUSTOM RULE ENGINE
+    // ==========================================================================
+
+    const BUILTIN_STANDARDS_RULES = [
+      {
+        id: "STD-SEC-01",
+        title: "SQL Injection Prevention via Parameterized Queries",
+        category: "Security",
+        severity: "critical",
+        cwe: "CWE-89",
+        enabled: true,
+        description: "Database queries must use parameterized queries or ORM placeholders. Never concatenate or interpolate raw user input strings into SQL expressions.",
+        defaultSuggestion: '    query = "SELECT * FROM users WHERE id = %s AND is_active = 1"\n    cursor.execute(query, (user_id,))',
+        matcher: (text) => text.includes('f"SELECT') || text.includes("f'SELECT") || (text.includes('SELECT') && text.includes('{') && !text.includes('SELECT %s')) || (text.includes('SELECT') && text.includes('+') && (text.includes('WHERE') || text.includes('FROM')))
+      },
+      {
+        id: "STD-SEC-02",
+        title: "Zero Plaintext Credentials or API Tokens",
+        category: "Security",
+        severity: "critical",
+        cwe: "CWE-798",
+        enabled: true,
+        description: "Never hardcode secrets, API keys, private tokens, or passwords in source code. Retrieve credentials exclusively via environment variables or secret vaults.",
+        defaultSuggestion: '    api_key = os.environ.get("SERVICE_API_KEY")\n    if not api_key: raise RuntimeError("Missing API key configuration")',
+        matcher: (text) => /sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{30,}|github_pat_[a-zA-Z0-9]{22,}|AKIA[0-9A-Z]{16}|sk_live_[a-zA-Z0-9]{24,}|-----BEGIN (?:RSA|EC|OPENSSH) PRIVATE KEY-----/.test(text) || text.includes('[REDACTED_SECRET]') || text.includes('STRIPE_SECRET_KEY = "sk_')
+      },
+      {
+        id: "STD-SEC-03",
+        title: "Insecure Subprocess Execution & Command Injection",
+        category: "Security",
+        severity: "critical",
+        cwe: "CWE-78",
+        enabled: true,
+        description: "Executing shell commands with string interpolation or shell=True allows arbitrary command execution. Avoid shell=True and pass command arguments as a token list.",
+        defaultSuggestion: '    subprocess.run(["git", "status"], check=True, capture_output=True)',
+        matcher: (text) => (text.includes('subprocess.run(') || text.includes('subprocess.Popen(') || text.includes('os.system(')) && (text.includes('shell=True') || text.includes('f"') || text.includes("f'"))
+      },
+      {
+        id: "STD-SEC-04",
+        title: "Multi-Tenant Workspace & Resource Isolation",
+        category: "Security",
+        severity: "high",
+        cwe: "CWE-639",
+        enabled: true,
+        description: "Queries accessing tenant data must explicitly include organization/tenant_id filtering to guarantee cross-tenant isolation and prevent unauthorized data access.",
+        defaultSuggestion: '    stmt = select(Account).where(Account.id == acc_id, Account.tenant_id == current_tenant.id)',
+        matcher: (text) => (text.includes('def get_tenant_') || text.includes('tenant_lookup')) && !text.includes('tenant_id ==') && text.includes('select(')
+      },
+      {
+        id: "STD-ERR-01",
+        title: "No Silent or Bare Exception Handling",
+        category: "Reliability",
+        severity: "high",
+        cwe: "CWE-391",
+        enabled: true,
+        description: "Catch specific exceptions with actionable structured logging. Bare except blocks intercept system interruption signals and conceal critical fatal bugs.",
+        defaultSuggestion: '    except Exception as exc:\n        logger.error("Operation failed: %s", exc)\n        raise',
+        matcher: (text) => text.trim().startsWith('except:') || text.trim() === 'except Exception: pass' || text.trim() === 'catch (e) {}'
+      },
+      {
+        id: "STD-ERR-02",
+        title: "Async Exception Boundaries & Explicit Timeouts",
+        category: "Reliability",
+        severity: "high",
+        cwe: "CWE-703",
+        enabled: true,
+        description: "All asynchronous network requests and external RPC dispatches must declare explicit timeout deadlines and structured error handling.",
+        defaultSuggestion: '    async with httpx.AsyncClient(timeout=10.0) as client:\n        response = await client.post(url, json=data)\n        response.raise_for_status()',
+        matcher: (text) => (text.includes('httpx.') || text.includes('requests.') || text.includes('aiohttp.')) && (text.includes('.get(') || text.includes('.post(') || text.includes('.put(') || text.includes('.delete(')) && !text.includes('timeout=')
+      },
+      {
+        id: "STD-ERR-03",
+        title: "Resource Handle Hygiene & Context Managers",
+        category: "Reliability",
+        severity: "medium",
+        cwe: "CWE-775",
+        enabled: true,
+        description: "File descriptors, sockets, and lock handles must be scoped within context managers (with/async with) to prevent memory and file handle leaks.",
+        defaultSuggestion: '    with open(path, "r", encoding="utf-8") as f:\n        content = f.read()',
+        matcher: (text) => text.includes('open(') && !text.trim().startsWith('with open(') && text.includes('= open(')
+      },
+      {
+        id: "STD-PERF-01",
+        title: "N+1 Query Loop Prevention & Bulk Batching",
+        category: "Performance",
+        severity: "high",
+        cwe: "CWE-1050",
+        enabled: true,
+        description: "Database queries or remote API calls must never be executed inside iteration loops. Use bulk queries (SELECT ... WHERE id IN (...)) or eager loading.",
+        defaultSuggestion: '    users = db.execute("SELECT * FROM users WHERE id = ANY(%s)", (user_ids,)).fetchall()',
+        matcher: (text) => (text.includes('for ') || text.includes('.forEach(') || text.includes('.map(')) && (text.includes('execute(') || text.includes('.fetch(') || text.includes('.query('))
+      },
+      {
+        id: "STD-PERF-02",
+        title: "Synchronous Blocking I/O inside Async Event Loops",
+        category: "Performance",
+        severity: "high",
+        cwe: "CWE-834",
+        enabled: true,
+        description: "Blocking synchronous calls (time.sleep, requests.get) inside async def coroutines block the worker event loop and stall concurrent requests.",
+        defaultSuggestion: '    await asyncio.sleep(delay_seconds)',
+        matcher: (text) => (text.includes('time.sleep(') || text.includes('requests.get(') || text.includes('requests.post(')) && !text.includes('asyncio.sleep(')
+      },
+      {
+        id: "STD-QUAL-01",
+        title: "No Debug Console Output or Print Statements",
+        category: "Quality",
+        severity: "low",
+        cwe: "CWE-489",
+        enabled: true,
+        description: "Remove temporary print() or console.log() statements before pushing to production. Use structured loggers (logging / pino / zap) with appropriate log levels.",
+        defaultSuggestion: '    logger.info("Processed transaction: %s", transaction_id)',
+        matcher: (text) => (text.trim().startsWith('print(') || text.includes('console.log(') || text.includes('debugger;'))
+      },
+      {
+        id: "STD-QUAL-02",
+        title: "Public API Type Annotations & Schemas",
+        category: "Quality",
+        severity: "medium",
+        cwe: "CWE-398",
+        enabled: false,
+        description: "Public functions and API endpoints must declare type signatures for parameters and return values to guarantee contract stability.",
+        defaultSuggestion: '    async def get_user_profile(user_id: str) -> UserResponse:',
+        matcher: (text) => (text.trim().startsWith('def ') || text.trim().startsWith('async def ')) && !text.includes('->') && !text.includes('__init__') && !text.includes('__repr__')
+      }
+    ];
+
+    let activeStandardsConfig = {
+      settings: {
+        fail_on_severity: "high",
+        max_comments: 5,
+        include: ["**/*.py", "**/*.ts", "**/*.js", "**/*.go", "**/*.rs"],
+        exclude: ["tests/**", "vendor/**", "node_modules/**", "dist/**", "*.generated.*"]
+      },
+      rules: BUILTIN_STANDARDS_RULES.map(r => ({ ...r }))
+    };
+
+    let currentCategoryFilter = 'all';
+
     function evaluateDiffStandards(file) {
       const findings = [];
       const lines = file.lines || [];
+      const enabledRules = activeStandardsConfig.rules.filter(r => r.enabled);
 
       lines.forEach(line => {
         if (line.type !== 'add' || !line.new) return;
         const text = line.text;
 
-        // 1. SQL Injection (STD-SEC-01 / CWE-89)
-        if (
-          text.includes('f"SELECT') || text.includes("f'SELECT") ||
-          (text.includes('SELECT') && text.includes('{') && !text.includes('SELECT %s')) ||
-          (text.includes('SELECT') && text.includes('+') && (text.includes('WHERE') || text.includes('FROM')))
-        ) {
-          findings.push({
-            anchorLine: line.new,
-            severity: 'critical',
-            ruleId: 'STD-SEC-01',
-            cwe: 'CWE-89',
-            title: 'SQL Injection via String Interpolation',
-            message: 'Untrusted input is dynamically formatted directly into an SQL statement. This exposes database records to SQL injection attacks.',
-            suggestion: '    query = "SELECT * FROM users WHERE id = %s AND is_active = 1"\n    cursor.execute(query, (user_id,))'
-          });
-        }
+        for (const rule of enabledRules) {
+          let isMatch = false;
+          if (rule.regex) {
+            try {
+              const reg = new RegExp(rule.regex, 'i');
+              isMatch = reg.test(text);
+            } catch (e) {
+              console.warn('Invalid custom regex:', rule.regex, e);
+            }
+          } else if (typeof rule.matcher === 'function') {
+            isMatch = rule.matcher(text);
+          }
 
-        // 2. Hardcoded Secrets (STD-SEC-02 / CWE-798)
-        const secretPatterns = [
-          { regex: /sk-[a-zA-Z0-9]{20,}/, label: 'OpenAI API Token' },
-          { regex: /ghp_[a-zA-Z0-9]{30,}/, label: 'GitHub Personal Access Token' },
-          { regex: /github_pat_[a-zA-Z0-9]{22,}/, label: 'GitHub PAT' },
-          { regex: /AKIA[0-9A-Z]{16}/, label: 'AWS Access Key ID' },
-          { regex: /sk_live_[a-zA-Z0-9]{24,}/, label: 'Stripe Live Key' },
-          { regex: /-----BEGIN (?:RSA|EC|OPENSSH) PRIVATE KEY-----/, label: 'Private Cryptographic Key' }
-        ];
-        for (const p of secretPatterns) {
-          if (p.regex.test(text) || text.includes('[REDACTED_SECRET]')) {
+          if (isMatch) {
             findings.push({
               anchorLine: line.new,
-              severity: 'critical',
-              ruleId: 'STD-SEC-02',
-              cwe: 'CWE-798',
-              title: `Hardcoded Secret (${p.label})`,
-              message: `Hardcoded API credential detected in patch. Secrets must be strictly stored in environment variables or vault secret managers.`,
-              suggestion: '    api_key = os.environ.get("SERVICE_API_KEY")\n    if not api_key: raise RuntimeError("Missing API key configuration")'
+              severity: rule.severity || 'high',
+              ruleId: rule.id,
+              cwe: rule.cwe || 'CWE-Other',
+              title: rule.title,
+              message: rule.description,
+              suggestion: rule.defaultSuggestion || '// Fix according to ' + rule.id
             });
             break;
           }
         }
-
-        // 3. Missing Timeout in HTTP Calls (STD-ERR-02 / CWE-703)
-        if (
-          (text.includes('httpx.') || text.includes('requests.') || text.includes('aiohttp.')) &&
-          (text.includes('.get(') || text.includes('.post(') || text.includes('.put(') || text.includes('.delete(')) &&
-          !text.includes('timeout=')
-        ) {
-          findings.push({
-            anchorLine: line.new,
-            severity: 'high',
-            ruleId: 'STD-ERR-02',
-            cwe: 'CWE-703',
-            title: 'Missing Network Timeout Boundary',
-            message: 'Asynchronous HTTP request lacks an explicit timeout deadline. An unresponsive upstream server will cause worker connection pool exhaustion.',
-            suggestion: '    response = await client.post("https://api.partner.com/events", timeout=10.0)'
-          });
-        }
-
-        // 4. Bare Exception (STD-ERR-01 / CWE-391)
-        if (text.trim().startsWith('except:')) {
-          findings.push({
-            anchorLine: line.new,
-            severity: 'high',
-            ruleId: 'STD-ERR-01',
-            cwe: 'CWE-391',
-            title: 'Bare Exception Suppression',
-            message: 'Bare `except:` blocks intercept system interruption signals (SIGINT, SIGTERM) and obscure unhandled runtime faults.',
-            suggestion: '    except Exception as exc:\n        logger.error("Operation failed: %s", exc)\n        raise'
-          });
-        }
-
-        // 5. Insecure Subprocess (STD-SEC-03 / CWE-78)
-        if (
-          (text.includes('subprocess.run(') || text.includes('subprocess.Popen(') || text.includes('os.system(')) &&
-          (text.includes('shell=True') || text.includes('f"') || text.includes("f'"))
-        ) {
-          findings.push({
-            anchorLine: line.new,
-            severity: 'critical',
-            ruleId: 'STD-SEC-03',
-            cwe: 'CWE-78',
-            title: 'Command Injection via Subprocess',
-            message: 'Executing shell commands with string interpolation allows arbitrary command injection. Avoid shell=True and pass command arguments as a list.',
-            suggestion: '    subprocess.run(["git", "status"], check=True, capture_output=True)'
-          });
-        }
       });
 
       return findings;
+    }
+
+    // ==========================================================================
+    // STANDARDS ARCHITECT UI CONTROLLER
+    // ==========================================================================
+
+    function renderRulesList() {
+      const container = document.getElementById('rulesCardsContainer');
+      if (!container) return;
+
+      const searchTerm = (document.getElementById('ruleSearchInput')?.value || '').toLowerCase().trim();
+      container.innerHTML = '';
+
+      let activeCount = 0;
+      let disabledCount = 0;
+
+      activeStandardsConfig.rules.forEach(rule => {
+        if (rule.enabled) activeCount++;
+        else disabledCount++;
+
+        // Filter by category
+        if (currentCategoryFilter !== 'all') {
+          if (currentCategoryFilter === 'Custom' && !rule.isCustom) return;
+          if (currentCategoryFilter !== 'Custom' && rule.category !== currentCategoryFilter) return;
+        }
+
+        // Filter by search
+        if (searchTerm) {
+          const matchId = rule.id.toLowerCase().includes(searchTerm);
+          const matchTitle = rule.title.toLowerCase().includes(searchTerm);
+          const matchCwe = (rule.cwe || '').toLowerCase().includes(searchTerm);
+          const matchDesc = (rule.description || '').toLowerCase().includes(searchTerm);
+          if (!matchId && !matchTitle && !matchCwe && !matchDesc) return;
+        }
+
+        const card = document.createElement('div');
+        card.className = `rule-card ${rule.enabled ? '' : 'disabled'}`;
+        card.id = `rule-card-${rule.id}`;
+
+        const sevClass = rule.severity ? rule.severity.toLowerCase() : 'high';
+
+        card.innerHTML = `
+          <div class="rule-card-header" onclick="toggleRuleExpand('${rule.id}')">
+            <div class="rule-card-left">
+              <label class="rule-toggle-switch" onclick="event.stopPropagation()">
+                <input type="checkbox" ${rule.enabled ? 'checked' : ''} onchange="toggleRuleEnabled('${rule.id}', this.checked)">
+                <span class="switch-slider"></span>
+              </label>
+              <span class="rule-id-code">${escapeHtml(rule.id)}</span>
+              <span class="rule-title-text" title="${escapeHtml(rule.title)}">${escapeHtml(rule.title)}</span>
+              ${rule.cwe ? `<span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);">${escapeHtml(rule.cwe)}</span>` : ''}
+              ${rule.isCustom ? `<span style="font-size: 10px; background: var(--accent-subtle); color: var(--accent); padding: 1px 5px; border-radius: 4px; font-weight: 700;">CUSTOM</span>` : ''}
+            </div>
+            <div class="rule-card-right" onclick="event.stopPropagation()">
+              <select class="rule-sev-select ${sevClass}" onchange="changeRuleSeverity('${rule.id}', this.value, this)">
+                <option value="critical" ${rule.severity === 'critical' ? 'selected' : ''}>Critical</option>
+                <option value="high" ${rule.severity === 'high' ? 'selected' : ''}>High</option>
+                <option value="medium" ${rule.severity === 'medium' ? 'selected' : ''}>Medium</option>
+                <option value="low" ${rule.severity === 'low' ? 'selected' : ''}>Low</option>
+              </select>
+              <span id="expand-icon-${rule.id}" style="color: var(--text-tertiary); font-size: 11px; padding: 2px;">▼</span>
+            </div>
+          </div>
+          <div class="rule-card-body" id="rule-body-${rule.id}">
+            <div class="rule-desc">${escapeHtml(rule.description)}</div>
+            ${rule.regex ? `<div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 6px;">Regex: <code>${escapeHtml(rule.regex)}</code></div>` : ''}
+            ${rule.defaultSuggestion ? `
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 3px;">1-Click Suggestion Template:</div>
+              <pre class="rule-suggestion-code"><code>${escapeHtml(rule.defaultSuggestion)}</code></pre>
+            ` : ''}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      const counter = document.getElementById('rulesActiveCounter');
+      if (counter) {
+        counter.innerText = `${activeCount} active • ${disabledCount} disabled`;
+      }
+    }
+
+    function toggleRuleExpand(ruleId) {
+      const card = document.getElementById(`rule-card-${ruleId}`);
+      if (!card) return;
+      const isExpanded = card.classList.toggle('expanded');
+      const icon = document.getElementById(`expand-icon-${ruleId}`);
+      if (icon) icon.innerText = isExpanded ? '▲' : '▼';
+    }
+
+    function toggleRuleEnabled(ruleId, isChecked) {
+      const rule = activeStandardsConfig.rules.find(r => r.id === ruleId);
+      if (!rule) return;
+      rule.enabled = isChecked;
+      const card = document.getElementById(`rule-card-${ruleId}`);
+      if (card) {
+        if (isChecked) card.classList.remove('disabled');
+        else card.classList.add('disabled');
+      }
+      renderYamlPreview();
+      const counter = document.getElementById('rulesActiveCounter');
+      if (counter) {
+        const active = activeStandardsConfig.rules.filter(r => r.enabled).length;
+        const disabled = activeStandardsConfig.rules.length - active;
+        counter.innerText = `${active} active • ${disabled} disabled`;
+      }
+    }
+
+    function changeRuleSeverity(ruleId, newSev, selectElement) {
+      const rule = activeStandardsConfig.rules.find(r => r.id === ruleId);
+      if (!rule) return;
+      rule.severity = newSev;
+      if (selectElement) {
+        selectElement.className = `rule-sev-select ${newSev}`;
+      }
+      renderYamlPreview();
+    }
+
+    function setCategoryFilter(category, btnElement) {
+      currentCategoryFilter = category;
+      document.querySelectorAll('.category-chip').forEach(b => b.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+      renderRulesList();
+    }
+
+    function filterRulesList() {
+      renderRulesList();
+    }
+
+    function toggleSettingsAccordion() {
+      const body = document.getElementById('settingsBody');
+      const arrow = document.getElementById('settingsAccordionArrow');
+      if (!body) return;
+      const isHidden = body.style.display === 'none';
+      body.style.display = isHidden ? 'grid' : 'none';
+      if (arrow) arrow.innerText = isHidden ? '▼' : '▶';
+    }
+
+    function updateRepositorySettings() {
+      const failSev = document.getElementById('cfgFailSeverity')?.value || 'high';
+      const maxComments = parseInt(document.getElementById('cfgMaxComments')?.value || '5', 10);
+      const incStr = document.getElementById('cfgIncludeGlobs')?.value || '';
+      const excStr = document.getElementById('cfgExcludeGlobs')?.value || '';
+
+      activeStandardsConfig.settings.fail_on_severity = failSev;
+      activeStandardsConfig.settings.max_comments = maxComments;
+      activeStandardsConfig.settings.include = incStr.split(',').map(s => s.trim()).filter(Boolean);
+      activeStandardsConfig.settings.exclude = excStr.split(',').map(s => s.trim()).filter(Boolean);
+
+      renderYamlPreview();
+    }
+
+    function loadStandardsPreset(presetKey) {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`preset-${presetKey}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const allRules = activeStandardsConfig.rules;
+
+      if (presetKey === 'all') {
+        allRules.forEach(r => r.enabled = (r.id !== 'STD-QUAL-02'));
+        activeStandardsConfig.settings.fail_on_severity = 'high';
+        activeStandardsConfig.settings.include = ['**/*.py', '**/*.ts', '**/*.js', '**/*.go', '**/*.rs'];
+        activeStandardsConfig.settings.exclude = ['tests/**', 'vendor/**', 'node_modules/**', 'dist/**', '*.generated.*'];
+      } else if (presetKey === 'python') {
+        const pyIds = ['STD-SEC-01', 'STD-SEC-02', 'STD-SEC-03', 'STD-ERR-01', 'STD-ERR-02', 'STD-PERF-02', 'STD-QUAL-01'];
+        allRules.forEach(r => r.enabled = pyIds.includes(r.id));
+        activeStandardsConfig.settings.fail_on_severity = 'high';
+        activeStandardsConfig.settings.include = ['**/*.py'];
+        activeStandardsConfig.settings.exclude = ['tests/**', 'venv/**', '.venv/**', 'build/**'];
+      } else if (presetKey === 'node') {
+        const nodeIds = ['STD-SEC-02', 'STD-SEC-03', 'STD-ERR-01', 'STD-ERR-02', 'STD-PERF-01', 'STD-QUAL-01'];
+        allRules.forEach(r => r.enabled = nodeIds.includes(r.id));
+        activeStandardsConfig.settings.fail_on_severity = 'high';
+        activeStandardsConfig.settings.include = ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'];
+        activeStandardsConfig.settings.exclude = ['node_modules/**', 'dist/**', 'build/**', '.next/**', 'coverage/**'];
+      } else if (presetKey === 'go') {
+        const goIds = ['STD-SEC-01', 'STD-SEC-02', 'STD-SEC-03', 'STD-ERR-01', 'STD-ERR-02', 'STD-PERF-01'];
+        allRules.forEach(r => r.enabled = goIds.includes(r.id));
+        activeStandardsConfig.settings.fail_on_severity = 'high';
+        activeStandardsConfig.settings.include = ['**/*.go'];
+        activeStandardsConfig.settings.exclude = ['vendor/**', '*_test.go'];
+      } else if (presetKey === 'security') {
+        allRules.forEach(r => {
+          if (r.category === 'Security') {
+            r.enabled = true;
+            r.severity = 'critical';
+          } else {
+            r.enabled = false;
+          }
+        });
+        activeStandardsConfig.settings.fail_on_severity = 'critical';
+        activeStandardsConfig.settings.include = ['**/*'];
+        activeStandardsConfig.settings.exclude = ['tests/**', 'vendor/**'];
+      }
+
+      // Update UI form fields
+      if (document.getElementById('cfgFailSeverity')) document.getElementById('cfgFailSeverity').value = activeStandardsConfig.settings.fail_on_severity;
+      if (document.getElementById('cfgMaxComments')) document.getElementById('cfgMaxComments').value = activeStandardsConfig.settings.max_comments;
+      if (document.getElementById('cfgIncludeGlobs')) document.getElementById('cfgIncludeGlobs').value = activeStandardsConfig.settings.include.join(', ');
+      if (document.getElementById('cfgExcludeGlobs')) document.getElementById('cfgExcludeGlobs').value = activeStandardsConfig.settings.exclude.join(', ');
+
+      renderRulesList();
+      renderYamlPreview();
+      showToast(`Loaded ${presetKey.toUpperCase()} preset configuration`);
+    }
+
+    function toggleCustomRuleForm() {
+      const form = document.getElementById('customRuleForm');
+      if (form) form.classList.toggle('open');
+    }
+
+    function saveCustomRule() {
+      const id = document.getElementById('crId')?.value.trim();
+      const title = document.getElementById('crTitle')?.value.trim();
+      const category = document.getElementById('crCategory')?.value || 'Quality';
+      const severity = document.getElementById('crSeverity')?.value || 'medium';
+      const cwe = document.getElementById('crCwe')?.value.trim() || undefined;
+      const desc = document.getElementById('crDesc')?.value.trim() || 'Custom repository policy.';
+      const regex = document.getElementById('crRegex')?.value.trim() || undefined;
+      const suggestion = document.getElementById('crSuggestion')?.value.trim() || undefined;
+
+      if (!id || !title) {
+        showToast('Rule ID and Title are required');
+        return;
+      }
+
+      const existing = activeStandardsConfig.rules.find(r => r.id === id);
+      if (existing) {
+        showToast(`Rule ID ${id} already exists`);
+        return;
+      }
+
+      const newRule = {
+        id,
+        title,
+        category,
+        severity,
+        cwe,
+        enabled: true,
+        isCustom: true,
+        description: desc,
+        regex,
+        defaultSuggestion: suggestion
+      };
+
+      activeStandardsConfig.rules.unshift(newRule);
+      toggleCustomRuleForm();
+      renderRulesList();
+      renderYamlPreview();
+      showToast(`Added custom rule ${id}`);
+    }
+
+    function generateStandardsYaml() {
+      const s = activeStandardsConfig.settings;
+      const enabledRules = activeStandardsConfig.rules.filter(r => r.enabled);
+
+      let yaml = `version: "1.0"\n\nsettings:\n  fail_on_severity: "${s.fail_on_severity}"\n  max_comments_per_review: ${s.max_comments}\n`;
+
+      if (s.include && s.include.length > 0) {
+        yaml += `  include:\n` + s.include.map(p => `    - "${p}"`).join('\n') + `\n`;
+      }
+      if (s.exclude && s.exclude.length > 0) {
+        yaml += `  exclude:\n` + s.exclude.map(p => `    - "${p}"`).join('\n') + `\n`;
+      }
+
+      yaml += `\nstandards:\n`;
+      enabledRules.forEach(r => {
+        yaml += `  - id: "${r.id}"\n`;
+        yaml += `    title: "${r.title.replace(/"/g, '\\"')}"\n`;
+        yaml += `    severity: "${(r.severity || 'high').toUpperCase()}"\n`;
+        yaml += `    category: "${(r.category || 'Quality').toUpperCase()}"\n`;
+        if (r.cwe) yaml += `    cwe: "${r.cwe}"\n`;
+        yaml += `    description: "${r.description.replace(/"/g, '\\"')}"\n`;
+        if (r.regex) yaml += `    pattern: "${r.regex.replace(/"/g, '\\"')}"\n`;
+        yaml += `\n`;
+      });
+
+      return yaml.trimEnd();
+    }
+
+    function renderYamlPreview() {
+      const codeView = document.getElementById('liveStandardsYamlView');
+      if (codeView) {
+        codeView.innerText = generateStandardsYaml();
+      }
+    }
+
+    function copyStandardsConfig() {
+      const yaml = generateStandardsYaml();
+      navigator.clipboard.writeText(yaml);
+      const label = document.getElementById('copyYamlBtnLabel');
+      if (label) {
+        const orig = label.innerText;
+        label.innerText = '✓ Copied!';
+        setTimeout(() => { label.innerText = orig; }, 2000);
+      }
+      showToast('Standards YAML copied to clipboard');
+    }
+
+    function downloadStandardsYaml() {
+      const yaml = generateStandardsYaml();
+      const blob = new Blob([yaml], { type: 'text/yaml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'standards.yml';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded .prism/standards.yml');
+    }
+
+    function runSandboxTest() {
+      const code = document.getElementById('sandboxCodeInput')?.value || '';
+      const resBox = document.getElementById('sandboxResultBox');
+      if (!resBox) return;
+
+      const lines = code.split(/\r?\n/).map((l, idx) => ({
+        type: 'add',
+        new: idx + 1,
+        text: l
+      }));
+
+      const findings = evaluateDiffStandards({ lines });
+      if (findings.length === 0) {
+        resBox.innerHTML = `<div style="color: var(--success); font-weight: 600; display: flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg>
+          <span>Clean Code — 0 standard violations identified with active rules!</span>
+        </div>`;
+      } else {
+        let html = `<div style="font-weight: 600; color: var(--critical); margin-bottom: 6px;">${findings.length} Violation(s) Detected:</div>`;
+        findings.forEach(f => {
+          html += `
+            <div style="margin-bottom: 6px; padding: 4px 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; font-size: 11.5px;">
+              <span class="finding-pill-sev ${f.severity}" style="font-size: 10px; margin-right: 4px;">${f.severity}</span>
+              <strong>${escapeHtml(f.ruleId)}</strong>: ${escapeHtml(f.title)} <span style="color: var(--text-tertiary);">(Line ${f.anchorLine})</span>
+            </div>
+          `;
+        });
+        resBox.innerHTML = html;
+      }
+    }
+
+    function applyStandardsToLivePlayground() {
+      const scenario = SCENARIO_DATA[currentScenario];
+      if (scenario) {
+        if (scenario.files && scenario.files.length > 0) {
+          scenario.files.forEach(f => {
+            f.findings = evaluateDiffStandards(f);
+          });
+          scenario.findings = scenario.files.flatMap(f => f.findings || []);
+        } else if (scenario.lines) {
+          scenario.findings = evaluateDiffStandards({ lines: scenario.lines });
+        }
+        renderDiffSurface(currentScenario, true);
+      }
+      showToast('Standards applied! Code Review view updated with custom policies.');
+      selectViewTab('review');
     }
 
     // Render Diff & Inline Findings
@@ -3353,6 +4442,8 @@ standards:
       updateThemeIcon(savedTheme);
 
       renderDiffSurface('sql', true);
+      renderRulesList();
+      renderYamlPreview();
       recalculateRoi();
     });
   </script>
