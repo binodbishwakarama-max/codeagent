@@ -181,6 +181,65 @@ $$\text{Acceptance Rate} = \frac{\text{Resolved Threads} + \text{Positive Reacti
 
 ---
 
+## 🚀 GitHub Action Quickstart (Zero-Server Setup)
+
+You can run Prism autonomously in any GitHub repository with zero infrastructure. It posts inline PR review comments, generates rich Markdown job summaries, and emits GitHub workflow annotations.
+
+Create `.github/workflows/prism.yml`:
+
+```yaml
+name: Prism Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  review:
+    name: Autonomous Standards Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Prism Review
+        uses: binodbishwakarama-max/codeagent@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          standards-file: ".prism/standards.yml"
+          fail-on-severity: "high" # none | medium | high
+```
+
+---
+
+## 💻 CLI Usage: Review Any PR or Local Branch
+
+Review live GitHub pull requests, local working trees, or patch files from your terminal:
+
+```bash
+# 1. Install Prism CLI
+pip install git+https://github.com/binodbishwakarama-max/codeagent.git
+
+# 2. Review any public GitHub pull request by URL
+prism --url https://github.com/fastapi/fastapi/pull/11020
+
+# 3. Review uncommitted or staged local changes
+prism --git
+prism --staged
+
+# 4. Review a git patch or piped diff
+git diff origin/main | prism --diff -
+```
+
+---
+
 ## ⚡ Quickstart in 5 Commands
 
 Reproduce the full benchmark or run Prism locally in under 3 minutes:

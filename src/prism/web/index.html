@@ -1529,6 +1529,145 @@
       gap: 12px;
     }
 
+    /* GitHub Action Setup Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 720px;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      animation: modalFadeIn 0.15s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-subtle);
+    }
+
+    .modal-title-group h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 2px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-title-group p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .btn-modal-close {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-modal-close:hover {
+      background: var(--surface);
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .modal-feature-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .feature-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      padding: 4px 10px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text-secondary);
+    }
+
+    .step-card {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .step-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .step-header code {
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11.5px;
+    }
+
+    .step-code-box {
+      margin: 0;
+      padding: 14px;
+      background: var(--canvas);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-code);
+      overflow-x: auto;
+      max-height: 240px;
+    }
+
     /* Responsive */
     @media (max-width: 960px) {
       .workspace-grid { grid-template-columns: 1fr; }
@@ -1574,6 +1713,10 @@
 
       <!-- Utility Actions -->
       <div class="header-right">
+        <button id="btnActionModal" class="btn btn-primary" onclick="openActionModal()" style="font-size: 12px; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px;" title="Set up automated PR reviews in GitHub Actions">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+          <span>Add to CI / CD</span>
+        </button>
         <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle color theme (Light / Dark)" aria-label="Toggle theme" onclick="toggleTheme()">
           <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -1617,6 +1760,9 @@
               <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0-1.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 6.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"></path></svg>
               <span id="checkOutcomeText">1 Standards Violation Identified</span>
             </span>
+          </div>
+        </div>
+      </section>
       <!-- Live PR & Custom Diff Controller Bar -->
       <section class="live-pr-banner" aria-label="Review Any Pull Request">
         <div class="live-pr-bar-inner">
@@ -2048,6 +2194,96 @@
         </div>
       </div>
     </section>
+
+    <!-- GitHub Action Setup Modal -->
+    <div id="actionModal" class="modal-backdrop" onclick="if(event.target === this) closeActionModal()" role="dialog" aria-modal="true" aria-labelledby="actionModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h2 id="actionModalTitle">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+              Automate PR Reviews in GitHub Actions
+            </h2>
+            <p>Drop Prism into any repository with zero infrastructure or server hosting.</p>
+          </div>
+          <button class="btn-modal-close" onclick="closeActionModal()" aria-label="Close modal">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-feature-pills">
+            <span class="feature-pill">⚡ 100% Serverless Execution</span>
+            <span class="feature-pill">🛡️ Trained Silence Guarantee</span>
+            <span class="feature-pill">💬 Inline Comments & Diff Suggestions</span>
+            <span class="feature-pill">🛑 Configurable Failure Gate</span>
+          </div>
+
+          <!-- Step 1 -->
+          <div class="step-card">
+            <div class="step-header">
+              <span>Step 1: Add Workflow <code>.github/workflows/prism.yml</code></span>
+              <button class="btn btn-secondary" onclick="copyWorkflowYaml()" style="font-size: 11px; padding: 3px 8px;">
+                <span id="copyWorkflowBtnText">📋 Copy Workflow YAML</span>
+              </button>
+            </div>
+            <pre class="step-code-box" id="workflowYamlCode"><code>name: Prism Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  review:
+    name: Autonomous Standards Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Prism Review
+        uses: binodbishwakarama-max/codeagent@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          standards-file: ".prism/standards.yml"
+          fail-on-severity: "high" # none | medium | high</code></pre>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card">
+            <div class="step-header">
+              <span>Step 2: Add Standards <code>.prism/standards.yml</code> (Optional)</span>
+              <button class="btn btn-secondary" onclick="copyActionStandardsYaml()" style="font-size: 11px; padding: 3px 8px;">
+                <span id="copyActionStandardsBtnText">📋 Copy Standards YAML</span>
+              </button>
+            </div>
+            <pre class="step-code-box" id="actionStandardsCode"><code>version: "1.0"
+standards:
+  - id: "STD-SEC-01"
+    title: "SQL Injection Prevention via Parameterized Queries"
+    description: "Database queries must use parameterized queries. Never interpolate raw user input."
+  - id: "STD-SEC-02"
+    title: "Zero Plaintext Credentials or API Tokens"
+    description: "Never hardcode passwords or secrets. Retrieve exclusively from environment variables."
+  - id: "STD-ERR-01"
+    title: "No Silent or Bare Exception Handling"
+    description: "Catch specific exceptions with actionable logging. Never use bare except clauses."</code></pre>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-tertiary); margin-top: 4px; flex-wrap: wrap; gap: 8px;">
+            <span>Need custom models or self-hosted vLLM? Pass <code>anthropic-api-key</code> or <code>llm-base-url</code>.</span>
+            <a href="https://github.com/binodbishwakarama-max/codeagent#readme" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: 500;">
+              Read Action Documentation →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Global Toast Notification -->
     <div id="toastNotification" class="toast-feedback" role="status" aria-live="polite">
@@ -3060,6 +3296,43 @@
       const yaml = document.getElementById('rawStandardsYaml').innerText;
       navigator.clipboard.writeText(yaml);
       showToast('Standards YAML copied');
+    }
+
+    // GitHub Action Modal Controls
+    function openActionModal() {
+      const modal = document.getElementById('actionModal');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeActionModal() {
+      const modal = document.getElementById('actionModal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeActionModal();
+    });
+
+    function copyWorkflowYaml() {
+      const code = document.getElementById('workflowYamlCode').innerText;
+      navigator.clipboard.writeText(code);
+      const btnText = document.getElementById('copyWorkflowBtnText');
+      const original = btnText.innerText;
+      btnText.innerText = '✓ Copied YAML!';
+      setTimeout(() => { btnText.innerText = original; }, 2000);
+      showToast('GitHub Action workflow copied to clipboard');
+    }
+
+    function copyActionStandardsYaml() {
+      const code = document.getElementById('actionStandardsCode').innerText;
+      navigator.clipboard.writeText(code);
+      const btnText = document.getElementById('copyActionStandardsBtnText');
+      const original = btnText.innerText;
+      btnText.innerText = '✓ Copied YAML!';
+      setTimeout(() => { btnText.innerText = original; }, 2000);
+      showToast('Standards configuration copied to clipboard');
     }
 
     function showToast(msg) {

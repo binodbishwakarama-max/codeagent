@@ -23,7 +23,7 @@ from prism.review.standards import load_default_standards, parse_repo_standards
 
 def parse_pr_url(url_or_spec: str) -> tuple[str, int]:
     """Extract owner/repo and PR number from a GitHub URL or shorthand specification.
-    
+
     Supported formats:
       - https://github.com/owner/repo/pull/123
       - http://github.com/owner/repo/pull/123
@@ -84,7 +84,7 @@ def get_local_git_diff(staged: bool = False) -> tuple[str, str]:
     """Extract git diff from the current repository."""
     cmd = ["git", "diff", "--cached"] if staged else ["git", "diff", "HEAD"]
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True)
         raw_diff = proc.stdout
     except subprocess.CalledProcessError as exc:
         raise RuntimeError(f"Failed to execute '{' '.join(cmd)}': {exc.stderr}") from exc
@@ -96,6 +96,8 @@ def get_local_git_diff(staged: bool = False) -> tuple[str, str]:
             ["git", "remote", "get-url", "origin"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             check=False,
         )
         if remote_proc.returncode == 0:
@@ -337,6 +339,30 @@ async def execute_review(
     identifier = f"#{pr_number}" if pr_number > 0 else "local patch"
     print_review_report(result, repo, identifier, dry_run)
     return 0
+
+
+async def run_cli(
+    repo: str,
+    pr_number: int,
+    dry_run: bool = False,
+    token: str | None = None,
+    standards_path: str | None = None,
+) -> int:
+    """Async entrypoint for reviewing a GitHub PR via repository and PR number."""
+    meta, raw_diff = await fetch_pr_details_and_diff(
+        repo=repo,
+        pr_number=pr_number,
+        github_token=token,
+    )
+    title = meta.get("title", f"Pull Request #{pr_number}")
+    return await execute_review(
+        repo=repo,
+        pr_number=pr_number,
+        pr_title=title,
+        raw_diff=raw_diff,
+        standards_path=standards_path,
+        dry_run=dry_run,
+    )
 
 
 def main() -> None:

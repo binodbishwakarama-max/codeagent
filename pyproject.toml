@@ -28,6 +28,10 @@ dependencies = [
     "langfuse>=5.0.2",
 ]
 
+[project.scripts]
+prism = "prism.review.cli:main"
+prism-action = "prism.github.action:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.2.0",

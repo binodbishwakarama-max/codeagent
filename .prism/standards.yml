@@ -1,0 +1,59 @@
+# Prism Engineering Standards Configuration
+# Learn more: https://github.com/binodbishwakarama-max/codeagent
+
+version: "1.0"
+
+standards:
+  - id: "STD-SEC-01"
+    title: "SQL Injection Prevention via Parameterized Queries"
+    description: "Database queries must never concatenate or format raw untrusted strings into query text. Always use query parameters, prepared statements, or ORM parameter binding."
+    good_example: |
+      cursor.execute("SELECT id, name FROM users WHERE tenant_id = %s", (tenant_id,))
+    bad_example: |
+      cursor.execute(f"SELECT id, name FROM users WHERE tenant_id = '{tenant_id}'")
+
+  - id: "STD-SEC-02"
+    title: "Zero Plaintext Credentials and API Secrets"
+    description: "Secret keys, passwords, JWT signing tokens, and third-party tokens must never be committed to source code. Use environment variables or secret vaults."
+    good_example: |
+      api_key = os.environ.get("ANTHROPIC_API_KEY")
+      if not api_key:
+          raise ValueError("ANTHROPIC_API_KEY environment variable required")
+    bad_example: |
+      anthropic_client = Anthropic(api_key="sk-ant-api03-live998877665544332211")
+
+  - id: "STD-ERR-01"
+    title: "No Silent or Bare Exception Handling"
+    description: "Never use bare 'except:' clauses or silent 'except Exception: pass'. Always catch specific exceptions, log actionable context, and preserve tracebacks with 'raise ... from exc'."
+    good_example: |
+      try:
+          data = json.loads(payload)
+      except json.JSONDecodeError as exc:
+          logger.warning("Invalid JSON payload received: %s", exc)
+          raise BadRequestError("Malformed JSON") from exc
+    bad_example: |
+      try:
+          data = json.loads(payload)
+      except:
+          pass
+
+  - id: "STD-ERR-02"
+    title: "Explicit Timeouts on Network & Async Calls"
+    description: "All outbound HTTP, gRPC, and database connections must define explicit connect and read timeouts to prevent thread/connection pool exhaustion under degraded upstream conditions."
+    good_example: |
+      async with httpx.AsyncClient(timeout=httpx.Timeout(10.0, connect=5.0)) as client:
+          response = await client.get(upstream_url)
+    bad_example: |
+      async with httpx.AsyncClient() as client:
+          response = await client.get(upstream_url)
+
+  - id: "STD-RES-01"
+    title: "Deterministic Context Manager Resource Cleanup"
+    description: "Always use context managers ('with' or 'async with') for files, connections, and temporary storage to prevent leaked descriptors on error."
+    good_example: |
+      with open("report.csv", "w", encoding="utf-8") as f:
+          f.write(report_data)
+    bad_example: |
+      f = open("report.csv", "w")
+      f.write(report_data)
+      f.close()
