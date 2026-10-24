@@ -397,6 +397,7 @@ permissions:
   contents: read
   pull-requests: write
   checks: write
+  issues: write
 
 jobs:
   review:
@@ -409,7 +410,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Prism Code Review
-        uses: binodbishwakarama-max/codeagent@v0.1.0
+        uses: binodbishwakarama-max/codeagent@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           standards-file: ".prism/standards.yml"

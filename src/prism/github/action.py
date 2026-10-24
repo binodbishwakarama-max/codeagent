@@ -161,7 +161,9 @@ def generate_action_summary_markdown(
 async def run_action() -> int:
     """Async GitHub Action runner."""
     token = get_action_input("github-token") or os.environ.get("GITHUB_TOKEN") or ""
-    if not token:
+    if not token or token == "${{ github.token }}" or token.startswith("${{"):
+        token = os.environ.get("GITHUB_TOKEN", "")
+    if not token or token.startswith("${{"):
         logger.error(
             "Missing required GitHub token. Please provide 'github-token: ${{ secrets.GITHUB_TOKEN }}'"
         )
@@ -182,6 +184,7 @@ async def run_action() -> int:
     pr_number = int(pr_data.get("number", 0)) if pr_data else 0
     pr_title = str(pr_data.get("title", "Pull Request Review")) if pr_data else "Workflow Review"
     head_sha = str(pr_data.get("head", {}).get("sha", "")) if pr_data else ""
+    head_sha = head_sha or os.environ.get("GITHUB_SHA", "")
 
     if not repo:
         repo = event_data.get("repository", {}).get("full_name", "local/repo")
@@ -217,8 +220,11 @@ async def run_action() -> int:
     if not file_diffs:
         logger.info("No reviewable code files found in diff. Marking check as clean.")
         write_github_output("findings_count", "0")
+        write_github_output("findings-count", "0")
         write_github_output("clean_pr", "true")
+        write_github_output("clean-pr", "true")
         write_github_output("review_status", "passed")
+        write_github_output("review-status", "passed")
         summary_md = (
             "## 💎 Prism Automated Engineering Review\n\n"
             f"**Repository**: `{repo}` | **PR**: `#{pr_number}`\n\n"
@@ -350,8 +356,11 @@ async def run_action() -> int:
     # 4. Set action output parameters
     has_violations = len(result.findings) > 0
     write_github_output("findings_count", str(len(result.findings)))
+    write_github_output("findings-count", str(len(result.findings)))
     write_github_output("clean_pr", "false" if has_violations else "true")
+    write_github_output("clean-pr", "false" if has_violations else "true")
     write_github_output("review_status", "failed" if has_violations else "passed")
+    write_github_output("review-status", "failed" if has_violations else "passed")
 
     await client.close()
 

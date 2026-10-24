@@ -8,8 +8,8 @@ branding:
 inputs:
   github-token:
     description: "GitHub Token for posting review comments and fetching PR diffs"
-    required: true
-    default: ${{ github.token }}
+    required: false
+    default: ""
   standards-file:
     description: "Path to repository standards YAML file"
     required: false
@@ -78,7 +78,8 @@ runs:
       shell: bash
       env:
         PYTHONPATH: ${{ github.action_path }}/src
-        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_TOKEN: ${{ inputs.github-token != '' && inputs.github-token || github.token }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token != '' && inputs.github-token || github.token }}
         INPUT_STANDARDS_FILE: ${{ inputs.standards-file }}
         INPUT_LLM_PROVIDER: ${{ inputs.llm-provider }}
         INPUT_LLM_MODEL: ${{ inputs.llm-model }}
@@ -88,4 +89,4 @@ runs:
         INPUT_POST_COMMENTS: ${{ inputs.post-comments }}
         INPUT_FAIL_ON_SEVERITY: ${{ inputs.fail-on-severity }}
       run: |
-        uv run python -m prism.github.action
+        python -m prism.github.action

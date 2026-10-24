@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Prism Review | Pull Request Standards & Code Correctness</title>
   <meta name="description" content="Production-grade AI code reviewer enforcing repository standards, reducing false-positive review noise with empirical benchmark verification.">
   
@@ -16,6 +16,12 @@
        DESIGN SYSTEM TOKENS
        ========================================================================== */
     :root {
+      /* Safe Area Insets for Mobile Displays */
+      --sat: env(safe-area-inset-top, 0px);
+      --sar: env(safe-area-inset-right, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+
       /* Light Theme (Default) */
       --canvas: #f7f8fa;
       --surface: #ffffff;
@@ -146,16 +152,20 @@
     /* Base Reset */
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
+    html, body {
       font-family: var(--font-ui);
       background-color: var(--canvas);
       color: var(--text-primary);
       line-height: 1.5;
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       font-size: 14px;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      width: 100%;
     }
 
     a { color: var(--accent); text-decoration: none; }
@@ -172,10 +182,11 @@
       max-width: 1360px;
       width: 100%;
       margin: 0 auto;
-      padding: 0 16px 48px 16px;
+      padding: 0 max(16px, var(--sal)) max(48px, var(--sab)) max(16px, var(--sar));
       flex: 1;
       display: flex;
       flex-direction: column;
+      box-sizing: border-box;
     }
 
     /* ==========================================================================
@@ -188,6 +199,9 @@
       top: 0;
       z-index: 50;
       box-shadow: var(--shadow-sm);
+      padding-top: var(--sat);
+      padding-left: var(--sal);
+      padding-right: var(--sar);
     }
 
     .header-inner {
@@ -528,7 +542,7 @@
 
     .live-pr-input-group {
       flex: 1;
-      min-width: 280px;
+      min-width: 0;
       display: flex;
       align-items: center;
       background: var(--surface-subtle);
@@ -2096,11 +2110,19 @@
     .btn-modal-close {
       background: transparent;
       border: none;
-      font-size: 18px;
+      font-size: 20px;
       color: var(--text-tertiary);
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: var(--radius-sm);
+      touch-action: manipulation;
     }
 
     .btn-modal-close:hover {
@@ -2171,11 +2193,669 @@
       max-height: 240px;
     }
 
-    /* Responsive */
+    /* ==========================================================================
+       RESPONSIVE DESIGN SYSTEM & MOBILE ARCHITECTURE (320px - 1920px)
+       ========================================================================== */
+
+    /* Mobile Navigation & Header Elements */
+    .mobile-menu-toggle-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), border-color var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .mobile-menu-toggle-btn:hover {
+      background: var(--surface-subtle);
+      border-color: var(--border-focus);
+    }
+
+    .mobile-nav-strip {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 8px max(14px, var(--sar)) 8px max(14px, var(--sal));
+      background: var(--surface);
+      border-top: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .mobile-nav-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mob-nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+      min-height: 38px;
+      touch-action: manipulation;
+    }
+
+    .mob-nav-pill:hover {
+      color: var(--text-primary);
+      border-color: var(--border-focus);
+    }
+
+    .mob-nav-pill.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(36, 87, 214, 0.25);
+    }
+
+    .mobile-nav-drawer {
+      display: none;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-panel);
+      padding: 14px max(16px, var(--sar)) 14px max(16px, var(--sal));
+      animation: drawerSlideDown 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mobile-nav-drawer.open {
+      display: block;
+    }
+
+    @keyframes drawerSlideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mobile-drawer-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mobile-drawer-repo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .mobile-drawer-repo strong {
+      color: var(--text-primary);
+    }
+
+    .mobile-drawer-repo .pr-num {
+      color: var(--text-tertiary);
+    }
+
+    .mobile-drawer-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .custom-rule-fields-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    /* Focus & Accessibility States */
+    button:focus-visible, 
+    a:focus-visible, 
+    input:focus-visible, 
+    select:focus-visible, 
+    textarea:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+    }
+
+    /* Respect Motion Preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    .btn-header-action {
+      font-size: 12px;
+      padding: 5px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Tablet Landscape & Small Desktop (769px to 1024px) */
+    @media (max-width: 1024px) {
+      .header-inner {
+        padding: 0 14px;
+        gap: 10px;
+      }
+      .repo-context-crumb {
+        padding-left: 8px;
+        font-size: 12px;
+      }
+      .repo-context-crumb span:first-child {
+        display: none;
+      }
+      .nav-tab {
+        padding: 0 8px;
+        font-size: 12.5px;
+      }
+      .builder-grid {
+        grid-template-columns: 1fr;
+      }
+      .builder-right-col {
+        position: static;
+      }
+    }
+
+    /* Tablet Layout (<= 960px) */
     @media (max-width: 960px) {
-      .workspace-grid { grid-template-columns: 1fr; }
-      .standards-layout { grid-template-columns: 1fr; }
-      .roi-stats-strip { grid-template-columns: 1fr; }
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+      .standards-layout {
+        grid-template-columns: 1fr;
+      }
+      .roi-stats-strip {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Tablet Portrait & Mobile Navigation Transition (<= 768px) */
+    @media (max-width: 768px) {
+      .app-shell {
+        padding: 0 max(12px, var(--sal)) max(36px, var(--sab)) max(12px, var(--sar));
+      }
+      .header-inner {
+        padding: 0 max(12px, var(--sal));
+        gap: 8px;
+      }
+      .header-left {
+        min-width: 0;
+        flex-shrink: 1;
+      }
+      .brand-logo span {
+        white-space: nowrap;
+      }
+      .header-right {
+        gap: 8px;
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+      .header-nav {
+        display: none;
+      }
+      .repo-context-crumb {
+        display: none;
+      }
+      .btn-header-link {
+        display: none;
+      }
+      #btnActionModal {
+        display: none !important;
+      }
+      .theme-toggle-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+      }
+      .mobile-menu-toggle-btn {
+        display: inline-flex;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+      }
+      .mobile-nav-strip {
+        display: flex;
+      }
+      .pane-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 10px 12px;
+      }
+      .toolbar-left {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .segmented-control {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-wrap: nowrap;
+      }
+      .segmented-control::-webkit-scrollbar {
+        display: none;
+      }
+      .segment-btn {
+        flex-shrink: 0;
+        min-height: 36px;
+        padding: 6px 12px;
+      }
+      .toolbar-right {
+        width: 100%;
+        display: flex;
+        gap: 6px;
+      }
+      .toolbar-right .btn {
+        flex: 1;
+        min-height: 36px;
+        padding: 6px 8px;
+        justify-content: center;
+      }
+      .inline-finding-card {
+        margin: 8px 8px 12px 8px;
+      }
+      .diff-table {
+        min-width: 480px;
+      }
+    }
+
+    /* Mobile Phones (<= 640px) */
+    @media (max-width: 640px) {
+      .pr-header-strip {
+        padding: 12px 14px;
+        margin: 12px 0;
+      }
+      .pr-meta-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .pr-title-group {
+        gap: 6px;
+      }
+      .pr-title-text {
+        font-size: 15px;
+        word-break: break-word;
+      }
+      .pr-branch-info {
+        font-size: 12px;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .branch-pill {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .live-pr-banner {
+        padding: 12px 14px;
+        margin-bottom: 14px;
+      }
+      .live-pr-bar-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .live-pr-input-group {
+        min-width: 0 !important;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      #btnFetchAndReviewPr {
+        width: 100%;
+        min-height: 42px;
+        justify-content: center;
+      }
+      .live-pr-subbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .live-pr-chips {
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+      }
+      .live-pr-chips::-webkit-scrollbar {
+        display: none;
+      }
+      .sample-chip {
+        flex-shrink: 0;
+        min-height: 28px;
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 10px;
+      }
+      .file-header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 8px 12px;
+      }
+      .file-path {
+        word-break: break-all;
+        font-size: 12px;
+      }
+      .file-switcher {
+        max-width: 100%;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+      }
+      .line-num {
+        width: 34px;
+        padding: 0 4px;
+        font-size: 10.5px;
+      }
+      .line-marker {
+        width: 16px;
+      }
+      .finding-header {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 8px 10px;
+      }
+      .finding-identity {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .finding-body {
+        padding: 10px;
+      }
+      .finding-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .finding-actions-left {
+        flex-direction: column;
+        width: 100%;
+        gap: 6px;
+      }
+      .finding-actions-left .btn,
+      .finding-actions .btn-secondary {
+        width: 100%;
+        min-height: 38px;
+        justify-content: center;
+      }
+      .remediation-header {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .remediation-code {
+        font-size: 11.5px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Tab 2 Mobile */
+      .thread-conversation-box {
+        padding: 14px 12px;
+      }
+      .thread-context-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .thread-reply-input-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .thread-reply-input-row .text-input {
+        min-height: 42px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .thread-reply-input-row .btn {
+        min-height: 42px;
+        width: 100%;
+        justify-content: center;
+      }
+      .chip-btn {
+        font-size: 11.5px;
+        padding: 6px 10px;
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      /* Tab 3 Mobile */
+      .builder-hero {
+        padding: 14px;
+      }
+      .builder-hero-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .builder-hero-top .btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 38px;
+      }
+      .preset-pills-row {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+      }
+      .preset-pills-row::-webkit-scrollbar {
+        display: none;
+      }
+      .preset-btn {
+        flex-shrink: 0;
+        min-height: 34px;
+      }
+      .settings-body {
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 10px;
+      }
+      .custom-rule-fields-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .rule-card-header {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 8px 10px;
+      }
+      .rule-card-left {
+        flex: 1 1 100%;
+      }
+      .rule-card-right {
+        margin-left: 42px;
+        width: calc(100% - 42px);
+        justify-content: space-between;
+      }
+      .builder-search-box {
+        min-width: 0;
+        width: 100%;
+      }
+      .toolbar-search-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .category-filter-chips {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+      }
+      .category-filter-chips::-webkit-scrollbar {
+        display: none;
+      }
+      .category-chip {
+        flex-shrink: 0;
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .yaml-code-view {
+        max-height: 320px;
+        font-size: 11px;
+      }
+      .yaml-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .yaml-actions {
+        width: 100%;
+      }
+      .yaml-actions .btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      /* Tab 4 Mobile */
+      .roi-card {
+        padding: 14px;
+      }
+      .roi-stats-strip {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .roi-stat-box {
+        padding: 10px;
+      }
+      .roi-stat-box .val {
+        font-size: 16px;
+      }
+      .clean-benchmark-table {
+        min-width: 640px;
+      }
+
+      /* Modal Mobile */
+      .modal-backdrop {
+        padding: max(8px, var(--sat)) max(8px, var(--sar)) max(8px, var(--sab)) max(8px, var(--sal));
+        align-items: flex-end;
+      }
+      .modal-card {
+        max-height: 92dvh;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      .modal-header {
+        padding: 12px 14px;
+      }
+      .modal-body {
+        padding: 12px 14px;
+        gap: 12px;
+      }
+      .step-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .step-header .btn {
+        width: 100%;
+        min-height: 36px;
+        justify-content: center;
+      }
+      .step-code-box {
+        font-size: 11px;
+        max-height: 180px;
+      }
+
+      /* Footer Mobile */
+      .app-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+        padding: 24px 0;
+      }
+    }
+
+    /* Small Mobile Phones (<= 390px, including 375px, 360px, 320px) */
+    @media (max-width: 390px) {
+      .header-inner {
+        padding: 0 max(8px, var(--sal));
+        gap: 6px;
+      }
+      .brand-logo {
+        gap: 6px;
+        font-size: 13.5px;
+      }
+      .brand-symbol {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+      }
+      .header-right {
+        gap: 6px;
+      }
+      .theme-toggle-btn {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        min-height: 34px;
+      }
+      .mobile-menu-toggle-btn {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        min-height: 34px;
+      }
+      .brand-logo span {
+        font-size: 13.5px;
+      }
+      .pr-title-text {
+        font-size: 13.5px;
+      }
+      .custom-diff-presets {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .custom-diff-presets::-webkit-scrollbar {
+        display: none;
+      }
+      .custom-diff-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .custom-diff-toolbar .btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -2216,7 +2896,7 @@
 
       <!-- Utility Actions -->
       <div class="header-right">
-        <button id="btnActionModal" class="btn btn-primary" onclick="openActionModal()" style="font-size: 12px; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px;" title="Set up automated PR reviews in GitHub Actions">
+        <button id="btnActionModal" class="btn btn-primary btn-header-action" onclick="openActionModal()" title="Set up automated PR reviews in GitHub Actions">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
           <span>Add to CI / CD</span>
         </button>
@@ -2229,6 +2909,58 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           <span>GitHub</span>
         </a>
+        <button id="mobileMenuToggle" class="mobile-menu-toggle-btn" aria-label="Toggle navigation menu" aria-expanded="false" onclick="toggleMobileMenu()">
+          <svg class="hamburger-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <svg class="close-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Strip -->
+    <nav class="mobile-nav-strip" aria-label="Mobile Navigation Tabs">
+      <button id="mob-tab-btn-review" class="mob-nav-pill active" onclick="selectViewTab('review')">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-8.5A1.75 1.75 0 0 1 4 13.25V1.75z"/></svg>
+        <span>Review</span>
+      </button>
+      <button id="mob-tab-btn-threads" class="mob-nav-pill" onclick="selectViewTab('threads')">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 13.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H2.75A1.75 1.75 0 0 1 1 10.25v-7.5z"/></svg>
+        <span>Discussions</span>
+      </button>
+      <button id="mob-tab-btn-standards" class="mob-nav-pill" onclick="selectViewTab('standards')">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M7.467.133a1.748 1.748 0 0 1 1.066 0l5.25 1.68A1.75 1.75 0 0 1 15 3.48v4.27c0 4.29-2.76 7.4-6.68 8.2a1.75 1.75 0 0 1-.64 0C3.76 15.15 1 12.04 1 7.75V3.48a1.75 1.75 0 0 1 1.217-1.667l5.25-1.68z"/></svg>
+        <span>Standards</span>
+      </button>
+      <button id="mob-tab-btn-benchmarks" class="mob-nav-pill" onclick="selectViewTab('benchmarks')">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1.75V13.5h13a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75V1.75a.75.75 0 0 1 1.5 0zm14.28 2.53-5.25 5.25a.75.75 0 0 1-1.06 0L7 7.06 4.28 9.78a.75.75 0 0 1-1.06-1.06l3.25-3.25a.75.75 0 0 1 1.06 0L10 7.94l4.72-4.72a.75.75 0 0 1 1.06 1.06z"/></svg>
+        <span>Benchmarks</span>
+      </button>
+    </nav>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileNavDrawer" class="mobile-nav-drawer" aria-hidden="true">
+      <div class="mobile-drawer-inner">
+        <div class="mobile-drawer-repo">
+          <span class="label">Repository:</span>
+          <strong id="mobileRepoName">fastapi/fastapi</strong>
+          <span class="pr-num">#412</span>
+        </div>
+        <div class="mobile-drawer-actions">
+          <button class="btn btn-primary" onclick="openActionModal(); closeMobileMenu();" style="width: 100%; justify-content: center; gap: 8px;">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+            <span>Add to CI / CD Workflow</span>
+          </button>
+          <a href="https://github.com/binodbishwakarama-max/codeagent" target="_blank" class="btn btn-secondary" onclick="closeMobileMenu();" style="width: 100%; justify-content: center; gap: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span>View on GitHub</span>
+          </a>
+        </div>
       </div>
     </div>
   </header>
@@ -2626,7 +3358,7 @@
             <!-- Custom Rule Form -->
             <div class="custom-rule-form" id="customRuleForm">
               <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 10px 0; color: var(--text-primary);">Create Custom Engineering Rule</h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <div class="custom-rule-fields-grid">
                 <div class="settings-field">
                   <label for="crId">Rule ID:</label>
                   <input type="text" id="crId" placeholder="e.g. TEAM-LOG-01" value="TEAM-LOG-01">
@@ -3112,16 +3844,83 @@ standards:
         b.classList.remove('active');
         b.setAttribute('aria-selected', 'false');
       });
+      document.querySelectorAll('.mob-nav-pill').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
       document.querySelectorAll('.tab-section').forEach(p => p.classList.remove('active'));
 
       const activeBtn = document.getElementById(`tab-btn-${tabKey}`);
+      const activeMobBtn = document.getElementById(`mob-tab-btn-${tabKey}`);
       const activeSection = document.getElementById(`section-${tabKey}`);
       if (activeBtn) {
         activeBtn.classList.add('active');
         activeBtn.setAttribute('aria-selected', 'true');
       }
+      if (activeMobBtn) {
+        activeMobBtn.classList.add('active');
+        activeMobBtn.setAttribute('aria-selected', 'true');
+        try {
+          activeMobBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } catch (_) {}
+      }
       if (activeSection) activeSection.classList.add('active');
+      closeMobileMenu();
     }
+
+    // Mobile Navigation Drawer Toggle & Outside-Click Handling
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobileNavDrawer');
+      if (!drawer) return;
+      if (drawer.classList.contains('open')) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    }
+
+    function openMobileMenu() {
+      const drawer = document.getElementById('mobileNavDrawer');
+      const toggleBtn = document.getElementById('mobileMenuToggle');
+      if (!drawer || !toggleBtn) return;
+      drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden', 'false');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      const hamburger = toggleBtn.querySelector('.hamburger-icon');
+      const close = toggleBtn.querySelector('.close-icon');
+      if (hamburger) hamburger.style.display = 'none';
+      if (close) close.style.display = 'block';
+    }
+
+    function closeMobileMenu() {
+      const drawer = document.getElementById('mobileNavDrawer');
+      const toggleBtn = document.getElementById('mobileMenuToggle');
+      if (!drawer || !toggleBtn) return;
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      const hamburger = toggleBtn.querySelector('.hamburger-icon');
+      const close = toggleBtn.querySelector('.close-icon');
+      if (hamburger) hamburger.style.display = 'block';
+      if (close) close.style.display = 'none';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMobileMenu();
+        closeActionModal();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const drawer = document.getElementById('mobileNavDrawer');
+      const toggleBtn = document.getElementById('mobileMenuToggle');
+      if (drawer && drawer.classList.contains('open') && toggleBtn) {
+        if (!drawer.contains(e.target) && !toggleBtn.contains(e.target)) {
+          closeMobileMenu();
+        }
+      }
+    });
 
     // ==========================================================================
     // UNIFIED DIFF PARSER & CLIENT-SIDE STANDARDS ENGINE
@@ -3790,6 +4589,8 @@ standards:
 
       // Update PR metadata & headers
       document.getElementById('headerRepoName').innerText = scenario.repo;
+      const mobRepo = document.getElementById('mobileRepoName');
+      if (mobRepo) mobRepo.innerText = scenario.repo;
       document.getElementById('prTitleText').innerText = scenario.title;
       document.getElementById('prBranchText').innerText = scenario.branch;
       document.getElementById('diffFilePath').innerText = scenario.file;
