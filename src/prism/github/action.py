@@ -73,9 +73,7 @@ def emit_workflow_annotation(finding: ReviewFinding) -> None:
     title = finding.standard_id or finding.category.value
     msg = finding.message.replace("\n", "%0A")
     # GitHub Workflow Command Syntax: ::warning file={name},line={line},title={title}::{message}
-    sys.stdout.write(
-        f"::{command} file={finding.path},line={finding.line},title={title}::{msg}\n"
-    )
+    sys.stdout.write(f"::{command} file={finding.path},line={finding.line},title={title}::{msg}\n")
     sys.stdout.flush()
 
 
@@ -95,66 +93,78 @@ def generate_action_summary_markdown(
     ]
 
     if not result.findings:
-        lines.extend([
-            "> ### ✅ All Standards Passed (Trained Silence Guarantee)",
-            "> ",
-            "> Prism evaluated this pull request against repository standards and found zero defects. ",
-            "> Negative SFT trained silence guarantees zero unsolicited spam on clean code.",
-            "",
-            "| Check | Status | Verification |",
-            "| :--- | :---: | :--- |",
-            "| **SQL Injection (STD-SEC-01)** | `PASSED` | Parameterized binding verified |",
-            "| **Secret Hygiene (STD-SEC-02)** | `PASSED` | No plaintext credentials detected |",
-            "| **Async Boundaries (STD-ERR-02)** | `PASSED` | Explicit timeouts present |",
-            "| **Exception Handling (STD-ERR-01)** | `PASSED` | No bare except blocks |",
-        ])
+        lines.extend(
+            [
+                "> ### ✅ All Standards Passed (Trained Silence Guarantee)",
+                "> ",
+                "> Prism evaluated this pull request against repository standards and found zero defects. ",
+                "> Negative SFT trained silence guarantees zero unsolicited spam on clean code.",
+                "",
+                "| Check | Status | Verification |",
+                "| :--- | :---: | :--- |",
+                "| **SQL Injection (STD-SEC-01)** | `PASSED` | Parameterized binding verified |",
+                "| **Secret Hygiene (STD-SEC-02)** | `PASSED` | No plaintext credentials detected |",
+                "| **Async Boundaries (STD-ERR-02)** | `PASSED` | Explicit timeouts present |",
+                "| **Exception Handling (STD-ERR-01)** | `PASSED` | No bare except blocks |",
+            ]
+        )
     else:
-        lines.extend([
-            f"> ### ⚠️ {len(result.findings)} Actionable Finding(s) Identified",
-            "",
-            "| Severity | Category | Location | Standard | Finding |",
-            "| :---: | :--- | :--- | :---: | :--- |",
-        ])
+        lines.extend(
+            [
+                f"> ### ⚠️ {len(result.findings)} Actionable Finding(s) Identified",
+                "",
+                "| Severity | Category | Location | Standard | Finding |",
+                "| :---: | :--- | :--- | :---: | :--- |",
+            ]
+        )
         for f in result.findings:
-            sev_badge = f"🔴 `{f.severity.value}`" if f.severity == Severity.HIGH else f"🟡 `{f.severity.value}`"
+            sev_badge = (
+                f"🔴 `{f.severity.value}`"
+                if f.severity == Severity.HIGH
+                else f"🟡 `{f.severity.value}`"
+            )
             rule = f"`{f.standard_id}`" if f.standard_id else "—"
             loc = f"[`{f.path}:{f.line}`](https://github.com/{repo}/pull/{pr_number}/files#diff-L{f.line})"
             # Escaping pipe in markdown table
             clean_msg = f.message.replace("|", "\\|")
             lines.append(f"| {sev_badge} | `{f.category.value}` | {loc} | {rule} | {clean_msg} |")
 
-        lines.extend([
-            "",
-            "### 🛠️ Suggested Remediations",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "### 🛠️ Suggested Remediations",
+                "",
+            ]
+        )
         for idx, f in enumerate(result.findings, 1):
             if f.suggestion:
-                lines.extend([
-                    f"#### {idx}. `{f.path}:{f.line}` — {f.standard_id or f.category.value}",
-                    "```suggestion",
-                    f.suggestion,
-                    "```",
-                    "",
-                ])
+                lines.extend(
+                    [
+                        f"#### {idx}. `{f.path}:{f.line}` — {f.standard_id or f.category.value}",
+                        "```suggestion",
+                        f.suggestion,
+                        "```",
+                        "",
+                    ]
+                )
 
-    lines.extend([
-        "",
-        "---",
-        "<sub>Evaluated autonomously by [Prism Review](https://github.com/binodbishwakarama-max/codeagent) • Verified with empirical benchmark evaluation</sub>",
-    ])
+    lines.extend(
+        [
+            "",
+            "---",
+            "<sub>Evaluated autonomously by [Prism Review](https://github.com/binodbishwakarama-max/codeagent) • Verified with empirical benchmark evaluation</sub>",
+        ]
+    )
     return "\n".join(lines)
 
 
 async def run_action() -> int:
     """Async GitHub Action runner."""
-    token = (
-        get_action_input("github-token")
-        or os.environ.get("GITHUB_TOKEN")
-        or ""
-    )
+    token = get_action_input("github-token") or os.environ.get("GITHUB_TOKEN") or ""
     if not token:
-        logger.error("Missing required GitHub token. Please provide 'github-token: ${{ secrets.GITHUB_TOKEN }}'")
+        logger.error(
+            "Missing required GitHub token. Please provide 'github-token: ${{ secrets.GITHUB_TOKEN }}'"
+        )
         return 1
 
     repo = os.environ.get("GITHUB_REPOSITORY", "")
@@ -226,14 +236,19 @@ async def run_action() -> int:
         with open(standards_input, encoding="utf-8") as f:
             standards_file = parse_repo_standards(f.read())
     else:
-        logger.info("No custom standards file found at %s; using default engineering standards.", standards_input)
+        logger.info(
+            "No custom standards file found at %s; using default engineering standards.",
+            standards_input,
+        )
         standards_file = load_default_standards()
 
     # Load Settings and Model configuration
     anthropic_key = get_action_input("anthropic-api-key") or os.environ.get("ANTHROPIC_API_KEY")
     openai_key = get_action_input("openai-api-key") or os.environ.get("OPENAI_API_KEY")
     llm_base_url = get_action_input("llm-base-url") or os.environ.get("LLM_BASE_URL")
-    llm_model = get_action_input("llm-model") or os.environ.get("LLM_MODEL", "claude-3-5-sonnet-20241022")
+    llm_model = get_action_input("llm-model") or os.environ.get(
+        "LLM_MODEL", "claude-3-5-sonnet-20241022"
+    )
 
     raw_provider = get_action_input("llm-provider", "auto")
     if raw_provider == "auto":
@@ -275,7 +290,9 @@ async def run_action() -> int:
             llm_client = create_llm_client(settings)
             result = await review_pr(pr_context, settings=settings, llm_client=llm_client)
         except Exception as exc:
-            logger.warning("Neural review failed (%s); falling back to deterministic standards engine.", exc)
+            logger.warning(
+                "Neural review failed (%s); falling back to deterministic standards engine.", exc
+            )
             findings = evaluate_deterministic_rules(file_diffs)
             elapsed = round((time.time() - start_time) * 1000.0, 1)
             result = ReviewResult(
@@ -326,7 +343,9 @@ async def run_action() -> int:
             )
             logger.info("Successfully posted PR review.")
         except Exception as exc:
-            logger.warning("Could not post PR review comment (check GITHUB_TOKEN write permissions): %s", exc)
+            logger.warning(
+                "Could not post PR review comment (check GITHUB_TOKEN write permissions): %s", exc
+            )
 
     # 4. Set action output parameters
     has_violations = len(result.findings) > 0
@@ -341,12 +360,19 @@ async def run_action() -> int:
     if fail_on == "high":
         critical_count = sum(1 for f in result.findings if f.severity == Severity.HIGH)
         if critical_count > 0:
-            logger.error("Failing CI build: identified %d high-severity standards violation(s).", critical_count)
+            logger.error(
+                "Failing CI build: identified %d high-severity standards violation(s).",
+                critical_count,
+            )
             return 1
     elif fail_on == "medium":
-        med_or_high = sum(1 for f in result.findings if f.severity in (Severity.HIGH, Severity.MEDIUM))
+        med_or_high = sum(
+            1 for f in result.findings if f.severity in (Severity.HIGH, Severity.MEDIUM)
+        )
         if med_or_high > 0:
-            logger.error("Failing CI build: identified %d medium/high standards violation(s).", med_or_high)
+            logger.error(
+                "Failing CI build: identified %d medium/high standards violation(s).", med_or_high
+            )
             return 1
 
     logger.info("Prism Review Action completed successfully.")

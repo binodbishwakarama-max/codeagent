@@ -136,7 +136,7 @@ def render_video() -> Path:
             str(dur),
             str(seg_out),
         ]
-        print(f"  Rendering Scene {idx+1}/{len(scenes)} ({s['image'].name}, {dur}s, {mode})...")
+        print(f"  Rendering Scene {idx + 1}/{len(scenes)} ({s['image'].name}, {dur}s, {mode})...")
         res = subprocess.run(cmd, capture_output=True, text=True)
         if res.returncode != 0:
             print(res.stderr)

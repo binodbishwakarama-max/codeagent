@@ -1,5 +1,7 @@
 """Unit tests for GitHub Actions automated pull request review runner."""
 
+from pathlib import Path
+
 import pytest
 
 from prism.github.action import (
@@ -18,7 +20,7 @@ def test_get_action_input(monkeypatch: pytest.MonkeyPatch) -> None:
     assert get_action_input("missing-var", default="default-val") == "default-val"
 
 
-def test_write_github_output(tmp_path: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_write_github_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     output_file = tmp_path / "output.txt"
     monkeypatch.setenv("GITHUB_OUTPUT", str(output_file))
 
@@ -30,7 +32,7 @@ def test_write_github_output(tmp_path: pytest.TempPathFactory, monkeypatch: pyte
     assert "findings_count=0\n" in content
 
 
-def test_append_github_step_summary(tmp_path: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_append_github_step_summary(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     summary_file = tmp_path / "step_summary.md"
     monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary_file))
 
@@ -87,9 +89,7 @@ def test_generate_action_summary_markdown_with_findings() -> None:
 
 
 @pytest.mark.asyncio
-async def test_run_action_clean_local_diff(
-    tmp_path: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch
-) -> None:
+async def test_run_action_clean_local_diff(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     output_file = tmp_path / "action_output.txt"
     summary_file = tmp_path / "action_summary.md"
 

@@ -546,9 +546,7 @@ async def review_diff_direct(req: DirectDiffReviewRequest) -> dict[str, Any]:
     file_diffs = parse_unified_diff(req.diff)
     redacted_diffs = redact_file_diffs(file_diffs)
     standards = (
-        parse_repo_standards(req.standards_yaml)
-        if req.standards_yaml
-        else load_default_standards()
+        parse_repo_standards(req.standards_yaml) if req.standards_yaml else load_default_standards()
     )
 
     settings = _get_settings()
@@ -567,16 +565,18 @@ async def review_diff_direct(req: DirectDiffReviewRequest) -> dict[str, Any]:
         )
         res = await review_pr(pr_ctx, settings, llm_client=create_llm_client(settings))
         for f in res.findings:
-            findings.append({
-                "path": f.path,
-                "line": f.line,
-                "category": f.category.value,
-                "severity": f.severity.value,
-                "message": f.message,
-                "suggestion": f.suggestion,
-                "confidence": f.confidence,
-                "standard_id": f.standard_id,
-            })
+            findings.append(
+                {
+                    "path": f.path,
+                    "line": f.line,
+                    "category": f.category.value,
+                    "severity": f.severity.value,
+                    "message": f.message,
+                    "suggestion": f.suggestion,
+                    "confidence": f.confidence,
+                    "standard_id": f.standard_id,
+                }
+            )
     else:
         # Deterministic standards rules engine (ideal for zero-credential cloud demos)
         for fd in redacted_diffs:
@@ -589,56 +589,62 @@ async def review_diff_direct(req: DirectDiffReviewRequest) -> dict[str, Any]:
                             or "f'SELECT" in text
                             or ("SELECT %s" not in text and "SELECT" in text and "{" in text)
                         ):
-                            findings.append({
-                                "path": fd.path,
-                                "line": line.new_no,
-                                "category": "SECURITY",
-                                "severity": "HIGH",
-                                "message": (
-                                    "SQL Injection vulnerability: untrusted input is directly"
-                                    " interpolated into query string. Use parameterized queries."
-                                ),
-                                "suggestion": (
-                                    '    query = "SELECT id, username, email FROM users WHERE id ='
-                                    ' %s"\n    cursor.execute(query, (user_id,))'
-                                ),
-                                "confidence": 0.96,
-                                "standard_id": "SEC-002",
-                            })
+                            findings.append(
+                                {
+                                    "path": fd.path,
+                                    "line": line.new_no,
+                                    "category": "SECURITY",
+                                    "severity": "HIGH",
+                                    "message": (
+                                        "SQL Injection vulnerability: untrusted input is directly"
+                                        " interpolated into query string. Use parameterized queries."
+                                    ),
+                                    "suggestion": (
+                                        '    query = "SELECT id, username, email FROM users WHERE id ='
+                                        ' %s"\n    cursor.execute(query, (user_id,))'
+                                    ),
+                                    "confidence": 0.96,
+                                    "standard_id": "SEC-002",
+                                }
+                            )
                         if text.strip().startswith("except:"):
-                            findings.append({
-                                "path": fd.path,
-                                "line": line.new_no,
-                                "category": "ERROR_HANDLING",
-                                "severity": "HIGH",
-                                "message": (
-                                    "Bare `except:` block silently suppresses all exceptions,"
-                                    " including KeyboardInterrupt and SystemExit. Catch specific"
-                                    " exceptions or log with traceback."
-                                ),
-                                "suggestion": (
-                                    "    except Exception as exc:\n        logger.error('Order"
-                                    " dispatch failed: %s', exc)\n        return False"
-                                ),
-                                "confidence": 0.92,
-                                "standard_id": "ERR-001",
-                            })
+                            findings.append(
+                                {
+                                    "path": fd.path,
+                                    "line": line.new_no,
+                                    "category": "ERROR_HANDLING",
+                                    "severity": "HIGH",
+                                    "message": (
+                                        "Bare `except:` block silently suppresses all exceptions,"
+                                        " including KeyboardInterrupt and SystemExit. Catch specific"
+                                        " exceptions or log with traceback."
+                                    ),
+                                    "suggestion": (
+                                        "    except Exception as exc:\n        logger.error('Order"
+                                        " dispatch failed: %s', exc)\n        return False"
+                                    ),
+                                    "confidence": 0.92,
+                                    "standard_id": "ERR-001",
+                                }
+                            )
                         if "[REDACTED_SECRET]" in text:
-                            findings.append({
-                                "path": fd.path,
-                                "line": line.new_no,
-                                "category": "SECURITY",
-                                "severity": "CRITICAL",
-                                "message": (
-                                    "Hardcoded API credential detected and automatically scrubbed."
-                                    " Store credentials in environment variables or secret vaults."
-                                ),
-                                "suggestion": (
-                                    '    api_key = os.environ.get("STRIPE_API_KEY")'
-                                ),
-                                "confidence": 0.99,
-                                "standard_id": "SEC-001",
-                            })
+                            findings.append(
+                                {
+                                    "path": fd.path,
+                                    "line": line.new_no,
+                                    "category": "SECURITY",
+                                    "severity": "CRITICAL",
+                                    "message": (
+                                        "Hardcoded API credential detected and automatically scrubbed."
+                                        " Store credentials in environment variables or secret vaults."
+                                    ),
+                                    "suggestion": (
+                                        '    api_key = os.environ.get("STRIPE_API_KEY")'
+                                    ),
+                                    "confidence": 0.99,
+                                    "standard_id": "SEC-001",
+                                }
+                            )
 
     return {
         "status": "completed",
@@ -649,8 +655,12 @@ async def review_diff_direct(req: DirectDiffReviewRequest) -> dict[str, Any]:
 
 
 class PRUrlReviewRequest(BaseModel):
-    url: str = Field(description="GitHub Pull Request URL or shorthand (e.g. https://github.com/owner/repo/pull/123)")
-    token: str | None = Field(default=None, description="Optional GitHub token for private repositories")
+    url: str = Field(
+        description="GitHub Pull Request URL or shorthand (e.g. https://github.com/owner/repo/pull/123)"
+    )
+    token: str | None = Field(
+        default=None, description="Optional GitHub token for private repositories"
+    )
     standards_yaml: str | None = Field(default=None, description="Optional custom standards YAML")
 
 
@@ -682,7 +692,6 @@ async def review_pr_url(req: PRUrlReviewRequest) -> dict[str, Any]:
     result["title"] = meta.get("title", f"PR #{pr_number}")
     result["raw_diff"] = raw_diff
     return result
-
 
 
 @app.get("/healthz", tags=["Health"])

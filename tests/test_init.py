@@ -36,14 +36,16 @@ dependencies = [
 def test_detect_tech_stack_typescript_next(tmp_path: Path) -> None:
     pkg = tmp_path / "package.json"
     pkg.write_text(
-        json.dumps({
-            "name": "next-app",
-            "dependencies": {
-                "next": "^14.0.0",
-                "react": "^18.2.0",
-                "@prisma/client": "^5.0.0",
-            },
-        }),
+        json.dumps(
+            {
+                "name": "next-app",
+                "dependencies": {
+                    "next": "^14.0.0",
+                    "react": "^18.2.0",
+                    "@prisma/client": "^5.0.0",
+                },
+            }
+        ),
         encoding="utf-8",
     )
     (tmp_path / "tsconfig.json").write_text("{}", encoding="utf-8")

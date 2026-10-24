@@ -85,7 +85,9 @@ def get_local_git_diff(staged: bool = False) -> tuple[str, str]:
     """Extract git diff from the current repository."""
     cmd = ["git", "diff", "--cached"] if staged else ["git", "diff", "HEAD"]
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True)
+        proc = subprocess.run(
+            cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True
+        )
         raw_diff = proc.stdout
     except subprocess.CalledProcessError as exc:
         raise RuntimeError(f"Failed to execute '{' '.join(cmd)}': {exc.stderr}") from exc
@@ -147,7 +149,9 @@ def evaluate_deterministic_rules(file_diffs: list[FileDiff]) -> list[ReviewFindi
                         'f"SELECT' in text
                         or "f'SELECT" in text
                         or ("SELECT %s" not in text and "SELECT" in text and "{" in text)
-                        or ("SELECT" in text and "+" in text and ("FROM" in text or "WHERE" in text))
+                        or (
+                            "SELECT" in text and "+" in text and ("FROM" in text or "WHERE" in text)
+                        )
                     ):
                         findings.append(
                             ReviewFinding(
@@ -174,7 +178,10 @@ def evaluate_deterministic_rules(file_diffs: list[FileDiff]) -> list[ReviewFindi
                         (r"ghp_[a-zA-Z0-9]{30,}", "GitHub Personal Access Token"),
                         (r"AKIA[0-9A-Z]{16}", "AWS Access Key ID"),
                         (r"sk_live_[a-zA-Z0-9]{24,}", "Stripe Live Secret Key"),
-                        (r"-----BEGIN (?:RSA|EC|OPENSSH) PRIVATE KEY-----", "Private cryptographic key"),
+                        (
+                            r"-----BEGIN (?:RSA|EC|OPENSSH) PRIVATE KEY-----",
+                            "Private cryptographic key",
+                        ),
                     ]
                     for pattern, label in secret_patterns:
                         if re.search(pattern, text) or "[REDACTED_SECRET]" in text:
@@ -585,4 +592,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

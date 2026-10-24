@@ -642,7 +642,9 @@ def main() -> None:
     args = parser.parse_args()
 
     if not args.token:
-        sys.exit("Error: Hugging Face token required. Pass --token or set HF_TOKEN environment variable.")
+        sys.exit(
+            "Error: Hugging Face token required. Pass --token or set HF_TOKEN environment variable."
+        )
 
     print("=" * 80)
     print("💎 PRISM REVIEW - HUGGING FACE SPACES DEPLOYMENT")

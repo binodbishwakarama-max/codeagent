@@ -446,7 +446,9 @@ def scaffold_prism(
 
     # 3. Create .prism directory and write standards.yml
     prism_dir.mkdir(parents=True, exist_ok=True)
-    summary_label = f"{', '.join(languages)}" + (f" ({', '.join(frameworks)})" if frameworks else "")
+    summary_label = f"{', '.join(languages)}" + (
+        f" ({', '.join(frameworks)})" if frameworks else ""
+    )
     yaml_content = generate_standards_yaml_content(standards_list, summary_label)
     standards_path.write_text(yaml_content, encoding="utf-8")
 
