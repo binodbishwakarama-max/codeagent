@@ -1,6 +1,6 @@
 [project]
 name = "prism-review"
-version = "0.1.0"
+version = "1.1.0"
 description = "A GitHub App that reviews pull requests against custom engineering standards"
 readme = "README.md"
 requires-python = ">=3.11"

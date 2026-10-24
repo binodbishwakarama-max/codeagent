@@ -3,6 +3,7 @@
 This document contains publication-ready launch copy, empirical tables, and discussion hooks for Hacker News, LinkedIn, Twitter/X, and longform technical blogging.
 
 All links and metrics are verified against:
+
 * **Interactive Live Space**: [https://huggingface.co/spaces/Vinod8848/prism-review](https://huggingface.co/spaces/Vinod8848/prism-review)
 * **Hugging Face Benchmark Dataset**: [https://huggingface.co/datasets/Vinod8848/prism-review-benchmark](https://huggingface.co/datasets/Vinod8848/prism-review-benchmark)
 * **GitHub Repository**: [https://github.com/binodbishwakarama-max/codeagent](https://github.com/binodbishwakarama-max/codeagent)
@@ -14,6 +15,7 @@ All links and metrics are verified against:
 
 **Target Subreddit / Platform**: `news.ycombinator.com`  
 **Suggested Titles**:
+
 * `Show HN: Prism – Why base LLMs comment on 73.5% of clean PRs, and how we fixed it`
 * `Show HN: Prism – An open-source AI code reviewer with a measured clean-PR false positive rate`
 
@@ -65,7 +67,7 @@ We mined 300+ real pull requests across 24 repositories (FastAPI, Vite, tRPC, Py
 | Fine-Tuned 7B (AWQ 4-bit) 🏆 | 0.9304 [0.893, 0.959] | 23.53% | 40.5 ms | $3.60 |
 | AST Linters Baseline | 0.0000 [0.000, 0.000] | 0.00% | 0.0 ms | $0.00 |
 
-*Fine-tuned 7B reaches 96.8% of Claude 3.5 Sonnet's F1 score while serving 6.2x faster at 37x lower cost.*
+*Fine-tuned 7B reaches 96.8% of Claude 3.5 Sonnet's F1 score while serving 6.2x faster at 37x lower cost (benchmarked on a single dedicated NVIDIA A10G 24GB with vLLM AWQ 4-bit at 50% amortized GPU duty cycle; not universal multi-tenant SaaS pricing).*
 
 ### Open Source & Public Artifacts
 
@@ -122,6 +124,7 @@ If your team is experimenting with automated code review or local LLM serving, I
 ## 3. Twitter / X Deep-Dive Thread (6 Tweets)
 
 ### Tweet 1 (Hook)
+>
 > Most AI code review tools fail because of a metric they never publish:
 >
 > The Clean-PR False Positive Rate.
@@ -129,9 +132,10 @@ If your team is experimenting with automated code review or local LLM serving, I
 > Base coding LLMs comment on 73.5% of completely clean PRs.
 >
 > Here is how we built Prism to drop false alarms by 68% and achieve 96.8% of Claude 3.5 Sonnet’s F1 at 37x lower cost 🧵👇
-> https://github.com/binodbishwakarama-max/codeagent
+> <https://github.com/binodbishwakarama-max/codeagent>
 
 ### Tweet 2 (The Flaw)
+>
 > Why do base LLMs spam clean PRs?
 >
 > Pre-trained instruction models are biased toward generating tokens. When given a diff with no bugs, they hallucinate stylistic nitpicks and redundant refactors rather than returning an empty list.
@@ -139,6 +143,7 @@ If your team is experimenting with automated code review or local LLM serving, I
 > In production, developer fatigue sets in within days.
 
 ### Tweet 3 (The Fix: Negative Training)
+>
 > The solution: 25% negative training.
 >
 > During QLoRA fine-tuning on Qwen2.5-Coder-7B, we fed exactly 25% clean PRs with target output `{"findings": []}`.
@@ -146,28 +151,32 @@ If your team is experimenting with automated code review or local LLM serving, I
 > Teaching the model *when to remain silent* dropped the clean-PR false positive rate from 73.5% down to 23.5%.
 
 ### Tweet 4 (Architecture & Guardrails)
+>
 > We wrapped the model in a 4-layer production pipeline:
+>
 > 1. Automated secret scrubber (pre-LLM)
 > 2. Hybrid BM25 + dense RRF standards retrieval
 > 3. Self-verification filter (drops hallucinations)
 > 4. Multi-turn thread replies (@prism-review concedes false alarms when context is provided)
 
 ### Tweet 5 (Economics)
+>
 > Serving efficiency with AWQ 4-bit in vLLM:
-> 
+>
 > ⚡ Latency: 40.5 ms p50 (vs 251.5 ms for Sonnet)
 > 💰 Cost per 10k reviews: $3.60 (vs $133.40 for Sonnet)
 > 🎯 F1 Score: 0.9304 vs 0.9613 (reaches 96.8% of Sonnet quality)
-> 
+>
 > Runs comfortably on a single 24GB GPU.
 
 ### Tweet 6 (CTA & Links)
+>
 > Everything is open source, reproducible, and benchmarked on 300+ real PRs:
 >
-> 🌐 Live Interactive Playground: https://huggingface.co/spaces/Vinod8848/prism-review
-> 📂 Hugging Face Dataset: https://huggingface.co/datasets/Vinod8848/prism-review-benchmark
-> 🏷️ Release v1.1.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.1.0
-> 💻 GitHub: https://github.com/binodbishwakarama-max/codeagent
+> 🌐 Live Interactive Playground: <https://huggingface.co/spaces/Vinod8848/prism-review>
+> 📂 Hugging Face Dataset: <https://huggingface.co/datasets/Vinod8848/prism-review-benchmark>
+> 🏷️ Release v1.1.0: <https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.1.0>
+> 💻 GitHub: <https://github.com/binodbishwakarama-max/codeagent>
 >
 > Run `make simulate-webhook` to test the entire pipeline locally!
 
@@ -192,6 +201,7 @@ Why does this happen?
 The answer lies in an unmeasured variable: the **Clean-PR False Positive Rate**.
 
 ```
+
 +-----------------------------------------------------------------------------+
 |                           THE AI CODE REVIEW DILEMMA                        |
 |                                                                             |
@@ -199,6 +209,7 @@ The answer lies in an unmeasured variable: the **Clean-PR False Positive Rate**.
 |  Base Coding LLMs (Zero-Shot):     73.5% False Positive Rate on Clean PRs   |
 |  Prism (Negative SFT + Guardrails): 93.0% F1 Score with 23.5% Clean FPR      |
 +-----------------------------------------------------------------------------+
+
 ```
 
 ### The Benchmark: Measuring What Matters
@@ -224,9 +235,11 @@ Base models have been instruction-tuned to *always* provide helpful answers. Whe
 To build an automated reviewer that developers actually trust, we designed a multi-layer pipeline:
 
 ```
+
 [Incoming PR Webhook]
           │
           ▼
+
 1. HMAC-SHA256 & Deduplication (Idempotent replay protection)
           │
           ▼
@@ -246,6 +259,7 @@ To build an automated reviewer that developers actually trust, we designed a mul
           │
           ▼
 7. Multi-Turn Thread Resolver (Answers developer disputes & concessions)
+
 ```
 
 #### 1. Negative Training for Silence
@@ -270,6 +284,7 @@ Prism evaluates the developer's justification against the diff hunk. If the obje
 
 Conceded: Verified against the request validation pipeline. The customer UUID format is enforced prior to dispatch, so injection is safely mitigated.
 ```
+
 Every concession is logged to a Postgres telemetry table to feed continuous Reinforcement Learning from Developer Reactions (RLDR).
 
 ---
@@ -290,6 +305,7 @@ All models were evaluated on the frozen test split (120 PRs):
 ### Serving Economics
 
 Quantizing the fine-tuned model with AWQ 4-bit allowed us to serve it in vLLM on a single NVIDIA A10G (24GB VRAM):
+
 * **Median Latency (p50)**: **40.5 ms** (6.2× faster than Claude 3.5 Sonnet's 251.5 ms).
 * **Cost per Review**: **$0.00036** (37.1× cheaper than Sonnet's $0.01334).
 * **Throughput**: $3.60 per 10,000 pull requests under a conservative 50% duty cycle.
@@ -306,6 +322,7 @@ Explore the splits, manifests, and PR metadata at [Vinod8848/prism-review-benchm
 
 3. **Simulate Webhook & Reviews Locally**:
 You can run the full GitHub App pipeline locally with zero external dependencies:
+
 ```bash
 git clone https://github.com/binodbishwakarama-max/codeagent.git
 cd codeagent
@@ -313,10 +330,13 @@ uv sync
 python scripts/simulate_webhook.py
 ```
 
-4. **Check the v1.0.0 Release**:
-Release notes, migration scripts, and architecture docs are published on [GitHub Releases](https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0).
+4. **Check the v1.1.0 Release**:
+Release notes, migration scripts, and architecture docs are published on [GitHub Releases](https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.1.0).
 
 ---
 
 *Comments, feedback, and pull requests are warmly welcomed on [GitHub](https://github.com/binodbishwakarama-max/codeagent).*
+
 ```
+
+

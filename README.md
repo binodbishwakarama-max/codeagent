@@ -210,7 +210,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Prism Review
-        uses: binodbishwakarama-max/codeagent@main
+        uses: binodbishwakarama-max/codeagent@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           standards-file: ".prism/standards.yml"
@@ -345,6 +345,17 @@ standards:
 | 🚀 **[Installation & Usage](docs/usage.md)** | Multi-repo GitHub App setup, Fly.io deployment runbook, and kill-switch guide. |
 | 📈 **[Load Test Report](docs/load-test.md)** | 50 PR event burst simulation with 0.0% error rate and 11.8ms p95 ingestion latency. |
 | 🐳 **[Evaluation Dockerfile](Dockerfile.eval)** | Pinned, reproducible container specification for benchmark replication. |
+
+---
+
+## ⚠️ Known Limitations & Failure Modes
+
+An empirical AI engineering benchmark requires honesty about failure modes. Based on our 80-case root-cause taxonomy ([docs/writeup.md](docs/writeup.md)):
+
+1. **Cross-File Caller Invariants (37.5% of False Positives)**: When inspecting diff hunks in isolation, Prism may flag an unvalidated variable, unaware that sanitization occurred in an upstream controller outside the diff. *(Target: Whole-repo SCIP symbol graph indexing).*
+2. **Intentional Pragmatic Violations (25.0% of False Positives)**: One-off migrations, mock fixtures, or seed scripts often intentionally bypass strict rules (e.g. raw SQL queries in tests). *(Mitigation: Configure `file_patterns` exclusions in `.prism/standards.yml`).*
+3. **Silent Semantic Inversions (35.0% of False Negatives)**: Subtle business logic flips (e.g. swapping `<=` to `<` in bounds checking) that preserve clean syntax can elude models unless accompanied by an explicit standard.
+4. **Hardware-Specific Serving Figures**: The reported **40.5 ms** $p50$ latency and **$3.60 / 10k PRs** cost reflect our benchmark configuration on a dedicated NVIDIA A10G (24GB) via vLLM AWQ 4-bit at 50% amortized GPU utilization, not universal multi-tenant SaaS pricing.
 
 ---
 
