@@ -6,7 +6,7 @@ All links and metrics are verified against:
 * **Interactive Live Space**: [https://huggingface.co/spaces/Vinod8848/prism-review](https://huggingface.co/spaces/Vinod8848/prism-review)
 * **Hugging Face Benchmark Dataset**: [https://huggingface.co/datasets/Vinod8848/prism-review-benchmark](https://huggingface.co/datasets/Vinod8848/prism-review-benchmark)
 * **GitHub Repository**: [https://github.com/binodbishwakarama-max/codeagent](https://github.com/binodbishwakarama-max/codeagent)
-* **GitHub Release v1.0.0**: [https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0](https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0)
+* **GitHub Release v1.1.0**: [https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.1.0](https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.1.0) (or latest: [releases](https://github.com/binodbishwakarama-max/codeagent/releases))
 
 ---
 
@@ -73,7 +73,7 @@ All code, evaluation harnesses, and datasets are open:
 * Interactive Web Demo: https://huggingface.co/spaces/Vinod8848/prism-review
 * GitHub: https://github.com/binodbishwakarama-max/codeagent
 * Hugging Face Benchmark Dataset: https://huggingface.co/datasets/Vinod8848/prism-review-benchmark
-* Release v1.0.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0
+* Release v1.1.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.1.0
 * Local Simulator: You can run the entire webhook & review pipeline locally in terminal without external dependencies using `make simulate-webhook`.
 
 Would love to hear your thoughts on automated review heuristics, false positive mitigation, and how teams evaluate LLM code assistants!
@@ -109,7 +109,7 @@ To fix this, we built Prism Review (https://github.com/binodbishwakarama-max/cod
 All benchmarks, evaluation harnesses, and datasets are public:
 🌐 Interactive Live Playground: https://huggingface.co/spaces/Vinod8848/prism-review
 📦 Hugging Face Benchmark Dataset: https://huggingface.co/datasets/Vinod8848/prism-review-benchmark
-🚀 GitHub Release v1.0.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0
+🚀 GitHub Release v1.1.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.1.0
 💻 Codebase & Local Simulator: https://github.com/binodbishwakarama-max/codeagent
 
 If your team is experimenting with automated code review or local LLM serving, I’d love to connect and hear how you approach developer trust and noise reduction.
@@ -166,7 +166,7 @@ If your team is experimenting with automated code review or local LLM serving, I
 >
 > 🌐 Live Interactive Playground: https://huggingface.co/spaces/Vinod8848/prism-review
 > 📂 Hugging Face Dataset: https://huggingface.co/datasets/Vinod8848/prism-review-benchmark
-> 🏷️ Release v1.0.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.0.0
+> 🏷️ Release v1.1.0: https://github.com/binodbishwakarama-max/codeagent/releases/tag/v1.1.0
 > 💻 GitHub: https://github.com/binodbishwakarama-max/codeagent
 >
 > Run `make simulate-webhook` to test the entire pipeline locally!
