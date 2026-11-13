@@ -1,7 +1,6 @@
 """Arq worker settings, process lifecycle, and graceful shutdown configuration."""
 
 import logging
-import signal
 from typing import Any
 
 from prism.config import Settings
@@ -41,20 +40,6 @@ async def shutdown(ctx: dict[str, Any]) -> None:
         logger.info("Worker Redis connection closed")
 
     logger.info("Worker shutdown complete")
-
-
-def _handle_sigterm(signum: int, frame: Any) -> None:
-    """Handle SIGTERM for graceful shutdown."""
-    logger.info("Received SIGTERM, initiating graceful shutdown...")
-    raise SystemExit(0)
-
-
-# Register SIGTERM handler for graceful shutdown in containers
-try:
-    signal.signal(signal.SIGTERM, _handle_sigterm)
-except (OSError, ValueError):
-    # signal.signal can fail in some environments (e.g., non-main thread)
-    pass
 
 
 class WorkerSettings:

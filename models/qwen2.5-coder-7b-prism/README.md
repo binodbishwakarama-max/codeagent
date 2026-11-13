@@ -20,6 +20,11 @@ pipeline_tag: text-generation
 
 Fine-tuned version of `Qwen/Qwen2.5-Coder-7B-Instruct` optimized for automated, high-signal Pull Request code reviews adhering to custom engineering standards.
 
+> [!NOTE]
+> **Repository Artifacts vs. Model Weights**:
+> This repository contains the model architecture definition, adapter configurations (`adapter_config.json`), tokenizer metadata, and stub files for CI/integration tests.
+> The full 16-bit merged safetensors (~14.5 GB) and 4-bit AWQ quantized weights (~4.2 GB) can be trained using `training/modal_train.py` or downloaded from your organization's model registry / S3 bucket.
+
 ## Model Highlights
 - **Architecture**: Qwen2.5-Coder-7B-Instruct with QLoRA adapter
 - **LoRA Rank**: $r = 32$, $\alpha = 64$ (targeting all linear attention & MLP projections)
@@ -48,10 +53,44 @@ Fine-tuned version of `Qwen/Qwen2.5-Coder-7B-Instruct` optimized for automated, 
 | Gradient Checkpointing | `True` |
 | Packing | `False` |
 
-## Usage with vLLM
+## Weight Merging & Export
+
+To merge the trained LoRA adapter with the base model into standalone 16-bit BF16 weights:
+```bash
+python -m training.merge \
+    --adapter-dir models/qwen2.5-coder-7b-prism/adapter \
+    --output-dir models/qwen2.5-coder-7b-prism/merged_16bit \
+    --device cuda
+```
+
+## Production Serving with vLLM
+
+### Option 1: Native vLLM Command
 ```bash
 vllm serve models/qwen2.5-coder-7b-prism/merged_16bit \
+    --host 0.0.0.0 \
     --port 8000 \
     --max-model-len 8192 \
+    --gpu-memory-utilization 0.90 \
+    --trust-remote-code
+```
+
+### Option 2: 4-bit AWQ on Single A10G / L4 (Recommended)
+```bash
+vllm serve models/qwen2.5-coder-7b-prism/merged_16bit \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --quantization awq \
+    --max-model-len 8192 \
     --gpu-memory-utilization 0.90
+```
+
+### Option 3: Docker Compose
+```bash
+docker compose -f docker-compose.yml -f ops/serving/docker-compose.gpu.yml up -d
+```
+
+### Option 4: Serverless on Modal
+```bash
+modal deploy ops/serving/modal_serve.py
 ```

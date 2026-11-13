@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 from typing import Any
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
@@ -88,18 +89,85 @@ class TestWebhookSignatureVerification:
         body = json.dumps(payload).encode()
         sig = make_signature(body, webhook_secret)
 
-        response = client.post(
-            "/webhook/github",
-            content=body,
-            headers={
-                "Content-Type": "application/json",
-                "X-Hub-Signature-256": sig,
-                "X-GitHub-Event": "pull_request",
-                "X-GitHub-Delivery": "unique-delivery-001",
-            },
+        mock_pool = AsyncMock()
+        with patch("prism.api._arq_pool", mock_pool):
+            response = client.post(
+                "/webhook/github",
+                content=body,
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Hub-Signature-256": sig,
+                    "X-GitHub-Event": "pull_request",
+                    "X-GitHub-Delivery": "unique-delivery-001",
+                },
+            )
+            assert response.status_code == 202
+            mock_pool.enqueue_job.assert_awaited_once()
+
+    def test_webhook_returns_503_when_queue_unavailable(
+        self, client: TestClient, webhook_secret: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """When arq pool is unavailable, returns 503 so GitHub automatically retries."""
+        monkeypatch.setenv("GITHUB_APP_ID", "test-app-123")
+        monkeypatch.setenv(
+            "GITHUB_PRIVATE_KEY",
+            "-----BEGIN RSA PRIVATE KEY-----\nFAKE\n-----END RSA PRIVATE KEY-----",
         )
-        # 202 on success, or 500 if Redis connection fails gracefully
-        assert response.status_code in (202, 500)
+        monkeypatch.setenv("GITHUB_WEBHOOK_SECRET", webhook_secret)
+        monkeypatch.setenv("DATABASE_URL", "postgresql://prism:prism@localhost:5432/prism")
+        monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
+
+        payload = make_pr_event()
+        body = json.dumps(payload).encode()
+        sig = make_signature(body, webhook_secret)
+
+        with patch("prism.api._arq_pool", None):
+            response = client.post(
+                "/webhook/github",
+                content=body,
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Hub-Signature-256": sig,
+                    "X-GitHub-Event": "pull_request",
+                    "X-GitHub-Delivery": "unique-delivery-queue-down",
+                },
+            )
+            assert response.status_code == 503
+            assert "unavailable" in response.json()["detail"].lower()
+
+    def test_webhook_returns_503_when_enqueue_job_fails(
+        self, client: TestClient, webhook_secret: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """When enqueue_job raises an exception (Redis network error), returns 503."""
+        monkeypatch.setenv("GITHUB_APP_ID", "test-app-123")
+        monkeypatch.setenv(
+            "GITHUB_PRIVATE_KEY",
+            "-----BEGIN RSA PRIVATE KEY-----\nFAKE\n-----END RSA PRIVATE KEY-----",
+        )
+        monkeypatch.setenv("GITHUB_WEBHOOK_SECRET", webhook_secret)
+        monkeypatch.setenv("DATABASE_URL", "postgresql://prism:prism@localhost:5432/prism")
+        monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
+
+        payload = make_pr_event()
+        body = json.dumps(payload).encode()
+        sig = make_signature(body, webhook_secret)
+
+        mock_pool = AsyncMock()
+        mock_pool.enqueue_job.side_effect = ConnectionError("Redis connection dropped")
+
+        with patch("prism.api._arq_pool", mock_pool):
+            response = client.post(
+                "/webhook/github",
+                content=body,
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Hub-Signature-256": sig,
+                    "X-GitHub-Event": "pull_request",
+                    "X-GitHub-Delivery": "unique-delivery-enqueue-fail",
+                },
+            )
+            assert response.status_code == 503
+            assert "unavailable" in response.json()["detail"].lower()
 
     def test_invalid_signature_returns_401(
         self, client: TestClient, webhook_secret: str, monkeypatch: pytest.MonkeyPatch
@@ -219,3 +287,11 @@ def test_healthz_and_readyz_endpoints(client: TestClient) -> None:
     assert "status" in res_ready.json()
     assert "database" in res_ready.json()
     assert "redis" in res_ready.json()
+
+
+def test_landing_page_serves_html(client: TestClient) -> None:
+    res = client.get("/")
+    assert res.status_code == 200
+    assert "Prism Review" in res.text
+    assert "text/html" in res.headers.get("content-type", "")
+

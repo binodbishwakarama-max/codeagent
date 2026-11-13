@@ -11,7 +11,7 @@ from typing import Any, Protocol, TypeVar
 import httpx
 from pydantic import BaseModel
 
-from prism.config import Settings, calculate_token_cost
+from prism.config import ReviewPipelineSettings, Settings, calculate_token_cost
 from prism.observability.tracing import trace_llm_call
 
 logger = logging.getLogger(__name__)
@@ -353,7 +353,7 @@ class FakeLLMClient:
 # ---------------------------------------------------------------------------
 
 
-def create_llm_client(settings: Settings) -> LLMClient:
+def create_llm_client(settings: ReviewPipelineSettings | Settings) -> LLMClient:
     """Instantiate appropriate LLM client configured by application settings."""
     if settings.llm_base_url or settings.llm_provider == "openai_compat":
         return OpenAICompatClient(

@@ -14,7 +14,7 @@ from typing import Literal
 
 import httpx
 
-from prism.config import Settings
+from prism.config import ReviewPipelineSettings, Settings
 from prism.github.diff import parse_unified_diff
 from prism.models import FileDiff, IssueCategory, ReviewFinding, ReviewResult, Severity
 from prism.review.llm import create_llm_client
@@ -135,117 +135,7 @@ def get_local_git_diff_against_base(base_ref: str = "main") -> tuple[str, str]:
     return get_local_git_diff(staged=False)
 
 
-def evaluate_deterministic_rules(file_diffs: list[FileDiff]) -> list[ReviewFinding]:
-    """Deterministic static standards verification engine (fallback when no LLM API is configured)."""
-    findings: list[ReviewFinding] = []
-    for fd in file_diffs:
-        for hunk in fd.hunks:
-            for line in hunk.lines:
-                if line.kind == "add" and line.new_no is not None:
-                    text = line.text
-
-                    # 1. SQL Injection (STD-SEC-01 / CWE-89)
-                    if (
-                        'f"SELECT' in text
-                        or "f'SELECT" in text
-                        or ("SELECT %s" not in text and "SELECT" in text and "{" in text)
-                        or (
-                            "SELECT" in text and "+" in text and ("FROM" in text or "WHERE" in text)
-                        )
-                    ):
-                        findings.append(
-                            ReviewFinding(
-                                path=fd.path,
-                                line=line.new_no,
-                                category=IssueCategory.SECURITY,
-                                severity=Severity.HIGH,
-                                message=(
-                                    "SQL Injection vulnerability (CWE-89): dynamic input is directly "
-                                    "interpolated into query string. Use parameterized queries."
-                                ),
-                                suggestion=(
-                                    '    query = "SELECT * FROM users WHERE id = %s"\n'
-                                    "    cursor.execute(query, (user_id,))"
-                                ),
-                                confidence=0.96,
-                                standard_id="STD-SEC-01",
-                            )
-                        )
-
-                    # 2. Hardcoded Secrets (STD-SEC-02 / CWE-798)
-                    secret_patterns = [
-                        (r"sk-[a-zA-Z0-9]{20,}", "OpenAI API token"),
-                        (r"ghp_[a-zA-Z0-9]{30,}", "GitHub Personal Access Token"),
-                        (r"AKIA[0-9A-Z]{16}", "AWS Access Key ID"),
-                        (r"sk_live_[a-zA-Z0-9]{24,}", "Stripe Live Secret Key"),
-                        (
-                            r"-----BEGIN (?:RSA|EC|OPENSSH) PRIVATE KEY-----",
-                            "Private cryptographic key",
-                        ),
-                    ]
-                    for pattern, label in secret_patterns:
-                        if re.search(pattern, text) or "[REDACTED_SECRET]" in text:
-                            findings.append(
-                                ReviewFinding(
-                                    path=fd.path,
-                                    line=line.new_no,
-                                    category=IssueCategory.SECURITY,
-                                    severity=Severity.HIGH,
-                                    message=(
-                                        f"Hardcoded credential detected ({label}, CWE-798). "
-                                        "Store credentials in environment variables or a secret vault."
-                                    ),
-                                    suggestion='    api_key = os.environ.get("SERVICE_API_KEY")',
-                                    confidence=0.99,
-                                    standard_id="STD-SEC-02",
-                                )
-                            )
-                            break
-
-                    # 3. Missing Async Timeout (STD-ERR-02 / CWE-703)
-                    if (
-                        ("httpx." in text or "requests." in text or "aiohttp." in text)
-                        and any(m in text for m in [".get(", ".post(", ".put(", ".delete("])
-                        and "timeout=" not in text
-                    ):
-                        findings.append(
-                            ReviewFinding(
-                                path=fd.path,
-                                line=line.new_no,
-                                category=IssueCategory.ERROR_HANDLING,
-                                severity=Severity.MEDIUM,
-                                message=(
-                                    "Asynchronous HTTP invocation lacks explicit timeout (CWE-703). "
-                                    "Network partitions will cause unconstrained connection starvation."
-                                ),
-                                suggestion='    response = await client.post("https://api.partner.com/events", timeout=10.0)',
-                                confidence=0.91,
-                                standard_id="STD-ERR-02",
-                            )
-                        )
-
-                    # 4. Bare Exception (STD-ERR-01 / CWE-391)
-                    if text.strip().startswith("except:"):
-                        findings.append(
-                            ReviewFinding(
-                                path=fd.path,
-                                line=line.new_no,
-                                category=IssueCategory.ERROR_HANDLING,
-                                severity=Severity.HIGH,
-                                message=(
-                                    "Bare `except:` block silently suppresses system signals (CWE-391). "
-                                    "Catch specific exceptions or log with context."
-                                ),
-                                suggestion=(
-                                    "    except Exception as exc:\n"
-                                    '        logger.error("Operation failed: %s", exc)\n'
-                                    "        raise"
-                                ),
-                                confidence=0.93,
-                                standard_id="STD-ERR-01",
-                            )
-                        )
-    return findings
+from prism.review.rules_engine import evaluate_rules as evaluate_deterministic_rules
 
 
 def print_review_report(result: ReviewResult, repo: str, pr_identifier: str, dry_run: bool) -> None:
@@ -313,18 +203,13 @@ async def execute_review(
     )
 
     try:
-        settings = Settings()
+        settings: ReviewPipelineSettings = Settings()
     except Exception:
         raw_provider = os.getenv("LLM_PROVIDER", "anthropic")
         llm_provider: Literal["anthropic", "openai_compat"] = (
             "openai_compat" if raw_provider == "openai_compat" else "anthropic"
         )
-        settings = Settings(
-            github_app_id="cli-app",
-            github_private_key="cli-key",
-            github_webhook_secret="cli-secret",
-            database_url="postgresql://localhost/prism",
-            redis_url="redis://localhost:6379/0",
+        settings = ReviewPipelineSettings(
             anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
             llm_model=os.getenv("LLM_MODEL", "claude-3-5-sonnet-20241022"),
             llm_provider=llm_provider,

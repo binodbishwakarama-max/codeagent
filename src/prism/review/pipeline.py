@@ -10,7 +10,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from prism.config import Settings
+from prism.config import ReviewPipelineSettings, Settings
 from prism.models import FileDiff, Hunk, ReviewFinding, ReviewResult, Standard
 from prism.observability.tracing import get_current_trace
 from prism.retrieval import (
@@ -291,9 +291,65 @@ async def _review_chunk(
         return findings, usage
 
 
+async def _execute_context_retrieval(
+    pr_context: PRContext,
+    cfg: ReviewPipelineSettings,
+) -> tuple[str | None, int]:
+    """Retrieve and format relevant repository context chunks.
+
+    Returns a tuple of (formatted_context_string, candidates_count).
+    """
+    chunks_to_search: list[CodeChunk] = []
+    if pr_context.indexed_chunks:
+        chunks_to_search = [
+            c for c in pr_context.indexed_chunks if isinstance(c, CodeChunk)
+        ]
+    elif pr_context.repo_files:
+        indexer = RepositoryIndexer()
+        chunks_to_search = await indexer.index_repository(
+            repo=pr_context.repo_full_name,
+            commit_sha=pr_context.head_sha,
+            files=pr_context.repo_files,
+        )
+    else:
+        for fd in pr_context.file_diffs:
+            code_lines = [
+                line.text for h in fd.hunks for line in h.lines if line.kind != "del"
+            ]
+            if code_lines:
+                chunks_to_search.extend(
+                    chunk_source_file(fd.path, "\n".join(code_lines), fd.language)
+                )
+
+    if not chunks_to_search:
+        return None, 0
+
+    retrieved_candidates = retrieve_context(
+        file_diffs=pr_context.file_diffs,
+        chunks=chunks_to_search,
+        mode=cfg.retrieval_mode,
+        top_k=30,
+    )
+    candidate_chunks = [c for c, _score in retrieved_candidates]
+    if cfg.reranker_enabled and candidate_chunks:
+        query = build_search_query(pr_context.file_diffs)
+        scored = rerank_chunks(
+            query=query,
+            candidates=candidate_chunks,
+            top_k=cfg.retrieval_top_k,
+            model_name=cfg.reranker_model,
+        )
+    else:
+        scored = retrieved_candidates[: cfg.retrieval_top_k]
+
+    retrieved_context_str = format_retrieved_context(scored)
+    logger.info("Retrieved %d repository context chunks for review", len(scored))
+    return retrieved_context_str, len(scored)
+
+
 async def review_pr(
     pr_context: PRContext,
-    settings: Settings | None = None,
+    settings: ReviewPipelineSettings | Settings | None = None,
     llm_client: LLMClient | None = None,
     max_concurrency: int = 5,
     redis_client: Any = None,
@@ -339,94 +395,10 @@ async def review_pr(
                 span_type="retriever",
                 metadata={"mode": cfg.retrieval_mode},
             ) as ret_span:
-                chunks_to_search: list[CodeChunk] = []
-                if pr_context.indexed_chunks:
-                    chunks_to_search = [
-                        c for c in pr_context.indexed_chunks if isinstance(c, CodeChunk)
-                    ]
-                elif pr_context.repo_files:
-                    indexer = RepositoryIndexer()
-                    chunks_to_search = await indexer.index_repository(
-                        repo=pr_context.repo_full_name,
-                        commit_sha=pr_context.head_sha,
-                        files=pr_context.repo_files,
-                    )
-                else:
-                    for fd in pr_context.file_diffs:
-                        code_lines = [
-                            line.text for h in fd.hunks for line in h.lines if line.kind != "del"
-                        ]
-                        if code_lines:
-                            chunks_to_search.extend(
-                                chunk_source_file(fd.path, "\n".join(code_lines), fd.language)
-                            )
-
-                if chunks_to_search:
-                    retrieved_candidates = retrieve_context(
-                        file_diffs=pr_context.file_diffs,
-                        chunks=chunks_to_search,
-                        mode=cfg.retrieval_mode,
-                        top_k=30,
-                    )
-                    candidate_chunks = [c for c, _score in retrieved_candidates]
-                    if cfg.reranker_enabled and candidate_chunks:
-                        query = build_search_query(pr_context.file_diffs)
-                        scored = rerank_chunks(
-                            query=query,
-                            candidates=candidate_chunks,
-                            top_k=cfg.retrieval_top_k,
-                            model_name=cfg.reranker_model,
-                        )
-                    else:
-                        scored = retrieved_candidates[: cfg.retrieval_top_k]
-
-                    retrieved_context_str = format_retrieved_context(scored)
-                    ret_span.metadata["candidates_count"] = len(scored)
-                    logger.info("Retrieved %d repository context chunks for review", len(scored))
+                retrieved_context_str, count = await _execute_context_retrieval(pr_context, cfg)
+                ret_span.metadata["candidates_count"] = count
         else:
-            chunks_to_search = []
-            if pr_context.indexed_chunks:
-                chunks_to_search = [
-                    c for c in pr_context.indexed_chunks if isinstance(c, CodeChunk)
-                ]
-            elif pr_context.repo_files:
-                indexer = RepositoryIndexer()
-                chunks_to_search = await indexer.index_repository(
-                    repo=pr_context.repo_full_name,
-                    commit_sha=pr_context.head_sha,
-                    files=pr_context.repo_files,
-                )
-            else:
-                for fd in pr_context.file_diffs:
-                    code_lines = [
-                        line.text for h in fd.hunks for line in h.lines if line.kind != "del"
-                    ]
-                    if code_lines:
-                        chunks_to_search.extend(
-                            chunk_source_file(fd.path, "\n".join(code_lines), fd.language)
-                        )
-
-            if chunks_to_search:
-                retrieved_candidates = retrieve_context(
-                    file_diffs=pr_context.file_diffs,
-                    chunks=chunks_to_search,
-                    mode=cfg.retrieval_mode,
-                    top_k=30,
-                )
-                candidate_chunks = [c for c, _score in retrieved_candidates]
-                if cfg.reranker_enabled and candidate_chunks:
-                    query = build_search_query(pr_context.file_diffs)
-                    scored = rerank_chunks(
-                        query=query,
-                        candidates=candidate_chunks,
-                        top_k=cfg.retrieval_top_k,
-                        model_name=cfg.reranker_model,
-                    )
-                else:
-                    scored = retrieved_candidates[: cfg.retrieval_top_k]
-
-                retrieved_context_str = format_retrieved_context(scored)
-                logger.info("Retrieved %d repository context chunks for review", len(scored))
+            retrieved_context_str, _ = await _execute_context_retrieval(pr_context, cfg)
 
     # 2. Chunk diffs
     chunks = chunk_diffs(pr_context.file_diffs, max_tokens=cfg.max_diff_tokens)
@@ -459,6 +431,20 @@ async def review_pr(
     total_input_tokens = 0
     total_output_tokens = 0
     total_cost = 0.0
+
+    # Deterministic rules fast-pass (pre-LLM evaluation)
+    if getattr(cfg, "deterministic_rules_enabled", False):
+        from prism.review.rules_engine import evaluate_rules
+
+        det_findings = evaluate_rules(pr_context.file_diffs)
+        if det_findings:
+            logger.info(
+                "Deterministic rules fast-pass identified %d finding(s) for %s#%d",
+                len(det_findings),
+                pr_context.repo_full_name,
+                pr_context.pr_number,
+            )
+            all_raw_findings.extend(det_findings)
 
     for findings, usage in results:
         all_raw_findings.extend(findings)

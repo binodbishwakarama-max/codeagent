@@ -127,9 +127,25 @@ def parse_unified_diff(
     if not raw_diff or not raw_diff.strip():
         return []
 
+    # Synthesize diff --git header if standard unified diff markers exist without git header
+    clean_diff = raw_diff
+    if "diff --git " not in clean_diff:
+        if re.search(r"^--- [ab]/(.+?)$", clean_diff, flags=re.MULTILINE):
+            def _replace_header(m: re.Match[str]) -> str:
+                p = m.group(1).strip()
+                return f"diff --git a/{p} b/{p}\n--- a/{p}"
+
+            clean_diff = re.sub(r"^--- [ab]/(.+?)$", _replace_header, clean_diff, flags=re.MULTILINE)
+        elif re.search(r"^\+\+\+ [ab]/(.+?)$", clean_diff, flags=re.MULTILINE):
+            def _replace_header_plus(m: re.Match[str]) -> str:
+                p = m.group(1).strip()
+                return f"diff --git a/{p} b/{p}\n+++ b/{p}"
+
+            clean_diff = re.sub(r"^\+\+\+ [ab]/(.+?)$", _replace_header_plus, clean_diff, flags=re.MULTILINE)
+
     file_diffs: list[FileDiff] = []
     # Split diff by file chunks starting with "diff --git"
-    raw_files = re.split(r"(?=^diff --git )", raw_diff, flags=re.MULTILINE)
+    raw_files = re.split(r"(?=^diff --git )", clean_diff, flags=re.MULTILINE)
 
     for chunk in raw_files:
         chunk = chunk.strip()

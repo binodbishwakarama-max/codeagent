@@ -9,9 +9,9 @@ from fastapi.testclient import TestClient
 from evals.dataset.schema import GoldFinding, PRExample
 from evals.harness.config import PipelineConfig
 from evals.harness.runner import run_pipeline_on_example
-from prism.config import Settings
+from prism.config import ReviewPipelineSettings, Settings
 from prism.models import DiffLine, FileDiff, Hunk
-from prism.review.llm import OpenAICompatClient
+from prism.review.llm import OpenAICompatClient, create_llm_client
 from prism.review.pipeline import PRContext, review_pr
 from prism.review.prompts import ChunkReviewResponse
 from training.serve import create_mock_app
@@ -173,3 +173,110 @@ async def test_eval_harness_against_openai_compat_endpoint(monkeypatch: pytest.M
     assert review_res is not None
     assert review_res.model == "Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review"
     assert review_res.input_tokens > 0
+
+
+def test_create_llm_client_with_review_pipeline_settings() -> None:
+    """Verify create_llm_client creates OpenAICompatClient from ReviewPipelineSettings."""
+    settings = ReviewPipelineSettings(
+        llm_base_url="http://vllm-host:8000/v1",
+        llm_model="Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review",
+    )
+    client = create_llm_client(settings)
+    assert isinstance(client, OpenAICompatClient)
+    assert client.base_url == "http://vllm-host:8000/v1"
+    assert client.model == "Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review"
+
+    # Also test provider-based configuration without base_url
+    compat_settings = ReviewPipelineSettings(
+        llm_provider="openai_compat",
+        llm_model="custom-coder",
+    )
+    compat_client = create_llm_client(compat_settings)
+    assert isinstance(compat_client, OpenAICompatClient)
+    assert compat_client.base_url == "http://localhost:8000/v1"
+    assert compat_client.model == "custom-coder"
+
+
+@pytest.mark.asyncio
+async def test_readyz_probes_external_vllm_healthy(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify /readyz endpoint successfully probes healthy external vLLM instance."""
+    from unittest.mock import AsyncMock, MagicMock
+    import json
+    from prism.api import readiness_check
+
+    app = create_mock_app(model_name="Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review")
+    orig_client = httpx.AsyncClient
+
+    def _mock_async_client(*args: object, **kwargs: object) -> httpx.AsyncClient:
+        return orig_client(transport=httpx.ASGITransport(app=app))
+
+    monkeypatch.setattr(httpx, "AsyncClient", _mock_async_client)
+
+    # Mock settings with base_url
+    mock_settings = Settings(
+        github_app_id="app",
+        github_private_key="key",
+        github_webhook_secret="sec",
+        database_url="sqlite+aiosqlite:///:memory:",
+        redis_url="redis://localhost:6379/0",
+        llm_base_url="http://testserver/v1",
+        llm_provider="openai_compat",
+    )
+    monkeypatch.setattr("prism.api._get_settings", lambda: mock_settings)
+
+    # Mock DB engine connection
+    mock_conn = AsyncMock()
+    mock_conn.__aenter__.return_value = mock_conn
+    mock_engine = MagicMock()
+    mock_engine.connect.return_value = mock_conn
+    monkeypatch.setattr("prism.db.get_async_engine", lambda url: mock_engine)
+
+    # Mock Redis client
+    mock_redis = AsyncMock()
+    monkeypatch.setattr("prism.api._redis_client", mock_redis)
+
+    res = await readiness_check()
+    assert res.status_code == 200
+    body = json.loads(res.body.decode("utf-8"))
+    assert body["status"] == "ready"
+    assert body["database"] == "ok"
+    assert body["redis"] == "ok"
+    assert body["llm"] == "ok"
+
+
+@pytest.mark.asyncio
+async def test_readyz_reports_unhealthy_vllm(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify /readyz returns 503 if configured external vLLM is unreachable."""
+    from unittest.mock import AsyncMock, MagicMock
+    import json
+    from prism.api import readiness_check
+
+    mock_settings = Settings(
+        github_app_id="app",
+        github_private_key="key",
+        github_webhook_secret="sec",
+        database_url="sqlite+aiosqlite:///:memory:",
+        redis_url="redis://localhost:6379/0",
+        llm_base_url="http://unreachable-host:9999/v1",
+    )
+    monkeypatch.setattr("prism.api._get_settings", lambda: mock_settings)
+
+    mock_conn = AsyncMock()
+    mock_conn.__aenter__.return_value = mock_conn
+    mock_engine = MagicMock()
+    mock_engine.connect.return_value = mock_conn
+    monkeypatch.setattr("prism.db.get_async_engine", lambda url: mock_engine)
+    monkeypatch.setattr("prism.api._redis_client", AsyncMock())
+
+    # We do NOT intercept httpx here, or we force it to raise ConnectError
+    async def _failing_get(*args: object, **kwargs: object):
+        raise httpx.ConnectError("Connection refused")
+
+    monkeypatch.setattr(httpx.AsyncClient, "get", _failing_get)
+
+    res = await readiness_check()
+    assert res.status_code == 503
+    body = json.loads(res.body.decode("utf-8"))
+    assert body["status"] == "not_ready"
+    assert "unhealthy" in body["llm"]
+

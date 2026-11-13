@@ -3,14 +3,15 @@
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import Field, field_validator
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
-    """Runtime configuration schema for Prism Review.
+class ReviewPipelineSettings(BaseSettings):
+    """Configuration schema for PR review pipelines, inference, and benchmarks.
 
-    Fails fast at startup if critical credentials or connection strings are missing.
+    Enables standalone CLI, GitHub Actions, and evaluation harnesses to run
+    without requiring server infrastructure (database, Redis, or GitHub App secrets).
     """
 
     model_config = SettingsConfigDict(
@@ -18,30 +19,6 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
-    )
-
-    # GitHub App Credentials
-    github_app_id: str = Field(
-        default="",
-        description="GitHub App ID",
-    )
-    github_private_key: str = Field(
-        default="",
-        description="GitHub App private key PEM string or filesystem path to .pem file",
-    )
-    github_webhook_secret: str = Field(
-        default="",
-        description="Secret token used to verify incoming GitHub webhook signatures",
-    )
-
-    # Database & Cache
-    database_url: str = Field(
-        default="",
-        description="PostgreSQL connection string with pgvector support",
-    )
-    redis_url: str = Field(
-        default="",
-        description="Redis connection string for arq job queue",
     )
 
     # LLM Settings
@@ -67,20 +44,6 @@ class Settings(BaseSettings):
         description="Timeout deadline in seconds for LLM invocations",
     )
 
-    # Langfuse Observability
-    langfuse_public_key: str | None = Field(
-        default=None,
-        description="Langfuse public API key",
-    )
-    langfuse_secret_key: str | None = Field(
-        default=None,
-        description="Langfuse secret API key",
-    )
-    langfuse_host: str = Field(
-        default="https://cloud.langfuse.com",
-        description="Langfuse server host endpoint",
-    )
-
     # Review Pipeline Thresholds
     max_diff_tokens: int = Field(
         default=8000,
@@ -97,21 +60,6 @@ class Settings(BaseSettings):
         ge=0.0,
         le=1.0,
         description="Minimum confidence score required to post an inline finding",
-    )
-
-    # Safety & Operational Controls
-    blocked_installations: Any = Field(
-        default_factory=lambda: [],
-        description="List of GitHub App installation IDs blocked by per-installation kill switch",
-    )
-    daily_cost_budget_usd: float = Field(
-        default=10.0,
-        ge=0.0,
-        description="Maximum USD cost budget allowed per UTC day across all LLM reviews",
-    )
-    budget_enforced: bool = Field(
-        default=True,
-        description="Whether to enforce the daily cost budget cap and disable reviews when exceeded",
     )
 
     # Retrieval & Context Augmentation
@@ -156,12 +104,18 @@ class Settings(BaseSettings):
         description="Prompt template variant to utilize",
     )
 
+    # Deterministic Rules Fast-Pass
+    deterministic_rules_enabled: bool = Field(
+        default=False,
+        description="Whether to run deterministic static rules fast-pass before LLM inference",
+    )
+
     @property
     def retrieval(self) -> Any:
         """Namespace proxy supporting settings.retrieval.enabled access."""
 
         class _RetrievalProxy:
-            def __init__(self, s: "Settings") -> None:
+            def __init__(self, s: "ReviewPipelineSettings") -> None:
                 self.enabled = s.retrieval_enabled
                 self.mode = s.retrieval_mode
                 self.top_k = s.retrieval_top_k
@@ -176,11 +130,77 @@ class Settings(BaseSettings):
         """Namespace proxy supporting settings.self_verification.enabled access."""
 
         class _VerifyProxy:
-            def __init__(self, s: "Settings") -> None:
+            def __init__(self, s: "ReviewPipelineSettings") -> None:
                 self.enabled = s.self_verification_enabled
                 self.model = s.self_verification_model
 
         return _VerifyProxy(self)
+
+
+class Settings(ReviewPipelineSettings):
+    """Runtime configuration schema for Prism Review GitHub App & Webhook Server.
+
+    Fails fast at server startup if critical credentials or connection strings are missing.
+    """
+
+    # GitHub App Credentials
+    github_app_id: str = Field(
+        default="",
+        description="GitHub App ID",
+    )
+    github_private_key: str = Field(
+        default="",
+        validation_alias=AliasChoices(
+            "github_private_key",
+            "github_private_key_path",
+            "GITHUB_PRIVATE_KEY",
+            "GITHUB_PRIVATE_KEY_PATH",
+        ),
+        description="GitHub App private key PEM string or filesystem path to .pem file",
+    )
+    github_webhook_secret: str = Field(
+        default="",
+        description="Secret token used to verify incoming GitHub webhook signatures",
+    )
+
+    # Database & Cache
+    database_url: str = Field(
+        default="",
+        description="PostgreSQL connection string with pgvector support",
+    )
+    redis_url: str = Field(
+        default="",
+        description="Redis connection string for arq job queue",
+    )
+
+    # Langfuse Observability
+    langfuse_public_key: str | None = Field(
+        default=None,
+        description="Langfuse public API key",
+    )
+    langfuse_secret_key: str | None = Field(
+        default=None,
+        description="Langfuse secret API key",
+    )
+    langfuse_host: str = Field(
+        default="https://cloud.langfuse.com",
+        description="Langfuse server host endpoint",
+    )
+
+    # Safety & Operational Controls
+    blocked_installations: Any = Field(
+        default_factory=lambda: [],
+        description="List of GitHub App installation IDs blocked by per-installation kill switch",
+    )
+    daily_cost_budget_usd: float = Field(
+        default=10.0,
+        ge=0.0,
+        description="Maximum USD cost budget allowed per UTC day across all LLM reviews",
+    )
+    budget_enforced: bool = Field(
+        default=True,
+        description="Whether to enforce the daily cost budget cap and disable reviews when exceeded",
+    )
 
     @field_validator("blocked_installations", mode="after")
     @classmethod
@@ -218,10 +238,18 @@ class Settings(BaseSettings):
         Reads from disk if `github_private_key` points to an existing file,
         otherwise returns the raw key content.
         """
-        key_path = Path(self.github_private_key)
-        if key_path.is_file():
-            return key_path.read_text(encoding="utf-8").strip()
+        if not self.github_private_key:
+            return ""
+        try:
+            key_path = Path(self.github_private_key).expanduser()
+            if key_path.is_file():
+                return key_path.read_text(encoding="utf-8").strip()
+        except (OSError, ValueError):
+            pass
         return self.github_private_key
+
+
+ServerSettings = Settings
 
 
 # ---------------------------------------------------------------------------

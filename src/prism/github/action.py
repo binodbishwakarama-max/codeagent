@@ -19,16 +19,16 @@ import sys
 import time
 from typing import Any, Literal
 
-from prism.config import Settings
+from prism.config import ReviewPipelineSettings, Settings
 from prism.github.client import GitHubClient
 from prism.github.comments import post_pull_request_review
 from prism.github.diff import parse_unified_diff
 from prism.models import ReviewFinding, ReviewResult, Severity
 from prism.review.cli import (
-    evaluate_deterministic_rules,
     get_local_git_diff,
     get_local_git_diff_against_base,
 )
+from prism.review.rules_engine import evaluate_rules as evaluate_deterministic_rules
 from prism.review.llm import create_llm_client
 from prism.review.pipeline import PRContext, review_pr
 from prism.review.standards import load_default_standards, parse_repo_standards
@@ -267,12 +267,7 @@ async def run_action() -> int:
     else:
         provider = "openai_compat" if raw_provider == "openai_compat" else "anthropic"
 
-    settings = Settings(
-        github_app_id="github-action",
-        github_private_key="action-key",
-        github_webhook_secret="action-secret",
-        database_url="postgresql+asyncpg://prism:prism@localhost:5432/prism",
-        redis_url="redis://localhost:6379/0",
+    settings = ReviewPipelineSettings(
         anthropic_api_key=anthropic_key,
         llm_model=llm_model,
         llm_provider=provider,

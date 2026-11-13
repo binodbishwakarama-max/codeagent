@@ -1,6 +1,64 @@
 version: "3.8"
 
 services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prism-web
+    command: ["web"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - GITHUB_APP_ID=${GITHUB_APP_ID:-prism-dev-app}
+      - GITHUB_PRIVATE_KEY=${GITHUB_PRIVATE_KEY:-default-key}
+      - GITHUB_PRIVATE_KEY_PATH=${GITHUB_PRIVATE_KEY_PATH:-}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET:-default-secret}
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-prism}:${POSTGRES_PASSWORD:-prism}@postgres:5432/${POSTGRES_DB:-prism}
+      - REDIS_URL=redis://redis:6379/0
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
+      - LLM_MODEL=${LLM_MODEL:-claude-3-5-sonnet-20241022}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+      - LANGFUSE_HOST=http://langfuse:3000
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prism-worker
+    command: ["worker"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - GITHUB_APP_ID=${GITHUB_APP_ID:-prism-dev-app}
+      - GITHUB_PRIVATE_KEY=${GITHUB_PRIVATE_KEY:-default-key}
+      - GITHUB_PRIVATE_KEY_PATH=${GITHUB_PRIVATE_KEY_PATH:-}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET:-default-secret}
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-prism}:${POSTGRES_PASSWORD:-prism}@postgres:5432/${POSTGRES_DB:-prism}
+      - REDIS_URL=redis://redis:6379/0
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
+      - LLM_MODEL=${LLM_MODEL:-claude-3-5-sonnet-20241022}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+      - LANGFUSE_HOST=http://langfuse:3000
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
+
   postgres:
     image: pgvector/pgvector:pg16
     container_name: prism-postgres

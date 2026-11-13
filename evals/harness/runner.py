@@ -37,90 +37,33 @@ from evals.harness.metrics import (
     compute_pr_metrics,
 )
 from evals.harness.report import generate_run_report
+from prism.github.diff import parse_unified_diff as _prism_parse_unified_diff
 from prism.models import DiffLine, FileDiff, Hunk, ReviewFinding, ReviewResult
 
 logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Diff Parsing (unified diff string → FileDiff objects)
+# Diff Parsing
 # ---------------------------------------------------------------------------
 
 
 def parse_unified_diff(diff_text: str, language: str = "python") -> list[FileDiff]:
     """Parse a unified diff string into structured FileDiff objects.
 
-    Allows the evaluation harness to feed diffs directly through the review
-    pipeline without making any external GitHub API calls.
+    Wraps the canonical prism.github.diff.parse_unified_diff parser.
     """
-    file_diffs: list[FileDiff] = []
-    current_path = ""
-    current_hunks: list[Hunk] = []
-    current_lines: list[DiffLine] = []
-    old_start = 0
-    new_start = 0
-    old_line = 0
-    new_line = 0
-
-    for raw_line in diff_text.split("\n"):
-        if raw_line.startswith("+++ b/"):
-            # Flush previous file
-            if current_path:
-                if current_lines:
-                    current_hunks.append(
-                        Hunk(old_start=old_start, new_start=new_start, lines=current_lines)
-                    )
-                file_diffs.append(
-                    FileDiff(path=current_path, language=language, hunks=current_hunks)
-                )
-            current_path = raw_line[6:].strip()
-            current_hunks = []
-            current_lines = []
-        elif raw_line.startswith("--- a/"):
-            continue
-        elif raw_line.startswith("@@ "):
-            # Flush previous hunk
-            if current_lines:
-                current_hunks.append(
-                    Hunk(old_start=old_start, new_start=new_start, lines=current_lines)
-                )
-                current_lines = []
-
-            # Parse @@ -old_start,old_len +new_start,new_len @@
-            import re
-
-            match = re.search(r"-(\d+)(?:,\d+)?\s+\+(\d+)(?:,\d+)?", raw_line)
-            if match:
-                old_start = int(match.group(1))
-                new_start = int(match.group(2))
-                old_line = old_start
-                new_line = new_start
-        elif raw_line.startswith("+"):
-            current_lines.append(
-                DiffLine(kind="add", old_no=None, new_no=new_line, text=raw_line[1:])
+    diffs = _prism_parse_unified_diff(diff_text)
+    if language:
+        return [
+            FileDiff(
+                path=d.path,
+                language=d.language if d.language != "text" else language,
+                hunks=d.hunks,
             )
-            new_line += 1
-        elif raw_line.startswith("-"):
-            current_lines.append(
-                DiffLine(kind="del", old_no=old_line, new_no=None, text=raw_line[1:])
-            )
-            old_line += 1
-        else:
-            # Context line
-            text = raw_line[1:] if raw_line.startswith(" ") else raw_line
-            current_lines.append(DiffLine(kind="ctx", old_no=old_line, new_no=new_line, text=text))
-            old_line += 1
-            new_line += 1
-
-    # Flush final file
-    if current_path:
-        if current_lines:
-            current_hunks.append(
-                Hunk(old_start=old_start, new_start=new_start, lines=current_lines)
-            )
-        file_diffs.append(FileDiff(path=current_path, language=language, hunks=current_hunks))
-
-    return file_diffs
+            for d in diffs
+        ]
+    return diffs
 
 
 # ---------------------------------------------------------------------------

@@ -226,7 +226,12 @@ async def run_simulation() -> None:
 
     import prism.api
 
+    class MockArqPool:
+        async def enqueue_job(self, *args: Any, **kwargs: Any) -> str:
+            return "sim-job-123"
+
     prism.api._redis_client = MockRedis()
+    prism.api._arq_pool = MockArqPool()
     prism.api._settings = Settings()
 
     transport = httpx.ASGITransport(app=app)

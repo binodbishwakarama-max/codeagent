@@ -1,6 +1,19 @@
 # ==============================================================================
 # Fly.io Production Configuration for Prism Review
 # Multi-process architecture: Web API (FastAPI) + Background Worker (ARQ)
+#
+# Topology Note:
+# Fly.io machines run strictly CPU workloads (API gateway & background workers).
+# Model inference is decoupled to an external GPU inference server (e.g., RunPod,
+# Modal, AWS EC2 G5, or Lambda Labs) running vLLM with AWQ 4-bit or 16-bit BF16.
+#
+# Configure connection to remote GPU vLLM cluster:
+#   fly secrets set LLM_PROVIDER="openai_compat"
+#   fly secrets set LLM_BASE_URL="https://<gpu-endpoint>/v1"
+#   fly secrets set LLM_MODEL="Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review"
+#
+# Or configure cloud provider fallback:
+#   fly secrets set ANTHROPIC_API_KEY="sk-ant-..."
 # ==============================================================================
 
 app = "prism-review"
@@ -23,6 +36,9 @@ kill_timeout = "30s"
   BUDGET_ENFORCED = "true"
   RETRIEVAL_ENABLED = "true"
   RETRIEVAL_MODE = "hybrid"
+  # Default LLM configuration (can be overridden via fly secrets)
+  LLM_PROVIDER = "anthropic"
+  LLM_MODEL = "claude-3-5-sonnet-20241022"
 
 [http_service]
   processes = ["web"]

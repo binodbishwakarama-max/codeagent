@@ -1,0 +1,84 @@
+version: "3.8"
+
+# ==============================================================================
+# Docker Compose GPU Serving Overlay for Prism Review
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f ops/serving/docker-compose.gpu.yml up -d
+#
+# Requirements:
+#   - NVIDIA GPU with >= 8GB VRAM (for AWQ 4-bit) or >= 18GB VRAM (for 16-bit BF16)
+#   - NVIDIA Container Toolkit installed (nvidia-docker2)
+# ==============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # vLLM High-Throughput OpenAI-Compatible Inference Server
+  # ---------------------------------------------------------------------------
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: prism-vllm
+    restart: unless-stopped
+    ports:
+      - "${VLLM_HOST_PORT:-8001}:8000"
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN:-}
+      - MODEL_NAME=${VLLM_MODEL_NAME:-Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review}
+      - NCCL_DEBUG=WARN
+    volumes:
+      - ${PRISM_MODEL_DIR:-./models/qwen2.5-coder-7b-prism/merged_16bit}:/model:ro
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    command: >
+      serve /model
+      --host 0.0.0.0
+      --port 8000
+      --max-model-len 8192
+      --gpu-memory-utilization 0.90
+      --trust-remote-code
+      ${VLLM_EXTRA_ARGS:-}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+  # ---------------------------------------------------------------------------
+  # Override Web API to wire to local vLLM container
+  # ---------------------------------------------------------------------------
+  web:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      vllm:
+        condition: service_healthy
+    environment:
+      - LLM_PROVIDER=openai_compat
+      - LLM_MODEL=${VLLM_MODEL_NAME:-Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review}
+      - LLM_BASE_URL=http://vllm:8000/v1
+
+  # ---------------------------------------------------------------------------
+  # Override ARQ Worker to wire to local vLLM container
+  # ---------------------------------------------------------------------------
+  worker:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      vllm:
+        condition: service_healthy
+    environment:
+      - LLM_PROVIDER=openai_compat
+      - LLM_MODEL=${VLLM_MODEL_NAME:-Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review}
+      - LLM_BASE_URL=http://vllm:8000/v1
+
