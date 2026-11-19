@@ -200,8 +200,9 @@ def test_create_llm_client_with_review_pipeline_settings() -> None:
 @pytest.mark.asyncio
 async def test_readyz_probes_external_vllm_healthy(monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify /readyz endpoint successfully probes healthy external vLLM instance."""
-    from unittest.mock import AsyncMock, MagicMock
     import json
+    from unittest.mock import AsyncMock, MagicMock
+
     from prism.api import readiness_check
 
     app = create_mock_app(model_name="Qwen/Qwen2.5-Coder-7B-Instruct-Prism-Review")
@@ -247,8 +248,9 @@ async def test_readyz_probes_external_vllm_healthy(monkeypatch: pytest.MonkeyPat
 @pytest.mark.asyncio
 async def test_readyz_reports_unhealthy_vllm(monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify /readyz returns 503 if configured external vLLM is unreachable."""
-    from unittest.mock import AsyncMock, MagicMock
     import json
+    from unittest.mock import AsyncMock, MagicMock
+
     from prism.api import readiness_check
 
     mock_settings = Settings(

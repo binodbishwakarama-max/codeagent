@@ -19,7 +19,7 @@ import sys
 import time
 from typing import Any, Literal
 
-from prism.config import ReviewPipelineSettings, Settings
+from prism.config import ReviewPipelineSettings
 from prism.github.client import GitHubClient
 from prism.github.comments import post_pull_request_review
 from prism.github.diff import parse_unified_diff
@@ -28,9 +28,9 @@ from prism.review.cli import (
     get_local_git_diff,
     get_local_git_diff_against_base,
 )
-from prism.review.rules_engine import evaluate_rules as evaluate_deterministic_rules
 from prism.review.llm import create_llm_client
 from prism.review.pipeline import PRContext, review_pr
+from prism.review.rules_engine import evaluate_rules as evaluate_deterministic_rules
 from prism.review.standards import load_default_standards, parse_repo_standards
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -69,7 +69,12 @@ def append_github_step_summary(markdown_content: str) -> None:
 
 def emit_workflow_annotation(finding: ReviewFinding) -> None:
     """Emit standard GitHub Workflow Commands to annotate pull request diffs."""
-    command = "error" if finding.severity == Severity.HIGH else "warning"
+    if finding.severity == Severity.HIGH:
+        command = "error"
+    elif finding.severity == Severity.MEDIUM:
+        command = "warning"
+    else:
+        command = "notice"
     title = finding.standard_id or finding.category.value
     msg = finding.message.replace("\n", "%0A")
     # GitHub Workflow Command Syntax: ::warning file={name},line={line},title={title}::{message}
@@ -95,10 +100,10 @@ def generate_action_summary_markdown(
     if not result.findings:
         lines.extend(
             [
-                "> ### ✅ All Standards Passed (Trained Silence Guarantee)",
+                "> ### ✅ All Standards Passed (False-Positive Suppression)",
                 "> ",
                 "> Prism evaluated this pull request against repository standards and found zero defects. ",
-                "> Negative SFT trained silence guarantees zero unsolicited spam on clean code.",
+                "> Negative SFT training significantly suppresses unsolicited comments on clean code.",
                 "",
                 "| Check | Status | Verification |",
                 "| :--- | :---: | :--- |",
@@ -118,11 +123,12 @@ def generate_action_summary_markdown(
             ]
         )
         for f in result.findings:
-            sev_badge = (
-                f"🔴 `{f.severity.value}`"
-                if f.severity == Severity.HIGH
-                else f"🟡 `{f.severity.value}`"
-            )
+            if f.severity == Severity.HIGH:
+                sev_badge = f"🔴 `{f.severity.value}`"
+            elif f.severity == Severity.MEDIUM:
+                sev_badge = f"🟡 `{f.severity.value}`"
+            else:
+                sev_badge = f"🔵 `{f.severity.value}`"
             rule = f"`{f.standard_id}`" if f.standard_id else "—"
             loc = f"[`{f.path}:{f.line}`](https://github.com/{repo}/pull/{pr_number}/files#diff-L{f.line})"
             # Escaping pipe in markdown table
@@ -300,8 +306,8 @@ async def run_action() -> int:
                 findings=findings,
                 model="deterministic-standards-v1",
                 prompt_version="rules-engine",
-                input_tokens=len(raw_diff) // 3,
-                output_tokens=len(findings) * 50,
+                input_tokens=0,
+                output_tokens=0,
                 latency_ms=elapsed,
                 cost_usd=0.0,
             )
@@ -313,8 +319,8 @@ async def run_action() -> int:
             findings=findings,
             model="deterministic-standards-v1",
             prompt_version="rules-engine",
-            input_tokens=len(raw_diff) // 3,
-            output_tokens=len(findings) * 50,
+            input_tokens=0,
+            output_tokens=0,
             latency_ms=elapsed,
             cost_usd=0.0,
         )

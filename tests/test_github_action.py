@@ -55,7 +55,7 @@ def test_generate_action_summary_markdown_clean() -> None:
         cost_usd=0.0,
     )
     md = generate_action_summary_markdown("owner/repo", 42, result, files_count=1)
-    assert "All Standards Passed (Trained Silence Guarantee)" in md
+    assert "All Standards Passed (False-Positive Suppression)" in md
     assert "STD-SEC-01" in md
     assert "owner/repo" in md
     assert "#42" in md

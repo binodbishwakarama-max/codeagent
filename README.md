@@ -34,7 +34,7 @@
 
 > **Prism Review** is a production-grade GitHub App that autonomously reviews pull requests against explicit engineering standards (`.prism/standards.yml`), verified by an empirical evaluation benchmark on frozen open-source repositories.
 >
-> By fine-tuning **Qwen2.5-Coder-7B-Instruct** with QLoRA on multi-file diffs and explicitly training the model to remain silent on clean code, Prism captures **96.8% of Claude 3.5 Sonnet's F1 score** (`0.9304` vs `0.9613`) at **37.1× lower cost** ($0.00036 vs $0.01334 per PR) with **40.5 ms** $p50$ latency, posting high-signal inline comments with interactive one-click commit suggestions.
+> By fine-tuning **Qwen2.5-Coder-7B-Instruct** with QLoRA on multi-file diffs and explicitly training the model to remain silent on clean code, Prism captures **96.8% of Claude 3.5 Sonnet's F1 score** (`0.9304` vs `0.9613`) at **37.1× lower token cost** ($0.00036 vs $0.01334 per PR, token-only; excludes GPU infrastructure) with **40.5 ms** $p50$ latency, posting high-signal inline comments with interactive one-click commit suggestions.
 
 ---
 
@@ -45,8 +45,8 @@
 | Metric | Result | Benchmark Context |
 |:---|:---:|:---|
 | **Review F1 Score** | **`0.9304`** | `96.8%` of Claude 3.5 Sonnet (`0.9613`) on frozen test split |
-| **Serving Cost per Review** | **`$0.00036`** | **`37.1×` cheaper** than Claude 3.5 Sonnet ($0.01334/PR) |
-| **Monthly Spend (10k PRs)** | **`$3.60`** | Compared to `$133.40` for Frontier API at 50% GPU utilization |
+| **Serving Cost per Review** | **`$0.00036`** | **`37.1×` cheaper** than Claude 3.5 Sonnet ($0.01334/PR) token-only; excludes GPU compute |
+| **Monthly Spend (10k PRs)** | **`$3.60`** | Token-only cost. Compared to `$133.40` for Frontier API. Add GPU hosting (~$1/hr A10G). |
 | **Clean-PR False Positive Rate** | **`0.2353`** | **`68.0%` noise reduction** vs. Base Qwen-7B (`0.7353`) |
 | **Serving Latency (vLLM)** | **`40.5 ms`** | `6.2×` faster than Frontier API roundtrip (251.5 ms) |
 | **Memory Footprint (AWQ 4-bit)** | **`5.8 GB`** | Fits on commodity 24GB GPUs (NVIDIA A10G / RTX 4090) |
@@ -141,7 +141,7 @@ flowchart TD
 
 We evaluated all candidate models under **identical conditions** across a leak-free frozen test split of **120 PRs** (`trpc/trpc` and `vitejs/vite`) using the `MultiMatcher` ($\pm 3$ line tolerance, semantic cosine similarity $\ge 0.82$, $B=1,000$ paired bootstrap iterations):
 
-| Model / Candidate | Precision (95% CI) | Recall (95% CI) | F1 Score (95% CI) | Clean-PR FPR | Latency p50 | Cost / Review | Spend (10k PRs) |
+| Model / Candidate | Precision (95% CI) | Recall (95% CI) | F1 Score (95% CI) | Clean-PR FPR | Latency p50 | Token Cost / Review | Token Spend (10k PRs) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Frontier API (Claude 3.5 Sonnet)** | `0.9675` [0.938, 0.993] | `0.9551` [0.920, 0.985] | **`0.9613`** [0.939, 0.982] | `0.0588` | 251.5 ms | **$0.01334** | $133.40 |
 | **Mid-Size API (Claude 3.5 Haiku)** | `0.9062` [0.858, 0.947] | `0.9295` [0.891, 0.964] | **`0.9177`** [0.887, 0.945] | `0.1765` | 110.1 ms | **$0.00335** | $33.50 |
@@ -355,7 +355,7 @@ An empirical AI engineering benchmark requires honesty about failure modes. Base
 1. **Cross-File Caller Invariants (37.5% of False Positives)**: When inspecting diff hunks in isolation, Prism may flag an unvalidated variable, unaware that sanitization occurred in an upstream controller outside the diff. *(Target: Whole-repo SCIP symbol graph indexing).*
 2. **Intentional Pragmatic Violations (25.0% of False Positives)**: One-off migrations, mock fixtures, or seed scripts often intentionally bypass strict rules (e.g. raw SQL queries in tests). *(Mitigation: Configure `file_patterns` exclusions in `.prism/standards.yml`).*
 3. **Silent Semantic Inversions (35.0% of False Negatives)**: Subtle business logic flips (e.g. swapping `<=` to `<` in bounds checking) that preserve clean syntax can elude models unless accompanied by an explicit standard.
-4. **Hardware-Specific Serving Figures**: The reported **40.5 ms** $p50$ latency and **$3.60 / 10k PRs** cost reflect our benchmark configuration on a dedicated NVIDIA A10G (24GB) via vLLM AWQ 4-bit at 50% amortized GPU utilization, not universal multi-tenant SaaS pricing.
+4. **Hardware-Specific Serving Figures**: The reported **40.5 ms** $p50$ latency and **\$3.60 / 10k PRs** cost reflect **token-only** costs at our benchmark configuration on a dedicated NVIDIA A10G (24GB) via vLLM AWQ 4-bit at 50% amortized GPU utilization. GPU infrastructure costs (e.g. ~\$1.00–\$1.50/hr for an AWS `g5.xlarge` A10G instance) are not included in the per-review cost and must be budgeted separately. The 37.1× cost reduction applies strictly to token expenditure, not total cost of ownership.
 
 ---
 

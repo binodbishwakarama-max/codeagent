@@ -57,10 +57,11 @@ async def _execute_with_retry(
 ) -> httpx.Response:
     """Execute async HTTP request with exponential backoff and jitter for 429/5xx."""
     last_exc: Exception | None = None
+    response: httpx.Response | None = None
 
     for attempt in range(max_retries):
         try:
-            response: httpx.Response = await request_fn()
+            response = await request_fn()
             # Retry on rate limits or server errors
             if response.status_code == 429 or response.status_code >= 500:
                 delay = min(initial_delay * (2**attempt) + random.uniform(0.0, 0.5), max_delay)
@@ -88,7 +89,13 @@ async def _execute_with_retry(
 
     if last_exc is not None:
         raise last_exc
-    raise httpx.HTTPStatusError("Exceeded max retries", request=None, response=response)  # type: ignore[arg-type]
+    if response is not None:
+        raise httpx.HTTPStatusError(
+            f"Exceeded max retries (last status: {response.status_code})",
+            request=response.request,
+            response=response,
+        )
+    raise RuntimeError("Exceeded max retries with no response received")
 
 
 # ---------------------------------------------------------------------------
@@ -97,7 +104,7 @@ async def _execute_with_retry(
 
 
 class AnthropicClient:
-    """Client for Anthropic Claude models using tool use for guaranteed structured output."""
+    """Client for Anthropic Claude models using tool use for structured output."""
 
     def __init__(
         self,
@@ -144,10 +151,14 @@ class AnthropicClient:
         }
 
         async with trace_llm_call(f"anthropic:{self.model}", model=self.model) as span:
-            async with httpx.AsyncClient(timeout=deadline) as client:
-                response = await _execute_with_retry(
-                    lambda: client.post(self.base_url, headers=headers, json=payload)
-                )
+            async with httpx.AsyncClient(timeout=deadline) as http_client:
+
+                async def _do_request() -> httpx.Response:
+                    return await http_client.post(
+                        self.base_url, headers=headers, json=payload
+                    )
+
+                response = await _execute_with_retry(_do_request)
                 response.raise_for_status()
                 data = response.json()
 
@@ -238,10 +249,14 @@ class OpenAICompatClient:
         }
 
         async with trace_llm_call(f"openai_compat:{self.model}", model=self.model) as span:
-            async with httpx.AsyncClient(timeout=deadline) as client:
-                response = await _execute_with_retry(
-                    lambda: client.post(url, headers=headers, json=payload)
-                )
+            async with httpx.AsyncClient(timeout=deadline) as http_client:
+
+                async def _do_request() -> httpx.Response:
+                    return await http_client.post(
+                        url, headers=headers, json=payload
+                    )
+
+                response = await _execute_with_retry(_do_request)
                 response.raise_for_status()
                 data = response.json()
 
@@ -319,8 +334,8 @@ class FakeLLMClient:
         self.call_count += 1
 
         if not self.responses:
-            # Return empty schema instance by default
-            return schema(), LLMUsage(
+            # Return default-constructed schema instance (bypasses validation for required fields)
+            return schema.model_construct(), LLMUsage(
                 input_tokens=100,
                 output_tokens=50,
                 cost_usd=0.0,
@@ -358,7 +373,7 @@ def create_llm_client(settings: ReviewPipelineSettings | Settings) -> LLMClient:
     if settings.llm_base_url or settings.llm_provider == "openai_compat":
         return OpenAICompatClient(
             base_url=settings.llm_base_url,
-            api_key=None,
+            api_key=getattr(settings, "openai_api_key", None),
             model=settings.llm_model,
             timeout=settings.llm_timeout_seconds,
         )

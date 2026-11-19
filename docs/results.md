@@ -43,9 +43,9 @@ All models were evaluated under **identical conditions**:
 
 | Model / Deployment Target | Hardware Spec | VRAM Footprint | Latency p50 | Latency p95 | Avg Tokens (In/Out) | Cost / Review | Monthly Spend (10,000 PRs) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Frontier API (Claude 3.5 Sonnet)** | Cloud API | Serverless | `251.5 ms` | `283.6 ms` | 2,240 / 185 | **`$0.01334`** | **$150.00** |
-| **Mid-Size API (Claude 3.5 Haiku)** | Cloud API | Serverless | `110.1 ms` | `127.8 ms` | 2,130 / 165 | **`$0.00335`** | **$26.80** |
-| **Base Qwen2.5-Coder-7B (vLLM)** | 1x A10G (24GB) | 16.2 GB | `67.9 ms` | `78.1 ms` | 1,980 / 215 | **`$0.00003`** | **$3.88** |
+| **Frontier API (Claude 3.5 Sonnet)** | Cloud API | Serverless | `251.5 ms` | `283.6 ms` | 2,240 / 185 | **`$0.01334`** | **$133.40** |
+| **Mid-Size API (Claude 3.5 Haiku)** | Cloud API | Serverless | `110.1 ms` | `127.8 ms` | 2,130 / 165 | **`$0.00335`** | **$33.50** |
+| **Base Qwen2.5-Coder-7B (vLLM)** | 1x A10G (24GB) | 16.2 GB | `67.9 ms` | `78.1 ms` | 1,980 / 215 | **`$0.00039`** | **$3.88** |
 | **Fine-Tuned 7B (vLLM BF16)** | 1x A100 (40GB) | 16.2 GB | `60.7 ms` | `68.8 ms` | 2,075 / 180 | **`$0.00098`** | **$9.80** |
 | **Fine-Tuned 7B (vLLM AWQ 4-bit) 🏆** | 1x A10G (24GB) | 5.8 GB | `40.5 ms` | `47.1 ms` | 2,070 / 175 | **`$0.00036`** | **$3.60** |
 | **Linter Baseline** | CPU process | < 100 MB | `0.0 ms` | `0.0 ms` | 0 / 0 | **$0.00000** | **$0.00** |

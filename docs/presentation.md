@@ -245,7 +245,7 @@
 
 ### Q2: "How do you justify your cost savings claim if some PRs escalate to Claude 3.5 Sonnet?"
 **Answer**:
-> "That was a critical insight we modeled explicitly. We derived the blended cost formula: $C_{\text{blended}} = (1 - e) C_{\text{local}} + e C_{\text{frontier}}$. At zero escalation, local AWQ serving is 37.1× cheaper at \$0.00036 per review. At our production escalation rate of 5%, where only massive diffs (>8,000 tokens across >10 files) escalate to Sonnet, the blended cost is \$0.00101 per review. That still delivers a **13.2× cost reduction**, saving over \$1,400 every 100,000 PRs while providing frontier reasoning where it matters most."
+> "That was a critical insight we modeled explicitly. We derived the blended cost formula: $C_{\text{blended}} = (1 - e) C_{\text{local}} + e C_{\text{frontier}}$. At zero escalation, local AWQ serving is 37.1× cheaper on tokens at \$0.00036 per review (token-only cost; dedicated GPU infrastructure amortizes separately). At our production escalation rate of 5%, where only massive diffs (>8,000 tokens across >10 files) escalate to Sonnet, the blended cost is \$0.00101 per review. That still delivers a **13.2× cost reduction**, saving over \$1,400 every 100,000 PRs while providing frontier reasoning where it matters most."
 
 ### Q3: "Why did you choose 25% for clean PRs in Negative SFT rather than 10% or 50%?"
 **Answer**:
@@ -254,3 +254,4 @@
 ### Q4: "Your test set has 120 PRs and your CI dev set has 40 PRs. Aren't your confidence intervals wide?"
 **Answer**:
 > "Yes, and we explicitly document this in our threats to validity! On the 40-PR CI regression subset, there are only 11 clean PRs, which creates a wide 95% bootstrap confidence interval of [0.1000, 0.6667] for clean false positive rate. That is why we do not use the 40-PR subset for final claims. Our definitive benchmark was evaluated on the frozen 120-PR test set with 1,000 paired bootstrap iterations, tightening the 95% confidence interval for F1 to [0.8926, 0.9592]."
+

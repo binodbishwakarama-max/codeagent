@@ -7,7 +7,7 @@ Provides high-precision, sub-millisecond pattern checks for:
 4. Bare Exception Blocks (CWE-391 / STD-ERR-01 / ERR-001)
 
 Used both as an offline fallback when zero LLM credentials are configured,
-and as a pre-LLM fast pass to guarantee deterministic detection of critical
+and as a pre-LLM fast pass for deterministic detection of critical
 antipatterns with zero token cost.
 """
 

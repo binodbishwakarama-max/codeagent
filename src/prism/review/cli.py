@@ -16,9 +16,10 @@ import httpx
 
 from prism.config import ReviewPipelineSettings, Settings
 from prism.github.diff import parse_unified_diff
-from prism.models import FileDiff, IssueCategory, ReviewFinding, ReviewResult, Severity
+from prism.models import ReviewResult
 from prism.review.llm import create_llm_client
 from prism.review.pipeline import PRContext, review_pr
+from prism.review.rules_engine import evaluate_rules as evaluate_deterministic_rules
 from prism.review.standards import load_default_standards, parse_repo_standards
 
 
@@ -135,9 +136,6 @@ def get_local_git_diff_against_base(base_ref: str = "main") -> tuple[str, str]:
     return get_local_git_diff(staged=False)
 
 
-from prism.review.rules_engine import evaluate_rules as evaluate_deterministic_rules
-
-
 def print_review_report(result: ReviewResult, repo: str, pr_identifier: str, dry_run: bool) -> None:
     """Pretty-print the review output and telemetry summary to stdout."""
     print("=" * 80)
@@ -150,8 +148,7 @@ def print_review_report(result: ReviewResult, repo: str, pr_identifier: str, dry
     print("=" * 80)
 
     if not result.findings:
-        print("\n [OK] Clean Pull Request! No standards violations or security issues detected.")
-        print("      (Verified Clean PR • 25% Negative SFT Silence Guarantee)\n")
+        print("\n [OK] Clean Pull Request! No standards violations or security issues detected.\n")
     else:
         print(f"\nIdentified {len(result.findings)} actionable finding(s):\n")
         for idx, finding in enumerate(result.findings, 1):
@@ -230,8 +227,8 @@ async def execute_review(
                 findings=findings,
                 model="deterministic-standards-v1",
                 prompt_version="rules-engine",
-                input_tokens=len(raw_diff) // 3,
-                output_tokens=len(findings) * 50,
+                input_tokens=0,
+                output_tokens=0,
                 latency_ms=elapsed,
                 cost_usd=0.0,
             )
@@ -243,8 +240,8 @@ async def execute_review(
             findings=findings,
             model="deterministic-standards-v1",
             prompt_version="rules-engine",
-            input_tokens=len(raw_diff) // 3,
-            output_tokens=len(findings) * 50,
+            input_tokens=0,
+            output_tokens=0,
             latency_ms=elapsed,
             cost_usd=0.0,
         )

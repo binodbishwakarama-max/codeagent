@@ -38,7 +38,7 @@ from evals.harness.metrics import (
 )
 from evals.harness.report import generate_run_report
 from prism.github.diff import parse_unified_diff as _prism_parse_unified_diff
-from prism.models import DiffLine, FileDiff, Hunk, ReviewFinding, ReviewResult
+from prism.models import FileDiff, ReviewFinding, ReviewResult
 
 logger = logging.getLogger(__name__)
 

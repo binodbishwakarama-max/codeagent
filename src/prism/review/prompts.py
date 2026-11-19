@@ -140,11 +140,15 @@ def render_diff_with_line_numbers(file_diffs: list[FileDiff]) -> str:
             diff_text.append(f"@@ -{hunk.old_start} +{hunk.new_start} @@")
             for line in hunk.lines:
                 if line.kind == "add":
-                    diff_text.append(f"L{line.new_no:4d} [+] {line.text}")
+                    line_str = f"L{line.new_no:4d}" if line.new_no is not None else "     "
+                    diff_text.append(f"{line_str} [+] {line.text}")
                 elif line.kind == "del":
-                    diff_text.append(f"L{line.old_no:4d} [-] {line.text}")
+                    line_str = f"L{line.old_no:4d}" if line.old_no is not None else "     "
+                    diff_text.append(f"{line_str} [-] {line.text}")
                 else:
-                    diff_text.append(f"L{line.new_no:4d} [ ] {line.text}")
+                    line_num = line.new_no if line.new_no is not None else line.old_no
+                    line_str = f"L{line_num:4d}" if line_num is not None else "     "
+                    diff_text.append(f"{line_str} [ ] {line.text}")
         diff_text.append("")
 
     return "\n".join(diff_text)

@@ -9,8 +9,6 @@ from prism.models import DiffLine, FileDiff, Hunk, IssueCategory, Severity
 from prism.review.llm import FakeLLMClient
 from prism.review.pipeline import PRContext, review_pr
 from prism.review.rules_engine import (
-    DEFAULT_RULES,
-    DeterministicRule,
     check_bare_except,
     check_hardcoded_secrets,
     check_missing_timeout,

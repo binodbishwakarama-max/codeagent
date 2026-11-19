@@ -180,99 +180,15 @@ async def _review_chunk(
         prompt_variant=prompt_variant,
     )
 
-    active_trace = get_current_trace()
     async with semaphore:
-        if active_trace is not None:
-            async with active_trace.span(
-                name="llm_call:review_chunk",
-                span_type="generation",
-                model=model_name,
-                prompt_version=prompt_ver,
-                metadata={"chunk_files": [f.path for f in chunk]},
-            ) as span_node:
-                try:
-                    response, usage = await llm_client.complete_structured(
-                        system=SYSTEM_PROMPT,
-                        user=user_prompt,
-                        schema=ChunkReviewResponse,
-                        timeout=timeout,
-                    )
-                    findings = response.findings
-                except Exception as initial_error:
-                    logger.warning(
-                        "LLM review on chunk failed (%s); retrying with repair prompt",
-                        initial_error,
-                    )
-                    repair_prompt = build_repair_prompt(
-                        malformed_output=str(initial_error),
-                        error_detail=str(initial_error),
-                    )
-                    full_prompt = f"{user_prompt}\n\n{repair_prompt}"
-                    try:
-                        repair_response, repair_usage = await llm_client.complete_structured(
-                            system=SYSTEM_PROMPT,
-                            user=full_prompt,
-                            schema=ChunkReviewResponse,
-                            timeout=timeout,
-                        )
-                        findings, usage = repair_response.findings, repair_usage
-                    except Exception as repair_error:
-                        logger.error(
-                            "Repair prompt also failed (%s); returning empty findings for chunk",
-                            repair_error,
-                        )
-                        fallback_usage = LLMUsage(
-                            input_tokens=0,
-                            output_tokens=0,
-                            cost_usd=0.0,
-                            latency_ms=0.0,
-                            model=model_name,
-                        )
-                        return [], fallback_usage
-                span_node.input_tokens = usage.input_tokens
-                span_node.output_tokens = usage.output_tokens
-                span_node.cost_usd = usage.cost_usd
-        else:
-            try:
-                response, usage = await llm_client.complete_structured(
-                    system=SYSTEM_PROMPT,
-                    user=user_prompt,
-                    schema=ChunkReviewResponse,
-                    timeout=timeout,
-                )
-                findings = response.findings
-            except Exception as initial_error:
-                logger.warning(
-                    "LLM review on chunk failed (%s); retrying with repair prompt",
-                    initial_error,
-                )
-                repair_prompt = build_repair_prompt(
-                    malformed_output=str(initial_error),
-                    error_detail=str(initial_error),
-                )
-                full_prompt = f"{user_prompt}\n\n{repair_prompt}"
-                try:
-                    repair_response, repair_usage = await llm_client.complete_structured(
-                        system=SYSTEM_PROMPT,
-                        user=full_prompt,
-                        schema=ChunkReviewResponse,
-                        timeout=timeout,
-                    )
-                    findings, usage = repair_response.findings, repair_usage
-                except Exception as repair_error:
-                    # Never raise on malformed output: return empty list for this chunk
-                    logger.error(
-                        "Repair prompt also failed (%s); returning empty findings for chunk",
-                        repair_error,
-                    )
-                    fallback_usage = LLMUsage(
-                        input_tokens=0,
-                        output_tokens=0,
-                        cost_usd=0.0,
-                        latency_ms=0.0,
-                        model=model_name,
-                    )
-                    return [], fallback_usage
+        findings, usage = await _invoke_llm_with_repair(
+            llm_client=llm_client,
+            user_prompt=user_prompt,
+            timeout=timeout,
+            model_name=model_name,
+            prompt_ver=prompt_ver,
+            chunk_files=[f.path for f in chunk],
+        )
 
         if redis_client is not None:
             cache_payload = {
@@ -289,6 +205,81 @@ async def _review_chunk(
             )
 
         return findings, usage
+
+
+async def _invoke_llm_with_repair(
+    llm_client: LLMClient,
+    user_prompt: str,
+    timeout: float,
+    model_name: str,
+    prompt_ver: str,
+    chunk_files: list[str],
+) -> tuple[list[ReviewFinding], LLMUsage]:
+    """Call the LLM for a chunk review with automatic repair on malformed output.
+
+    Handles optional Langfuse tracing transparently — when a trace is active,
+    spans are recorded; otherwise the same logic runs without tracing overhead.
+    """
+    fallback_usage = LLMUsage(
+        input_tokens=0,
+        output_tokens=0,
+        cost_usd=0.0,
+        latency_ms=0.0,
+        model=model_name,
+    )
+
+    async def _try_complete() -> tuple[list[ReviewFinding], LLMUsage]:
+        """Execute initial call, then repair prompt if the first attempt fails."""
+        try:
+            response, usage = await llm_client.complete_structured(
+                system=SYSTEM_PROMPT,
+                user=user_prompt,
+                schema=ChunkReviewResponse,
+                timeout=timeout,
+            )
+            return response.findings, usage
+        except Exception as initial_error:
+            logger.warning(
+                "LLM review on chunk failed (%s); retrying with repair prompt",
+                initial_error,
+            )
+            repair_prompt = build_repair_prompt(
+                malformed_output=str(initial_error),
+                error_detail=str(initial_error),
+            )
+            full_prompt = f"{user_prompt}\n\n{repair_prompt}"
+            try:
+                repair_response, repair_usage = await llm_client.complete_structured(
+                    system=SYSTEM_PROMPT,
+                    user=full_prompt,
+                    schema=ChunkReviewResponse,
+                    timeout=timeout,
+                )
+                return repair_response.findings, repair_usage
+            except Exception as repair_error:
+                logger.error(
+                    "Repair prompt also failed (%s); returning empty findings for chunk",
+                    repair_error,
+                )
+                return [], fallback_usage
+
+    active_trace = get_current_trace()
+    if active_trace is not None:
+        async with active_trace.span(
+            name="llm_call:review_chunk",
+            span_type="generation",
+            model=model_name,
+            prompt_version=prompt_ver,
+            metadata={"chunk_files": chunk_files},
+        ) as span_node:
+            findings, usage = await _try_complete()
+            span_node.input_tokens = usage.input_tokens
+            span_node.output_tokens = usage.output_tokens
+            span_node.cost_usd = usage.cost_usd
+    else:
+        findings, usage = await _try_complete()
+
+    return findings, usage
 
 
 async def _execute_context_retrieval(

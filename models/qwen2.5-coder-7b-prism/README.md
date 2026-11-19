@@ -29,10 +29,17 @@ Fine-tuned version of `Qwen/Qwen2.5-Coder-7B-Instruct` optimized for automated, 
 - **Architecture**: Qwen2.5-Coder-7B-Instruct with QLoRA adapter
 - **LoRA Rank**: $r = 32$, $\alpha = 64$ (targeting all linear attention & MLP projections)
 - **Training Objective**: Instruction-tuned on multi-file unified diffs with exact line-number localization
-- **False-Positive Suppression**: Trained with balanced 25% clean PRs to enforce silence on defect-free code
+- **False-Positive Suppression**: Trained with balanced 25% clean PRs to suppress false positives on defect-free code
 - **Output Format**: Structured JSON adhering strictly to `ChunkReviewResponse` schema
 
-## Evaluation Results (Dev Set Benchmark)
+## Evaluation Results (Dev Set — Training Validation)
+
+> [!NOTE]
+> These are **development set** metrics measured during training. Final benchmark
+> results on the held-out frozen test split (120 PRs from `trpc/trpc` and `vitejs/vite`)
+> are reported in the main project [README](../../README.md) and differ significantly
+> due to different data distributions and post-training quantization (AWQ 4-bit).
+
 - **F1 Score**: `0.8613`
 - **Precision**: `0.7620`
 - **Recall**: `0.9780`
